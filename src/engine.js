@@ -3,6 +3,7 @@
  * Geometry only; no tablebases, position files, chess engine or network requests.
  */
 import { legalMoves, applyMove, inCheck, findKing, distance, coords, opposite, outcome } from './chess.js';
+import { chooseProofPattern } from './proof-policy.js';
 
 function extraPiece(board){return board.find(p=>p && p[1]!=='K')||null;}
 function edgeDistance(square){const [x,y]=coords(square);return Math.min(x,7-x,y,7-y);}
@@ -54,9 +55,11 @@ function minimax(board,turn,material,computer,depth,alpha,beta){
   }
   return best;
 }
-export function chooseMove(state,computerColor){
+export function chooseDecision(state,computerColor){
   const moves=legalMoves(state.board,state.turn);
   if(state.turn!==computerColor||!moves.length)return null;
+  const proof=chooseProofPattern(state,computerColor,moves);
+  if(proof)return proof;
   const rookGame=state.material==='krk' && extraPiece(state.board)?.[1]==='R';
   // Depth-two adversarial replies; no precomputed position evaluations.
   const depth=rookGame?2:1;
@@ -69,6 +72,8 @@ export function chooseMove(state,computerColor){
     if(rookGame && outcome(board,opposite(state.turn)).kind==='mate')value+=10000;
     if(value>bestScore){bestScore=value;best=move;}
   }
-  return best;
+  return {move:best,origin:'experimental-heuristic',rule:'local minimax fallback',
+    reason:'No locally implemented proof-construction branch covers this turn; independent geometric evaluation and lookahead choose a legal move. Not certified.'};
 }
-export function strategyLabel(material){return material==='krk'?'Experimental rook geometry + shallow adversarial search':'Any legal move (dead-position theorem)';}
+export function chooseMove(state,computerColor){return chooseDecision(state,computerColor)?.move || null;}
+export function strategyLabel(material){return material==='krk'?'Proof-pattern moves where implemented; EXPERIMENTAL fallback elsewhere':'Any legal move (dead-position theorem)';}
