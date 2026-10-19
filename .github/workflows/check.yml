@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      statuses: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,3 +21,31 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright
       - run: npx playwright install --with-deps chromium
       - run: node scripts/browser-qa.mjs
+
+      # Report the completed test job to the commit's public status API. This
+      # makes browser QA visible without confusing Vercel deployment with CI.
+      - name: Publish Node and Chromium QA status
+        if: ${{ always() && github.event_name == 'push' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECK_RESULT: ${{ job.status }}
+        run: |
+          node --input-type=module <<'EOF'
+          const state = process.env.CHECK_RESULT === 'success' ? 'success' : 'failure';
+          const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/statuses/${process.env.GITHUB_SHA}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              authorization: `Bearer ${process.env.GH_TOKEN}`,
+              accept: 'application/vnd.github+json',
+              'x-github-api-version': '2022-11-28'
+            },
+            body: JSON.stringify({
+              state,
+              context: 'Playground Node + Chromium QA',
+              description: state === 'success' ? 'Unit tests, syntax, build and Chromium browser QA passed' : 'One or more Node/Chromium QA steps failed',
+              target_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            })
+          });
+          if (!response.ok) throw Error(`Cannot publish CI status: ${response.status} ${await response.text()}`);
+          EOF
