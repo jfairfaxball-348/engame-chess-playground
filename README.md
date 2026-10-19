@@ -57,7 +57,7 @@ S003 implemented explicit 8-row/8-column equal-track board geometry, locally dra
 
 The aim is an attractive, accessible chessboard for interacting with **already known, verified results**—not a place to make further mathematical discoveries.
 
-## S004 interaction QA — partial pass, drag failure observed
+## S004/S005 browser verification
 
 S004 fixed two user-input risks found in code review: re-rendering the entire board could lose keyboard focus, and an elapsed-time 350 ms drag-click suppression could block a legitimate immediate click. After S004, square/palette/control focus is restored after re-render, drag suppression consumes only a synthetic drag click, cancellation clears the drag ghost, and a persistent polite screen-reader live region announces status and setup errors. Visible inset focus styling was also added.
 
@@ -70,7 +70,7 @@ npx playwright install --with-deps chromium
 node scripts/browser-qa.mjs
 ```
 
-The owner's browser check accepted the S003 appearance. After S004, [GitHub Actions run #35](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39285471688) **passed** unit tests, JS syntax, build, geometry/click/opponent flow at all five widths and keyboard focus, but **failed** on mouse drag (two-move timeout). The enlarged S005 browser test includes event tracing to diagnose that failure. CI and Vercel deployment must be checked independently; a deployed site is not proof of passing Chromium QA.
+The owner's browser check accepted the S003 appearance. S004 [run #35](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39285471688) passed unit/check/build and geometry, but initially failed a **raw mouse test that was targeting an offscreen square**. S005 fixed the test's scroll-before-drag requirement and an actual keyboard focus-restoration bug. The corrected S005 [GitHub Actions run #39304665312](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39304665312) is **fully green**: Node tests, syntax, build, mouse drag, Chrome touch drag, keyboard, editor and all five viewport geometries. This is browser automation on a GitHub Ubuntu runner, not a physical Android or Safari test. CI and Vercel deployment are reported separately.
 
 ## S005 — controls, navigation and editor
 
@@ -78,4 +78,4 @@ S005 added a single keyboard Tab stop for the board, displayed-orientation-aware
 
 The editor has individually named piece/Erase controls with selected state, a flip-orientation button that never swaps colours, and clear validation. Move history distinguishes **You** versus **Opponent**.
 
-S005 extended CI to cover these controls and to publish an explicit **Playground Node + Chromium QA** GitHub commit status in addition to Vercel's deployment status. Real-device Android/pen, Firefox and Safari have not yet been independently verified. See `docs/ROADMAP.md` and `NEXT_SESSION.md` for the outstanding browser verification and S006 handoff.
+S005 extended CI to cover these controls and to publish an explicit **Playground Node + Chromium QA** GitHub commit status in addition to Vercel's deployment status. The completed test suite is green; real-device Android/pen, Firefox and Safari have not yet been independently verified. See [S005 QA report](docs/S005_QA_REPORT.md), `docs/ROADMAP.md` and `NEXT_SESSION.md` for evidence and the S006 handoff.
