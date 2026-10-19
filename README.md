@@ -1,56 +1,53 @@
 # Endgame Chess Playground
 
-An independent, minimal browser chess playground inspired by **frozen mathematical endgame results** from [engame-chess](https://github.com/jfairfaxball-348/engame-chess).
+A standalone browser playground that turns **completed, formally verified, frozen and owner-approved endgame-chess mathematics** into a playable opponent. This repo is **not a research project**: new mathematics, proofs, strategy discovery, theorem freezing and ultra-weak chess solving happen only in [the main endgame-chess repository](https://github.com/jfairfaxball-348/engame-chess).
 
-**This is a separate implementation, not an extension of the research proof system.** It never fetches from the research repository at runtime, uses no chess engine or tablebase, and does not import Lean modules. The research project's UWS (ultra-weak solution) objectives, frozen artifacts, governance and next-session schedule are unaffected.
+**Release direction is strictly one-way:** endgame-chess finishes and freezes a result → owner approves its import → this repo implements a fully local, independently tested opponent for that exact scope. There is no runtime import, lookup or sync. No prebuilt chess engine, Stockfish, Syzygy, model API or remote move selection.
 
-## Run locally / Vercel
+## What can I play now?
 
-Node 20+; no npm dependencies, API keys, secrets, subscriptions or backend.
+| Material | Upstream source | Playground |
+| --- | --- | --- |
+| K vs K | EC-T0003 | Available — any legal move |
+| K+B vs K | EC-T0004 | Available — any legal move |
+| K+N vs K | EC-T0005 | Available — any legal move |
+| K+R vs K | Partial scope EC-T0019 | **Coming later: NOT PLAYABLE** until main KRK work is properly finished and the owner expressly authorises release |
+
+K/K+B/K+N are *dead-position classes*. FIDE Article 5.2.2 normally ends such a game immediately; the playground deliberately allows further moves to demonstrate the mathematics. This is **exploration**, not a normal FIDE tournament game. The virtual halfmove/repetition history begins at an artificial local starting point, not a certified historic chess game.
+
+KRK was previously exposed using incomplete proof-guided move patterns and an experimental heuristic. At the owner's direction that policy has now been **removed**, not merely renamed. The class remains visible as coming later but cannot be selected for play, including through `newGame`. The old S002 audit is historical and superseded by the binding [AGENTS.md](AGENTS.md).
+
+## Using the web app
+
+1. Choose one of the three available material classes; KRK is locked.
+2. Choose your colour and side to move, arrange the pieces in a locally legal position, and start.
+3. Select a piece and destination to move it; the locally implemented adversary plays the other colour. Drag-and-drop and a visual overhaul are the **next scheduled session**, not current functionality.
+4. Edit/reset and play again. The board flips when you play Black.
+
+The position editor checks local chess geometry, not proof that the position can be reached from the standard initial setup.
+
+## Local development / Vercel
+
+No npm dependencies, credentials, subscriptions or backend. Node 20+:
 
 ```sh
-npm run dev       # http://localhost:3000
-npm test          # rules and engine tests
-npm run check     # JavaScript syntax checks
-npm run build     # static dist/ ready for Vercel
+npm run dev       # local site: http://localhost:3000
+npm test          # rules, release gate and adversary tests
+npm run check     # JS syntax
+npm run build     # copy static app to dist/
 ```
 
-Vercel: **New Project → Import Git Repository → `jfairfaxball-348/engame-chess-playground`**. Root directory `/`; Framework: Other; Build command: `npm run build`; Output directory: `dist` (also defined in `vercel.json`). Git integration deploys future `main` changes automatically. No environment variables.
+Vercel import: `jfairfaxball-348/engame-chess-playground`. Framework Other, root `/`, build `npm run build`, output `dist` (also in `vercel.json`). Ordinary Git integration can automatically deploy `main`; no runtime variables.
 
-## Using the app
+## Source of truth and files
 
-1. Choose one of the **locally implemented** classes: K vs K, K+B vs K, K+N vs K, or K+R vs K.
-2. Select your colour and side to move; use the piece palette to put exactly the required material anywhere on the board.
-3. **Start playing** after a static-legality check. The board flips when playing Black. Choose a piece then a highlighted legal destination; the adversarial engine always plays the opposite colour.
-4. Return to the editor, reset, or choose another class. Move history displays all plies.
+- [AGENTS.md](AGENTS.md): **binding upstream-only and KRK hold** rules; explicit owner release gate.
+- [NEXT_SESSION.md](NEXT_SESSION.md): full next session, currently **S003 usability / chessboard overhaul only**.
+- [docs/ROADMAP.md](docs/ROADMAP.md): engineering milestones.
+- `src/chess.js`: locally implemented movement/legality, material availability and game-state rules.
+- `src/engine.js`: available dead-class demonstration move selector, no heuristic or upstream runtime lookup.
+- `src/app.js`, `src/styles.css`: current interface.
+- `test/chess.test.js`: gameplay geometry, availability gate, no-external-engine checks.
+- [S002 historical move audit](docs/S002_MOVE_FIDELITY_AUDIT.md): audit of now-withdrawn experimental KRK prototype; **not an active policy**.
 
-The validator checks legal local geometry (king separation, side-who-just-moved cannot be in check, and exactly the prescribed material). It **does not certify retrograde reachability from the standard chess initial position**. Such a certificate is intentionally out of scope for the first UI.
-
-## Honesty about proof / engine status
-
-| Material | Frozen mathematical source | What the playground does | Status of LIVE move selection |
-| --- | --- | --- | --- |
-| K vs K | EC-T0003 | First legal move, independent of scoring | Dead-position theorem; no strategy needed |
-| K+B vs K | EC-T0004 | First legal move, independent of scoring | Dead-position theorem; no strategy needed |
-| K+N vs K | EC-T0005 | First legal move, independent of scoring | Dead-position theorem; no strategy needed |
-| K+R vs K | EC-T0019 | Individual source-anchored construction moves, followed by local heuristic fallback when no construction matches | **Partially proof-guided; complete selector NOT formalised/verified** |
-
-The first three material classes are **immediately drawn under FIDE Article 5.2.2**. The UI deliberately suspends that automatic termination in *mathematical exploration mode* so pieces can be moved and the geometry observed. A bishop or knight can be captured and the result is still a dead king-only position. For play demonstrations, the static state starts at a halfmove counter of 0; fivefold repetition and 75-move automatic draw termination are simulated, but real prior history is not available. Do not mistake exploration for a normal FIDE game.
-
-The engine displays the **rule and provenance of every engine move**. `proof-pattern` means we reimplemented a concrete geometric witness from a frozen lemma, **not** that the entire JavaScript selector is a verified Lean strategy. `experimental-heuristic` means no reimplemented proof-construction rule matched and ordinary independent minimax was used. See [S002 fidelity audit](docs/S002_MOVE_FIDELITY_AUDIT.md) and [local source-pinned rules](src/proof-policy.js). The rules are pegged to EC-T0019 proof-source commit `4acc3e8638a916f329788d4c2b5f0db6f2c9bf67`; they never fetch this code at runtime.
-
-The frozen KRK result is a **clock-free forcing theorem subject to its exact hypotheses**. It establishes existence of winning play against all legal replies, not an executable selector for the winning move, nor FIDE halfmove/repetition-history parity. The playground's move-selection heuristic may make errors or fail to force mate. The code must never claim otherwise. No lookup of Syzygy or any chess database is permitted.
-
-## Architecture and programme boundaries
-
-- `src/chess.js`: local rules/movement/attack maps, legality, game outcomes, move history.
-- `src/proof-policy.js`: individually source-anchored KRK geometric witness patterns, with precise rule identifiers; still an unverified JavaScript implementation.
-- `src/engine.js`: delegates first to local proof patterns, then exposes an explicitly experimental heuristic fallback.
-- `src/app.js`: single-page interactive editor/play UI.
-- `src/styles.css`: responsive board / panel styles.
-- `test/chess.test.js`: Node builtin tests including proof-witness controls, policy provenance, adversarial samples and offline-only import checks.
-- `.github/workflows/check.yml`: GitHub Actions gate for tests, JavaScript checks and production build.
-- `docs/ROADMAP.md`: staged development and proof-fidelity ladder.
-- `NEXT_SESSION.md`: installed handover, separate from the UWS research repo.
-
-No external script/CDN, no accounts, tracking, model API or runtime network lookups. All game logic runs in the browser. The MIT licence is in `LICENSE`.
+The aim is an attractive, accessible chessboard for interacting with **already known, verified results**—not a place to make further mathematical discoveries.
