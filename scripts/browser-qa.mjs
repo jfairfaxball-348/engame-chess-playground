@@ -155,7 +155,7 @@ async function main(){
             },true);
         });
         await drag(page,4,3);
-        if(await page.locator('.move-row').count()!==2){
+        if(await page.locator('.move-row').count()===0){
           console.error('Mouse drag diagnostics',JSON.stringify(await page.evaluate(()=>({
             trace:window.__dragTrace,
             moves:document.querySelector('.moves')?.textContent,
@@ -227,6 +227,15 @@ async function main(){
       try{
         await fresh(page);
         await page.locator('#start').click();
+        await sq(page,4).scrollIntoViewIfNeeded();
+        await page.evaluate(()=>{
+          window.__touchTrace=[];
+          for(const type of ['pointerdown','pointermove','pointerup','pointercancel','touchstart','touchmove','touchend','click'])
+            document.getElementById('app').addEventListener(type,e=>{
+              if(window.__touchTrace.length<80)
+                window.__touchTrace.push([type,e.target.closest?.('[data-sq]')?.dataset.sq,e.clientX,e.clientY,e.pointerId]);
+            },true);
+        });
         const from=await sq(page,4).boundingBox(),to=await sq(page,3).boundingBox();
         const pt=r=>({x:r.x+r.width/2,y:r.y+r.height/2});
         const a=pt(from),z=pt(to);
@@ -235,6 +244,15 @@ async function main(){
         for(let i=1;i<=6;i++)await cdp.send('Input.dispatchTouchEvent',{
           type:'touchMove',touchPoints:[{x:a.x+(z.x-a.x)*i/6,y:a.y+(z.y-a.y)*i/6}]});
         await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+        if(await page.locator('.move-row').count()===0){
+          console.error('Touch drag diagnostics',JSON.stringify(await page.evaluate(()=>({
+            trace:window.__touchTrace,
+            moves:document.querySelector('.moves')?.textContent,
+            notice:document.querySelector('.validation')?.textContent,
+            source:document.querySelector('[data-sq="4"]')?.textContent,
+            selected:document.querySelector('.sq.selected')?.dataset.sq
+          }))));
+        }
         await ensureMoves(page,2,'actual CDP touchscreen drag');
         assert.equal(await page.locator('.drag-ghost').count(),0);
         console.log('PASS actual Chrome touchscreen drag at 390px');
