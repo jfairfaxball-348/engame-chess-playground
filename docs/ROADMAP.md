@@ -33,15 +33,15 @@ No mathematical changes and NO KRK release.
 - [x] Preserve local engine policy, setup validation, orientation, turn choices, game history, reset, and the disabled KRK button.
 - [x] Added UI-oriented pure-helper and static CSS/interaction regression tests. **Browser-level QA is pending S004**; CI runs test/check/build. No claim of verified zero CLS or Android drag/drop without browser measurement.
 
-## S004 — CI result observed, browser drag regression outstanding
+## S004 — historical browser QA failure, diagnosed and closed in S005
 
 - [x] Corrected stale synthetic drag-click suppression, focus retention and live status announcements.
 - [x] Installed real Chromium QA at 320/360/390/768/1280 CSS px; all 64 squares were measured at each size.
 - [x] GitHub Actions run [#35](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39285471688) **actually passed** npm test, npm run check, npm run build and Chromium geometry/click flow at all five widths, plus keyboard focus.
-- [x] S005 traced the S004 drag timeout to **no pointer events generated** in headless Chromium, because the raw Playwright mouse helper targeted an off-viewport bottom-row square on the 1280×850 viewport. Corrected the helper to scroll source into view before measuring raw mouse coordinates and to drop outside the board while still inside the viewport. This is a **test-harness defect**, not demonstrated evidence of an app pointer-handler failure. A complete fresh browser run must still confirm the fix.
+- [x] S005 traced the S004 drag timeout to **no pointer events generated** in headless Chromium, because the raw Playwright mouse helper targeted an off-viewport bottom-row square on the 1280×850 viewport. Corrected the helper to scroll source into view before measuring raw mouse coordinates and to drop outside the board while still inside the viewport. This is a **test-harness defect**, not demonstrated evidence of an app pointer-handler failure. [S005 green Actions run #39304665312](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39304665312) now confirms the complete fix.
 - [ ] Independent manual examination of the current deployed Vercel revision is still outstanding. A successful Vercel deployment is not the same as a successful browser QA run.
 
-## S005 — player-facing usability implemented, final browser verification gated
+## S005 — completed implementation and verified Chromium CI
 
 - [x] One Tab stop on the chessboard; arrow navigation follows displayed white/black orientation. Enter/Space work via native buttons; Escape clears selection; focus is carried through rerenders.
 - [x] **Restart from this setup** creates a new game, clears repetition/halfmove/move history and cancels pending opponent timers. Does not modify the arranged setup or computer selector.
@@ -50,14 +50,14 @@ No mathematical changes and NO KRK release.
 - [x] Player/opponent separation in history without moving board geometry.
 - [x] Browser QA expanded to exercise keyboard arrows in both orientations, Escape, roving Tab, undo/restart, orientation flip and previous mouse/touch paths.
 - [x] CI now publishes a separate public Node+Chromium commit status, independent of Vercel's deployment status.
-- [ ] Verify a **completed green** GitHub Actions run for the corrected S005 browser test; prior red runs showed one keyboard focus bug fixed in app.js and the offscreen pointer harness bug fixed in browser-qa.mjs.
+- [x] [Actions run #39304665312](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39304665312) passed **npm test**, **npm run check**, **npm run build** and all Chromium integration tests, including 5 viewport geometries, mouse drag, CDP touch, keyboard, invalid editor and orientation. Prior red runs revealed a real focusin navigation target bug (fixed in app.js), plus a viewport-scroll flaw in the raw-mouse browser test (fixed in browser-qa.mjs). See [S005 QA report](S005_QA_REPORT.md).
 - [ ] Verify a physical Android device, Safari/WebKit, Firefox and pen interactions where possible.
 
-## NEXT — S006 input reliability and cross-browser polish
+## NEXT — S006 cross-browser input and undo/restart edge cases
 
-- [ ] Start with any S005 red CI result, especially the mouse-drag trace, and correct it. Require unit/check/build/Chromium all green before declaring regression resolved.
-- [ ] Inspect browser pointer capture/drop/click cancellation across mouse and touch; add stress cases with rapid move/restart/undo and resize.
-- [ ] Validate orientation, keyboard and layout at mobile/desktop sizes, plus optional Firefox/WebKit automation when available.
+- [x] Confirm latest S005 code green in GitHub Actions (verified on e9ab1a6). Any *new* CI failure in S006 must be triaged before release.
+- [ ] Add stress and race cases: rapid move/undo/restart, computer-first Black human, restart while engine reply is queued, capture and game-over undo; verify exact history/halfmove/repetition restoration.
+- [ ] Validate input, orientation, accessibility and board geometry across Firefox/WebKit where available; physical Android/touch/pen if feasible. Keep Chromium regression green.
 - [ ] Keep KRK blocked and released local opponent choice unchanged.
 
 ## Later
