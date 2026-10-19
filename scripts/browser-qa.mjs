@@ -171,7 +171,8 @@ async function main(){
         await page.locator('#start').click();
         await sq(page,4).scrollIntoViewIfNeeded();
         const pos=await page.locator('.chessboard').boundingBox();
-        await drag(page,4,{x:pos.x-15,y:pos.y-15});
+        const kingRect=await sq(page,4).boundingBox();
+        await drag(page,4,{x:pos.x-15,y:kingRect.y+kingRect.height/2});
         assert.equal(await page.locator('.move-row').count(),0,'out-of-board drop must not play');
         assert.equal(await sq(page,4).locator('.piece-icon').count(),1,'illegal drop preserves source piece');
         assert.equal(await page.locator('.drag-ghost').count(),0,'out-of-board ghost cleared');
