@@ -33,25 +33,35 @@ No mathematical changes and NO KRK release.
 - [x] Preserve local engine policy, setup validation, orientation, turn choices, game history, reset, and the disabled KRK button.
 - [x] Added UI-oriented pure-helper and static CSS/interaction regression tests. **Browser-level QA is pending S004**; CI runs test/check/build. No claim of verified zero CLS or Android drag/drop without browser measurement.
 
-## S004 — interaction fixes delivered, Chromium CI validation pending
+## S004 — CI result observed, browser drag regression outstanding
 
-- [x] Replace 350 ms click suppression with suppression scoped to the completed drag; cancellation permits immediate next click.
-- [x] Retain keyboard focus through board/palette/sidebar rerenders and add visible inset square focus.
-- [x] Add persistent `role=status` live announcement for turn/check/outcomes, editor validation and invalid actions.
-- [x] Add dependency-free production app with **temporary CI-only** Playwright Chromium tests measuring all 64 squares at 320/360/390/768/1280px and exercising mouse, touch, keyboard, editor, invalid drop and pointercancel.
-- [x] Fix previously failing `test/chess.test.js` assertion that confused CSS `last-from` with an external import; no relaxation of external-engine exclusion.
-- [ ] Confirm a **completed passing** GitHub Actions Chromium run; current commits queued when this session was documented.
-- [ ] Independently inspect the deployed Vercel revision in a browser; owner's earlier positive appearance check is acknowledged but not an S004 automated pass.
+- [x] Corrected stale synthetic drag-click suppression, focus retention and live status announcements.
+- [x] Installed real Chromium QA at 320/360/390/768/1280 CSS px; all 64 squares were measured at each size.
+- [x] GitHub Actions run [#35](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39285471688) **actually passed** npm test, npm run check, npm run build and Chromium geometry/click flow at all five widths, plus keyboard focus.
+- [ ] **Browser suite as a whole was NOT green:** mouse drag then timed out waiting for two plies. The S005 browser runner adds event trace and move diagnostics to isolate the failure. Do not claim drag QA resolved until a completed green run confirms it.
+- [ ] Independent manual examination of the current deployed Vercel revision is still outstanding. A successful Vercel deployment is not the same as a successful browser QA run.
 
-## NEXT — S005 game controls and editor ergonomics
+## S005 — player-facing usability implemented, final browser verification gated
 
-- [ ] Close any S004 browser/CI defects before new features.
-- [ ] Improve keyboard square navigation, restart/undo accessibility, orientation/editor controls and history presentation.
-- [ ] Add browser regression coverage for each addition. Continue holding KRK.
+- [x] One Tab stop on the chessboard; arrow navigation follows displayed white/black orientation. Enter/Space work via native buttons; Escape clears selection; focus is carried through rerenders.
+- [x] **Restart from this setup** creates a new game, clears repetition/halfmove/move history and cancels pending opponent timers. Does not modify the arranged setup or computer selector.
+- [x] **Undo turn** snapshots board, move log, repetition keys, halfmove clock, last-move indicator and decision explanation **before a human move**. It safely reverses that move and any subsequent engine reply; if the engine is still queued, the pending timer is cancelled. First automatic engine opening move cannot be individually undone. Undo stops at the initial human opportunity.
+- [x] Editor palette labels + selected state, Erase help, validation and independent flip-board control; choosing player colour initially aligns board orientation but flip never swaps piece colours.
+- [x] Player/opponent separation in history without moving board geometry.
+- [x] Browser QA expanded to exercise keyboard arrows in both orientations, Escape, roving Tab, undo/restart, orientation flip and previous mouse/touch paths.
+- [x] CI now publishes a separate public Node+Chromium commit status, independent of Vercel's deployment status.
+- [ ] Verify a **completed green** GitHub Actions run for S005; the older S004 mouse-drag failure cannot be waived.
+- [ ] Verify a physical Android device, Safari/WebKit, Firefox and pen interactions where possible.
 
-## Later usability work (not new mathematics)
+## NEXT — S006 input reliability and cross-browser polish
 
-- S005: game usability — arrow-key board navigation, accessible history and safe restart/undo, plus editor quality-of-life changes.
-- Future material releases **only as approved by the owner following completion upstream**. No automatic KRK roadmap, proof extraction schedule, heuristic milestones or deadline.
+- [ ] Start with any S005 red CI result, especially the mouse-drag trace, and correct it. Require unit/check/build/Chromium all green before declaring regression resolved.
+- [ ] Inspect browser pointer capture/drop/click cancellation across mouse and touch; add stress cases with rapid move/restart/undo and resize.
+- [ ] Validate orientation, keyboard and layout at mobile/desktop sizes, plus optional Firefox/WebKit automation when available.
+- [ ] Keep KRK blocked and released local opponent choice unchanged.
+
+## Later
+
+Further user-facing polish, accessibility and explicitly approved upstream material releases only. No speculative KRK import target or heuristic substitution.
 
 **Non-goals:** invent mathematics, improve parent proof, implement incomplete KRK strategy, use a prebuilt opponent, bulk tablebase lookup, claim full FIDE history correctness, or advance UWS through this repo.
