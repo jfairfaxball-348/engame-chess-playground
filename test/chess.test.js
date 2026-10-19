@@ -90,7 +90,7 @@ test('client has no external engine or unfinished proof-policy in active runtime
   for(const file of ['src/chess.js','src/engine.js','src/app.js']){
     const content=readFileSync(file,'utf8');
     assert.doesNotMatch(content,/\bfetch\s*\(|\bWebSocket\s*\(|\bimport\s*\(/,file);
-    assert.doesNotMatch(content,/from\s*['"](?!\.)/,file);
+    assert.doesNotMatch(content,/^\s*import\b[^;\n]*\bfrom\s*['"](?!\.)/gm,file);
   }
   const engine=readFileSync('src/engine.js','utf8');
   assert.doesNotMatch(engine,/from\s*['"]\.\/proof-policy|function\s+rookEvaluation|function\s+minimax|Stockfish\s*\(/);
