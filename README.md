@@ -21,8 +21,8 @@ KRK was previously exposed using incomplete proof-guided move patterns and an ex
 
 1. Choose one of the three available material classes; KRK is locked.
 2. Choose your colour and side to move, arrange the pieces in a locally legal position, and start.
-3. Select a piece and destination to move it; the locally implemented adversary plays the other colour. Drag-and-drop and a visual overhaul are the **next scheduled session**, not current functionality.
-4. Edit/reset and play again. The board flips when you play Black.
+3. Select a piece then its highlighted square **or drag it** to a legal destination (mouse, touch, or pen). The local opponent replies. Illegal drops do not change the game.
+4. In the editor, choose a piece and tap a square to place it, drag an existing piece to reposition it, or choose Erase. Start validates local legality. Reset restores the arrangement. The board flips when you play Black.
 
 The position editor checks local chess geometry, not proof that the position can be reached from the standard initial setup.
 
@@ -42,12 +42,17 @@ Vercel import: `jfairfaxball-348/engame-chess-playground`. Framework Other, root
 ## Source of truth and files
 
 - [AGENTS.md](AGENTS.md): **binding upstream-only and KRK hold** rules; explicit owner release gate.
-- [NEXT_SESSION.md](NEXT_SESSION.md): full next session, currently **S003 usability / chessboard overhaul only**.
+- [NEXT_SESSION.md](NEXT_SESSION.md): full next session, currently **S004 browser QA and interaction polish only**.
 - [docs/ROADMAP.md](docs/ROADMAP.md): engineering milestones.
 - `src/chess.js`: locally implemented movement/legality, material availability and game-state rules.
 - `src/engine.js`: available dead-class demonstration move selector, no heuristic or upstream runtime lookup.
-- `src/app.js`, `src/styles.css`: current interface.
+- `src/app.js`, `src/styles.css`: responsive board, input handlers and interface.
+- `src/pieces.js`: original local SVG piece drawings (no external sprites or font glyphs).
+- `src/board-ui.js`: screen-square orientation and pointer hit-test helpers.
+- `test/ui.test.js`: orientation, SVG and CSS geometry regression tests.
 - `test/chess.test.js`: gameplay geometry, availability gate, no-external-engine checks.
 - [S002 historical move audit](docs/S002_MOVE_FIDELITY_AUDIT.md): audit of now-withdrawn experimental KRK prototype; **not an active policy**.
+
+S003 implemented explicit 8-row/8-column equal-track board geometry, locally drawn SVG pieces, legal-move indicators, last-move and check highlights, click/touch selection and pointer drag with capture/cancellation. The geometry and modality smoke assertions run in Node; **real browser rectangle measurements and mobile gesture QA are required in S004** and must not be implied by the pure-helper tests.
 
 The aim is an attractive, accessible chessboard for interacting with **already known, verified results**—not a place to make further mathematical discoveries.
