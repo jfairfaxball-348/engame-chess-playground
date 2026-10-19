@@ -8,7 +8,7 @@
     "dev": "node scripts/dev-server.js",
     "build": "node scripts/build.js",
     "test": "node --test",
-    "check": "node --check src/chess.js && node --check src/proof-policy.js && node --check src/engine.js && node --check src/app.js"
+    "check": "node --check src/chess.js && node --check src/engine.js && node --check src/app.js"
   },
   "engines": { "node": ">=20" }
 }
