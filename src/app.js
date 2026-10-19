@@ -287,9 +287,12 @@ root.addEventListener('keydown',event=>{
   const delta={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[event.key];
   const r=Math.max(0,Math.min(7,screenRow+delta[0]));
   const c=Math.max(0,Math.min(7,screenCol+delta[1]));
-  focusSquare=squareForCell(r,c,orientation);
+  // render restores the old focused square, which fires focusin; keep the
+  // navigation target in a local so that focusin cannot overwrite it.
+  const targetSquare=squareForCell(r,c,orientation);
+  focusSquare=targetSquare;
   render();
-  root.querySelector('[data-sq="'+focusSquare+'"]')?.focus({preventScroll:true});
+  root.querySelector('[data-sq="'+targetSquare+'"]')?.focus({preventScroll:true});
 });
 root.addEventListener('pointerdown',pointerDown);
 root.addEventListener('pointermove',pointerMove);
