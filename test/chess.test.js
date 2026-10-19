@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MATERIAL, makeBoard, initialSetup, validateSetup, squareAt, attacks, legalMoves, newGame, play, outcome, distance, findKing, positionKey } from '../src/chess.js';
-import { chooseMove, strategyLabel } from '../src/engine.js';
+import { chooseMove, chooseDecision, strategyLabel } from '../src/engine.js';
+import { PROOF_SOURCE } from '../src/proof-policy.js';
+import { readFileSync } from 'node:fs';
 const sq=squareAt;
 
 test('supports exactly four independent research classes',()=>assert.deepEqual(Object.keys(MATERIAL),['kk','kbk','knk','krk']));
@@ -63,4 +65,77 @@ test('rook checkmate is detected as terminal',()=>{
  // White Kc7 and Ra1 versus Black Ka8: rook gives check along a-file; king guards b8.
  assert.equal(validateSetup(b,'krk','b'),null);
  assert.deepEqual(outcome(b,'b'),{kind:'mate',winner:'w'});
+});
+
+test('proof source is pinned to the frozen KRK verification commit',()=>{
+ assert.equal(PROOF_SOURCE.theorem,'EC-T0019');
+ assert.equal(PROOF_SOURCE.commit,'4acc3e8638a916f329788d4c2b5f0db6f2c9bf67');
+});
+function three(whiteKing,rook,blackKing,turn='w'){
+ const b=makeBoard();
+ b[sq(...whiteKing)]='wK'; b[sq(...rook)]='wR'; b[sq(...blackKing)]='bK';
+ assert.equal(validateSetup(b,'krk',turn),null);
+ return newGame(b,turn,'krk');
+}
+test('clear-entry witness follows the frozen geometry, not numerical scoring',()=>{
+ const d=chooseDecision(three([4,0],[0,0],[4,7]),'w');
+ assert.equal(d.origin,'proof-pattern');
+ assert.match(d.rule,/krk_clear_vertical_entry_force/);
+ assert.deepEqual([d.move.from,d.move.to],[sq(0,0),sq(0,1)]);
+});
+test('rook-wall far-file move follows the frozen construction',()=>{
+ const d=chooseDecision(three([4,0],[1,2],[2,7]),'w');
+ assert.equal(d.origin,'proof-pattern');
+ assert.match(d.rule,/krk_wall_rook_move/);
+ assert.deepEqual([d.move.from,d.move.to],[sq(1,2),sq(7,2)]);
+});
+test('wall rank advance comes from the rescue lemma with its two-file premise',()=>{
+ const d=chooseDecision(three([4,0],[0,2],[4,6]),'w');
+ assert.equal(d.origin,'proof-pattern');
+ assert.match(d.rule,/krk_rank_advance_rescue/);
+ assert.deepEqual([d.move.from,d.move.to],[sq(0,2),sq(0,3)]);
+});
+test('same-rank positive setup selects proven backwards king witness',()=>{
+ const d=chooseDecision(three([4,3],[0,3],[4,7]),'w');
+ assert.equal(d.origin,'proof-pattern');
+ assert.match(d.rule,/krk_same_rank_retreat_force/);
+ assert.deepEqual([d.move.from,d.move.to],[sq(4,3),sq(4,2)]);
+});
+test('lone king takes free rook instead of conceding a phantom forced mate',()=>{
+ const d=chooseDecision(three([7,7],[1,1],[1,0],'b'),'b');
+ assert.equal(d.origin,'proof-pattern');
+ assert.match(d.rule,/capture obstruction/);
+ assert.deepEqual([d.move.from,d.move.to],[sq(1,0),sq(1,1)]);
+ assert.deepEqual(play(three([7,7],[1,1],[1,0],'b'),d.move).board.filter(Boolean).sort(),['bK','wK']);
+});
+test('immediate checkmate is chosen as explicit finite-rank terminal base case',()=>{
+ const d=chooseDecision(three([2,6],[1,0],[0,7]),'w');
+ assert.equal(d.origin,'proof-pattern');
+ assert.match(d.rule,/actual-mate base case/);
+ assert.equal(outcome(play(three([2,6],[1,0],[0,7]),d.move).board,'b').kind,'mate');
+});
+test('unimplemented rook branches are marked experimental, not proof-certified',()=>{
+ const d=chooseDecision(three([4,0],[0,1],[4,2]),'w');
+ assert.equal(d.origin,'experimental-heuristic');
+ assert.match(d.reason,/Not certified/);
+});
+test('dead classes genuinely use an arbitrary legal move rather than an engine evaluation',()=>{
+ for(const mat of ['kk','kbk','knk']){
+  const state=newGame(initialSetup(mat),'w',mat);
+  const d=chooseDecision(state,'w');
+  assert.equal(d.origin,'dead-position-choice');
+  assert.deepEqual([d.move.from,d.move.to],
+    [legalMoves(state.board,'w')[0].from,legalMoves(state.board,'w')[0].to]);
+ }
+});
+test('runtime has no external engine, package dependency or network search path',()=>{
+ const files=['src/chess.js','src/proof-policy.js','src/engine.js','src/app.js'];
+ for(const p of files){
+  const contents=readFileSync(p,'utf8');
+  assert.doesNotMatch(contents,/\bfetch\s*\(|\bWebSocket\s*\(|\bimport\s*\(/,p);
+  assert.doesNotMatch(contents,/from\s*['"](?!\.)/,p);
+ }
+ const pkg=JSON.parse(readFileSync('package.json','utf8'));
+ assert.equal(pkg.dependencies,undefined);
+ assert.equal(pkg.devDependencies,undefined);
 });
