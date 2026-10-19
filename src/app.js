@@ -12,7 +12,13 @@ const CLASS_DESCRIPTION={
 const root=document.getElementById('app');
 let material='kk',human='w',toMove='w',setup=initialSetup(material),mode='editor';
 let active='wK',selected=null,game=null,notice='',busy=false,timeoutId=null,engineNote='',lastMove=null;
-let gesture=null,ignoreClickUntil=0;
+let gesture=null,suppressPointerClick=false;
+const announcer=document.createElement('div');
+announcer.className='sr-only';
+announcer.setAttribute('role','status');
+announcer.setAttribute('aria-live','polite');
+announcer.setAttribute('aria-atomic','true');
+root.after(announcer);
 const activeExtra=()=>MATERIAL[material].extra;
 const colorName=c=>c==='w'?'White':'Black';
 function clearPending(){if(timeoutId!==null)clearTimeout(timeoutId);timeoutId=null;busy=false;}
@@ -92,6 +98,8 @@ function clearGesture(){
 }
 function pointerDown(event){
   if(!event.isPrimary||event.button!==0||gesture)return;
+  // A fresh pointer gesture must never inherit click suppression from a previous drag.
+  suppressPointerClick=false;
   const node=event.target.closest('[data-sq]');
   if(!node||!root.contains(node))return;
   const from=Number(node.dataset.sq),piece=(mode==='editor'?setup:game?.board)?.[from];
@@ -126,14 +134,15 @@ function pointerUp(event){
   const to=board?squareAtPoint(board.getBoundingClientRect(),event.clientX,event.clientY,human):-1;
   clearGesture();
   if(!dragged)return; // Native click handles both tap and keyboard activation.
-  ignoreClickUntil=Date.now()+350;
+  suppressPointerClick=true;
   if(mode==='editor'){relocatePiece(from,to);return;}
   if(!commitMove(from,to)){selected=null;notice='Illegal drop — piece returned to its square.';render();}
 }
 function pointerCancel(event){
   if(gesture&&event.pointerId===gesture.pointerId){
     const dragged=gesture.dragged;clearGesture();
-    if(dragged){ignoreClickUntil=Date.now()+350;render();}
+    suppressPointerClick=false;
+    if(dragged)render();
   }
 }
 function status(){
@@ -167,6 +176,11 @@ function boardMarkup(){
   return cells.join('');
 }
 function render(){
+  // Replacing the board DOM otherwise discards keyboard focus on every turn.
+  if(gesture)clearGesture();
+  const focused=root.contains(document.activeElement)?document.activeElement:null;
+  const key=['data-sq','data-piece','data-class','id'].find(attr=>focused?.hasAttribute(attr));
+  const focusSelector=key?`[${key}="${focused.getAttribute(key)}"]`:null;
   const extra=activeExtra(),error=validateSetup(setup,material,toMove);
   const palette=['wK','bK',...(extra?[`w${extra}`,`b${extra}`]:[]),'erase'];
   const gameOver=mode==='playing'&&outcome(game.board,game.turn,game.history,game.halfmove).kind!=='ongoing';
@@ -211,14 +225,17 @@ function render(){
   root.querySelector('#start')?.addEventListener('click',launch);
   root.querySelector('#reset')?.addEventListener('click',()=>setMaterial(material));
   root.querySelector('#edit')?.addEventListener('click',startEditor);
+  if(focusSelector)root.querySelector(focusSelector)?.focus({preventScroll:true});
+  const announcement=notice||(mode==='editor'&&error)||status();
+  if(announcer.textContent!==announcement)announcer.textContent=announcement;
 }
 // Delegated events survive board rerenders; both inputs call commitMove()/play().
 root.addEventListener('click',event=>{
   const node=event.target.closest('[data-sq]');
   if(!node||!root.contains(node))return;
-  if(Date.now()<ignoreClickUntil){event.preventDefault();return;}
+  // Consume only the synthetic click following a completed drag, never a timed window.
+  if(suppressPointerClick&&event.detail!==0){suppressPointerClick=false;event.preventDefault();return;}
   interact(Number(node.dataset.sq));
-  if(event.detail===0)root.querySelector('[data-sq="'+node.dataset.sq+'"]')?.focus({preventScroll:true});
 });
 root.addEventListener('pointerdown',pointerDown);
 root.addEventListener('pointermove',pointerMove);
