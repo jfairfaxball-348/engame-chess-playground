@@ -6,7 +6,7 @@ const CLASS_DESCRIPTION={
   kk:'Neither king can deliver checkmate. Arbitrary legal movement preserves that fact.',
   kbk:'A lone bishop and king cannot produce checkmate. Losing the bishop leaves K vs K.',
   knk:'A checking knight cannot cover the orthogonal escapes of the defending king.',
-  krk:'Clock-free forcing is proved. Some move constructions are now copied as local rules; a complete verified playing selector does not yet exist.'
+  krk:'Not released here. Wait until endgame-chess finishes, verifies, freezes and approves the full relevant playing strategy.'
 };
 const root=document.getElementById('app');
 let material='kk',human='w',toMove='w',setup=initialSetup(material),mode='editor';
@@ -15,7 +15,7 @@ const activeExtra=()=>MATERIAL[material].extra;
 const colorName=c=>c==='w'?'White':'Black';
 function clearPending(){if(timeoutId!==null)clearTimeout(timeoutId);timeoutId=null;busy=false;}
 function startEditor(){clearPending();mode='editor';game=null;selected=null;notice='';engineNote='';render();}
-function setMaterial(id){if(!MATERIAL[id])return;clearPending();material=id;setup=initialSetup(material);toMove='w';active='wK';mode='editor';game=null;selected=null;notice='';engineNote='';render();}
+function setMaterial(id){if(!MATERIAL[id]?.playable)return;clearPending();material=id;setup=initialSetup(material);toMove='w';active='wK';mode='editor';game=null;selected=null;notice='';engineNote='';render();}
 function placePiece(square){
   if(active==='erase')setup[square]=null;
   else {
@@ -28,6 +28,7 @@ function placePiece(square){
   selected=null;notice='';render();
 }
 function launch(){
+  if(!MATERIAL[material]?.playable){notice='Material not yet released for playground play.';render();return;}
   const error=validateSetup(setup,material,toMove);
   if(error){notice=error;render();return;}
   try{game=newGame(setup,toMove,material);}catch(e){notice=e.message;render();return;}
@@ -42,7 +43,7 @@ function queueComputer(){
     busy=false;
     if(decision?.move){
       game=play(game,decision.move);
-      engineNote=decision.rule+' · '+decision.reason+' ['+(decision.origin==='experimental-heuristic'?'experimental, not proved':'source-guided choice, not a certified complete selector')+']';
+      engineNote=decision.rule+' · '+decision.reason+' [frozen dead-position result; demonstration move]';
     }
     selected=null;render();
   },340);
@@ -87,7 +88,6 @@ function boardMarkup(){
 }
 function render(){
   const extra=activeExtra(),error=validateSetup(setup,material,toMove);
-  const rook=material==='krk';
   const palette=['wK','bK',...(extra?[`w${extra}`,`b${extra}`]:[]),'erase'];
   const gameOver=mode==='playing'&&outcome(game.board,game.turn,game.history,game.halfmove).kind!=='ongoing';
   root.innerHTML=`<div class="shell">
@@ -100,7 +100,7 @@ function render(){
       </section>
       <aside class="sidebar">
         <div class="panel"><div class="section-head"><span class="label">01 / MATERIAL CLASS</span><span class="mini-tag">LOCAL PROOF REFERENCE</span></div>
-          <div class="class-grid">${Object.entries(MATERIAL).map(([id,d])=>`<button class="class-option ${material===id?'on':''}" data-class="${id}">${d.label}</button>`).join('')}</div>
+          <div class="class-grid">${Object.entries(MATERIAL).map(([id,d])=>`<button class="class-option ${material===id?'on':''}" data-class="${id}" ${d.playable?'':'disabled aria-disabled="true" title="Awaiting complete release from endgame-chess"'}>${d.label}${d.playable?'':' · Coming later'}</button>`).join('')}</div>
           <div class="theorem"><span class="small">${MATERIAL[material].theorem}</span><strong>${MATERIAL[material].outcome}</strong><p>${CLASS_DESCRIPTION[material]}</p></div>
         </div>
         <div class="panel"><div class="section-head"><span class="label">02 / SET UP THE MATCH</span></div>
@@ -113,9 +113,9 @@ function render(){
         </div>
         <div class="panel"><div class="section-head"><span class="label">03 / ENGINE & RULES</span></div>
           <div class="engine-pill">${strategyLabel(material)}</div>
-          <p class="explain">${rook?'The engine tries source-pinned, locally implemented KRK construction steps first. Other turns use a clearly disclosed experimental heuristic. Neither path is a formally verified complete selector.':'The main theorem rules out all legal checkmate continuations. No special move selection is necessary.'}</p>
+          <p class="explain">The released material classes are frozen dead-position results. The opponent uses any legal move; unfinished KRK material is not part of this playable engine.</p>
           ${mode==='playing'&&engineNote?`<p class="engine-explanation"><strong>Last engine decision:</strong> ${engineNote}</p>`:''}
-          <p class="rules-note">${rook?'Clock-free forcing is frozen for its stated domain; full FIDE-history and distance parity are not. This playground begins at halfmove 0.':'Exploration mode deliberately suspends FIDE’s immediate dead-position termination so you can keep moving. Mate remains impossible. Move-count and repetition limits are still demonstrated.'}</p>
+          <p class="rules-note">Exploration mode deliberately suspends FIDE’s immediate dead-position termination so you can move the pieces. It is not a normal tournament game. KRK is held back pending full upstream completion and explicit owner approval.</p>
         </div>
         <div class="panel history"><div class="section-head"><span class="label">04 / MOVE HISTORY</span><span class="mini-tag">${mode==='playing'?game.log.length:0} PLIES</span></div>
         <div class="moves">${mode==='playing'&&game.log.length?game.log.map((line,i)=>`<div class="move-row"><span>${i+1}</span><span>${line}</span></div>`).join(''):'<p class="empty">Moves appear here after starting.</p>'}</div>
