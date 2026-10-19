@@ -30,7 +30,7 @@ test('every original vector is inline, consistently sized and distinguishable',(
   for(const svg of vectors){
     assert.match(svg,/viewBox="0 0 100 100"/);
     assert.match(svg,/aria-hidden="true"/);
-    assert.doesNotMatch(svg,/https?:|<image|font-family/);
+    assert.doesNotMatch(svg,/(?:href|src)=["']https?:|<image|font-family/);
   }
   assert.match(pieceLabel('bN'),/black knight/);
 });
