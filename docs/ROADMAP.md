@@ -12,19 +12,19 @@
 - [x] Unit tests and deploy instructions.
 - [ ] Verify live Vercel deployment after importing the Git repo.
 
-## S002 — Adversarial UI audit
+## S002 — Adversarial move-fidelity audit (2026-10-19)
 
-- Test board interactions on phone + desktop, colour reversal, invalid setups and unusual edge/corner cases.
-- Add drag-and-drop placement if useful. Keep click-to-place and keyboard support.
-- Expand tests to random legal transitions and check/stalemate/capture/repetition scenarios.
-- Distinguish local legality from fully retrograde-reachable positions more rigorously.
+- [x] Audit all live move-selection paths for external engines, runtime tablebases, network dependencies and opaque score overlays. See `docs/S002_MOVE_FIDELITY_AUDIT.md`.\n- [x] Implement explicit source-pinned KRK geometric construction witnesses, separate from unverified fallback. Explain last engine decision in UI.\n- [x] Add witness/defender capture/geometry regression tests, property samples and GitHub Actions test/build gate.\n- [ ] Browser-device QA on phone + desktop, colour reversal, invalid setups and unusual edge/corner cases remains for live deployment.
+- [ ] Consider drag-and-drop placement. Retain click-to-place; check keyboard board navigation on deployed app.
+- [x] Extend deterministic tests and adversarial property samples for chosen proof patterns. **Sampling is not a correctness proof.**
+- [ ] Certify source/target kernel-semantic agreement and retrograde reachability where relevant; current UI only checks local legality.
 
-## S003 — Move-selection fidelity
+## S003 — Complete proof-strategy extraction (next)
 
-- Reimplement frozen KRK proof's explicit geometric constructions as a candidate deterministic policy; use proof labels and source citations inside local code.
-- Add an *explain this move* panel citing the exact local rule used (not a network proof lookup).
+- Finish extracting ALL frozen KRK forcing branches: wall advances, rook rescue, opposed-king checking, lower-band pursuit, tempo, all-defence continuations, axis transport and weak-turn classification. The S002 partial geometric witnesses must not be misrepresented as a complete policy.
+- Expand the implemented **last engine decision** explanation to a complete, locally auditable rule trace and per-position obligation checks, without network proof lookups.
 - No 'verified' strategy badge without a separate complete correctness theorem/proof, including all defensive replies and terminal cases.
-- Preserve fallback experimental heuristic as separately labelled, not as a proxy for the proof.
+- Track and shrink fallback coverage, and separately test every terminal, capture and legal defender reply. Preserve fallback as **experimental** until a complete strategy with correctness correspondence exists.
 
 ## S004+ — New material releases
 
