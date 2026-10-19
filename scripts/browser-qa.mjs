@@ -53,6 +53,10 @@ async function geometry(page,label,prior=null){
 }
 const sq=(page,n)=>page.locator('[data-sq="'+n+'"]');
 async function drag(page,from,to){
+  // page.mouse uses viewport coordinates and does NOT auto-scroll like
+  // locator.click(). On tall 786px boards the bottom king may be offscreen.
+  // The old QA thus generated zero pointer events and falsely failed drag.
+  await sq(page,from).scrollIntoViewIfNeeded();
   const a=await sq(page,from).boundingBox();
   const b=typeof to==='number' ? await sq(page,to).boundingBox() : to;
   assert.ok(a&&b);
@@ -165,6 +169,7 @@ async function main(){
         assert.equal(await page.locator('.drag-ghost').count(),0);
         await fresh(page);
         await page.locator('#start').click();
+        await sq(page,4).scrollIntoViewIfNeeded();
         const pos=await page.locator('.chessboard').boundingBox();
         await drag(page,4,{x:pos.x-15,y:pos.y-15});
         assert.equal(await page.locator('.move-row').count(),0,'out-of-board drop must not play');
