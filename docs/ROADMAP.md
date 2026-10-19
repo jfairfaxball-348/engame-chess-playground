@@ -1,39 +1,41 @@
-# Playground roadmap (independent of the main research programme)
+# Chess Playground — engineering roadmap
 
-**Purpose:** playable, proof-inspired demonstrations of the already-frozen endgame classes. This repository is an implementation branch, not an authority on endgame mathematics. No source import, submodule, runtime fetch, or automated syncing from `engame-chess`.
+## Binding direction
 
-## S001 bootstrap (this session)
+This repo **does not conduct chess research**. It translates **finished, formally verified, frozen, owner-approved** results in [endgame-chess](https://github.com/jfairfaxball-348/engame-chess) into a standalone opponent. The parent repo retains all the mathematical work, including its long-term UWS ambition. Any new playable endgame class requires the explicit gate in [AGENTS.md](../AGENTS.md). No chess engines, tablebases or proof-imitating heuristic policies.
 
-- [x] Zero-dependency static webapp, Vercel-compatible.
-- [x] Piece-placement editor, material selector, user colour, turn selector, orientation, legal move highlights.
-- [x] Local movement/attack legality for K/K+B/K+N/K+R, move history and game ending logic.
-- [x] Adversary always plays the opposite side (with a small visual delay).
-- [x] Explicit immediate-draw / exploration split for K, B, N; KRK strategy visibly experimental.
-- [x] Unit tests and deploy instructions.
-- [ ] Verify live Vercel deployment after importing the Git repo.
+**Current release:** K vs K / K+B vs K / K+N vs K, with arbitrary legal moves demonstrating their proved dead-position outcomes. **KRK is held back**, even though selected clock-free forcing results upstream are frozen; wait for the owner's approval after upstream KRK is properly finished.
 
-## S002 — Adversarial move-fidelity audit (2026-10-19)
+## Completed — S001 bootstrap
 
-- [x] Audit all live move-selection paths for external engines, runtime tablebases, network dependencies and opaque score overlays. See `docs/S002_MOVE_FIDELITY_AUDIT.md`.
-- [x] Implement explicit source-pinned KRK geometric construction witnesses, separate from unverified fallback. Explain last engine decision in UI.
-- [x] Add witness/defender capture/geometry regression tests, property samples and GitHub Actions test/build gate.
-- [ ] Browser-device QA on phone + desktop, colour reversal, invalid setups and unusual edge/corner cases remains for live deployment.
-- [ ] Consider drag-and-drop placement. Retain click-to-place; check keyboard board navigation on deployed app.
-- [x] Extend deterministic tests and adversarial property samples for chosen proof patterns. **Sampling is not a correctness proof.**
-- [ ] Certify source/target kernel-semantic agreement and retrograde reachability where relevant; current UI only checks local legality.
+- [x] Static, dependency-free Vercel-compatible app.
+- [x] Local legal move rules, material editor, move history, user colour and orientation.
+- [x] Support for demonstrated dead-position classes.
+- [x] Local browser opponent.
+- [x] Local tests.
 
-## S003 — Complete proof-strategy extraction (next)
+## Historical — S002 move fidelity audit
 
-- Finish extracting ALL frozen KRK forcing branches: wall advances, rook rescue, opposed-king checking, lower-band pursuit, tempo, all-defence continuations, axis transport and weak-turn classification. The S002 partial geometric witnesses must not be misrepresented as a complete policy.
-- Expand the implemented **last engine decision** explanation to a complete, locally auditable rule trace and per-position obligation checks, without network proof lookups.
-- No 'verified' strategy badge without a separate complete correctness theorem/proof, including all defensive replies and terminal cases.
-- Track and shrink fallback coverage, and separately test every terminal, capture and legal defender reply. Preserve fallback as **experimental** until a complete strategy with correctness correspondence exists.
+- [x] Audited and rejected prebuilt engines, online move selection and tablebase lookup.
+- [x] Identified that the *then-enabled* KRK strategy was only partial proof patterns plus experimental heuristic.
+- [x] Documented its limits in `docs/S002_MOVE_FIDELITY_AUDIT.md`.
+- [x] **Owner correction:** removed the partial KRK selector from runtime, disabled KRK play, and made the upstream completion + owner approval gate mandatory. Prior S002 prototype is not a released material class.
 
-## S004+ — New material releases
+## NEXT — S003 chessboard visual and interaction overhaul
 
-- Only add a new class after it is **formally verified and frozen in the parent repository**.
-- Copy/rederive the needed movement principles as local code; never reach into the parent repo.
-- Pin each release to its source theorem identifier, immutable git commit and reviewed interpretation.
-- Test every orientation, all legal defender replies, capture transitions and clock/history distinctions.
+No mathematical changes and NO KRK release.
 
-**Non-goals:** chess solving, moving the parent research ladder, a shared engine service, tablebase ingestion, claiming formal certification for JavaScript heuristics, or publishing unproved material outcomes as frozen.
+- [ ] Aim for a **familiar chess.com-style board experience**: muted green/cream checks, legible piece silhouettes, subtle last-move and legal-destination highlights, coherent orientation and coordinates, uncluttered controls. Do **not** copy chess.com source, trade dress, branded imagery or unlicensed sprites.
+- [ ] Make an 8 × 8 board with *mathematically fixed geometry*, exact equal squares, a fixed 1:1 responsive container, and pieces drawn as absolute-positioned fixed-percentage visual layers. Audit changes on move/selection, turns, history updates and captures for **zero board reflow or square resizing**. Unicode glyph font metrics in the existing UI are suspect.
+- [ ] Replace font-dependent Unicode chess glyphs with crisp consistently sized local vector piece assets that can be legally reused. Keep pieces out of grid track sizing; prevent animated image/loading size jumps and layout shift.
+- [ ] Support BOTH click-to-select/click-to-destination and drag-and-drop using pointer events (mouse, touch, pen) in active games; editor should also support click placement and drag repositioning of pieces, including removal/reset. Invalid drops snap back without changing game state. Continue highlighting legal destinations during interaction.
+- [ ] Make the board the primary content with a cleaner side panel / mobile layout; accessible sizes, keyboard navigation, screen-reader labels, responsive small screens (including Android), light/dark piece contrast.
+- [ ] Preserve local engine policy, setup validation, orientation, turn choices, game history, reset, and the disabled KRK button.
+- [ ] Add UI-oriented regression tests and where possible real browser QA; run `npm test`, `npm run check`, `npm run build`, assess Vercel and commit only within the playground.
+
+## Later usability work (not new mathematics)
+
+- S004: usability and accessibility follow-up from actual phone/desktop testing; optional arrows, last move, move list UX, stronger editor ergonomics.
+- Future material releases **only as approved by the owner following completion upstream**. No automatic KRK roadmap, proof extraction schedule, heuristic milestones or deadline.
+
+**Non-goals:** invent mathematics, improve parent proof, implement incomplete KRK strategy, use a prebuilt opponent, bulk tablebase lookup, claim full FIDE history correctness, or advance UWS through this repo.
