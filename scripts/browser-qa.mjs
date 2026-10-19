@@ -95,6 +95,14 @@ async function main(){
         await geometry(page,width+' after user move',b);
         await ensureMoves(page,2,width+' opponent response');
         await geometry(page,width+' after opponent',b);
+        assert.equal(await page.locator('#undo').isEnabled(),true);
+        await page.locator('#undo').click();
+        await ensureMoves(page,0,width+' undo restores pre-human game');
+        await geometry(page,width+' after undo',b);
+        await page.locator('#restart').click();
+        await ensureMoves(page,0,width+' restart resets history');
+        assert.equal(await page.locator('#undo').isDisabled(),true);
+        await geometry(page,width+' after restart',b);
         assert.equal(await page.locator('.drag-ghost').count(),0);
         assert.deepEqual(errors,[],width+' runtime errors');
         console.log('PASS geometry+click+computer @ '+width+'px, board '+b.width.toFixed(2)+'px');
@@ -113,6 +121,14 @@ async function main(){
         await sq(page,4).focus();
         await sq(page,4).press('Space');
         assert.equal(await page.evaluate(()=>document.activeElement?.dataset.sq),'4','keyboard selected focus retained');
+        assert.equal(await page.locator('.sq[tabindex="0"]').count(),1,'one board Tab stop');
+        await sq(page,4).press('ArrowLeft');
+        assert.equal(await page.evaluate(()=>document.activeElement?.dataset.sq),'3','white view left');
+        await sq(page,3).press('ArrowRight');
+        assert.equal(await page.evaluate(()=>document.activeElement?.dataset.sq),'4','white view right');
+        await sq(page,4).press('Escape');
+        assert.equal(await page.locator('.sq.selected').count(),0,'Escape deselects');
+        await sq(page,4).press('Space');
         const legal=page.locator('.sq:has(.hint)').first();
         const target=await legal.getAttribute('data-sq');
         assert.ok(target);
@@ -126,7 +142,24 @@ async function main(){
         await fresh(page);
         await page.locator('#start').click();
         b=await geometry(page,'mouse drag start');
+        await page.evaluate(()=>{
+          window.__dragTrace=[];
+          for(const type of ['pointerdown','pointermove','pointerup','pointercancel','click'])
+            document.getElementById('app').addEventListener(type,e=>{
+              if(window.__dragTrace.length<80)
+                window.__dragTrace.push([type,e.target.closest?.('[data-sq]')?.dataset.sq,e.clientX,e.clientY,e.pointerId]);
+            },true);
+        });
         await drag(page,4,3);
+        if(await page.locator('.move-row').count()!==2){
+          console.error('Mouse drag diagnostics',JSON.stringify(await page.evaluate(()=>({
+            trace:window.__dragTrace,
+            moves:document.querySelector('.moves')?.textContent,
+            notice:document.querySelector('.validation')?.textContent,
+            selection:document.querySelector('.sq.selected')?.dataset.sq,
+            squares:[...document.querySelectorAll('.sq .piece-icon')].length
+          }))));
+        }
         await ensureMoves(page,2,'mouse drag single move');
         await geometry(page,'mouse drag after turn',b);
         assert.equal(await page.locator('.drag-ghost').count(),0);
@@ -165,6 +198,14 @@ async function main(){
         await page.locator('#reset').click();
         await page.locator('#player').selectOption('b');
         await page.locator('#turn').selectOption('b');
+        await sq(page,60).focus();
+        await sq(page,60).press('ArrowLeft');
+        assert.equal(await page.evaluate(()=>document.activeElement?.dataset.sq),'61','black-view left');
+        await sq(page,61).press('ArrowRight');
+        assert.equal(await page.evaluate(()=>document.activeElement?.dataset.sq),'60','black-view right');
+        await page.locator('#flip').click();
+        assert.equal(await page.locator('.sq').first().getAttribute('data-sq'),'56','flip does not change colour');
+        await page.locator('#flip').click();
         b=await geometry(page,'black orientation editor');
         assert.equal(await page.locator('.sq').first().getAttribute('data-sq'),'7');
         await page.locator('#start').click();
