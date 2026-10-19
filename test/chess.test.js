@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MATERIAL, makeBoard, initialSetup, validateSetup, squareAt, attacks, legalMoves, newGame, play, outcome, distance, findKing, positionKey } from '../src/chess.js';
+import { MATERIAL, makeBoard, initialSetup, validateSetup, squareAt, attacks, legalMoves, newGame, play, applyMove, opposite, outcome, distance, findKing, positionKey } from '../src/chess.js';
 import { chooseMove, chooseDecision, strategyLabel } from '../src/engine.js';
 import { PROOF_SOURCE } from '../src/proof-policy.js';
 import { readFileSync } from 'node:fs';
@@ -138,4 +138,27 @@ test('runtime has no external engine, package dependency or network search path'
  const pkg=JSON.parse(readFileSync('package.json','utf8'));
  assert.equal(pkg.dependencies,undefined);
  assert.equal(pkg.devDependencies,undefined);
+});
+
+test('deterministic property sample: proof-pattern moves are legal and never hang the rook immediately',()=>{
+ let seed=987654321;
+ const rand=n=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return (seed>>>0)%n;};
+ let verified=0;
+ for(let i=0;i<1600;i++){
+  const [s,r,w]=[rand(64),rand(64),rand(64)];
+  if(new Set([s,r,w]).size!==3)continue;
+  const strong=i%2?'w':'b',weak=opposite(strong),board=makeBoard();
+  board[s]=strong+'K';board[r]=strong+'R';board[w]=weak+'K';
+  if(validateSetup(board,'krk',strong))continue;
+  const state=newGame(board,strong,'krk'),d=chooseDecision(state,strong);
+  assert.ok(d?.move);
+  assert.ok(legalMoves(board,strong).some(m=>m.from===d.move.from&&m.to===d.move.to));
+  if(d.origin==='proof-pattern'){
+   verified++;
+   const next=applyMove(board,d.move);
+   assert.notEqual(outcome(next,weak).kind,'stalemate');
+   assert.ok(!legalMoves(next,weak).some(m=>m.capture===strong+'R'));
+  }
+ }
+ assert.ok(verified>500,'The sample must exercise many mathematical construction branches');
 });
