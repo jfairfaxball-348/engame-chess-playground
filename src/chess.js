@@ -1,12 +1,14 @@
 /** The playground's deliberately limited, independent chess rules implementation.
  * No engine, tablebase, remote lookup or dependency. Board indices: a1=0, h8=63.
- * Scope: K v K, K+B v K, K+N v K, K+R v K. No pawns/castling/en-passant.
+ * Playable: K v K, K+B v K, K+N v K. KRK geometry remains for local rules tests only;
+ * KRK play is explicitly blocked pending an owner-approved, completed upstream release.
+ * No pawns/castling/en-passant.
  */
 export const MATERIAL = Object.freeze({
-  kk: { label: 'K vs K', extra: null, theorem: 'EC-T0003', outcome: 'Dead position' },
-  kbk: { label: 'K+B vs K', extra: 'B', theorem: 'EC-T0004', outcome: 'Dead position' },
-  knk: { label: 'K+N vs K', extra: 'N', theorem: 'EC-T0005', outcome: 'Dead position' },
-  krk: { label: 'K+R vs K', extra: 'R', theorem: 'EC-T0019', outcome: 'Clock-free forcing result' },
+  kk: { label: 'K vs K', extra: null, theorem: 'EC-T0003', outcome: 'Dead position', playable: true },
+  kbk: { label: 'K+B vs K', extra: 'B', theorem: 'EC-T0004', outcome: 'Dead position', playable: true },
+  knk: { label: 'K+N vs K', extra: 'N', theorem: 'EC-T0005', outcome: 'Dead position', playable: true },
+  krk: { label: 'K+R vs K', extra: 'R', theorem: 'EC-T0019', outcome: 'Awaiting complete parent-release approval', playable: false },
 });
 const KNIGHT = [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
 const KING = [[1,1],[1,0],[1,-1],[0,1],[0,-1],[-1,1],[-1,0],[-1,-1]];
@@ -123,6 +125,7 @@ export function play(state,move){
     log:state.log.concat(`${state.turn==='w'?'White':'Black'} ${moveNotation(state.board,allowed,board,turn)}`)};
 }
 export function newGame(board,turn,material){
+  if(!MATERIAL[material]?.playable) throw new Error('This material class is not released for playground play. Wait for completed, frozen upstream results and owner approval.');
   const problem=validateSetup(board,material,turn);if(problem)throw new Error(problem);
   return {board:board.slice(),turn,material,halfmove:0,history:[positionKey(board,turn)],log:[]};
 }
