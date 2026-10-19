@@ -14,7 +14,10 @@
 
 ## S002 — Adversarial move-fidelity audit (2026-10-19)
 
-- [x] Audit all live move-selection paths for external engines, runtime tablebases, network dependencies and opaque score overlays. See `docs/S002_MOVE_FIDELITY_AUDIT.md`.\n- [x] Implement explicit source-pinned KRK geometric construction witnesses, separate from unverified fallback. Explain last engine decision in UI.\n- [x] Add witness/defender capture/geometry regression tests, property samples and GitHub Actions test/build gate.\n- [ ] Browser-device QA on phone + desktop, colour reversal, invalid setups and unusual edge/corner cases remains for live deployment.
+- [x] Audit all live move-selection paths for external engines, runtime tablebases, network dependencies and opaque score overlays. See `docs/S002_MOVE_FIDELITY_AUDIT.md`.
+- [x] Implement explicit source-pinned KRK geometric construction witnesses, separate from unverified fallback. Explain last engine decision in UI.
+- [x] Add witness/defender capture/geometry regression tests, property samples and GitHub Actions test/build gate.
+- [ ] Browser-device QA on phone + desktop, colour reversal, invalid setups and unusual edge/corner cases remains for live deployment.
 - [ ] Consider drag-and-drop placement. Retain click-to-place; check keyboard board navigation on deployed app.
 - [x] Extend deterministic tests and adversarial property samples for chosen proof patterns. **Sampling is not a correctness proof.**
 - [ ] Certify source/target kernel-semantic agreement and retrograde reachability where relevant; current UI only checks local legality.
