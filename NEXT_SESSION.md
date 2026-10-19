@@ -1,20 +1,26 @@
-# NEXT SESSION — S005: Player controls, editor ergonomics and accessible navigation
+# NEXT SESSION — S006: Reliable drag/drop, browser QA and final interaction polish
 
-**Owner activation:** "run next session" means immediately execute S005 in **jfairfaxball-348/engame-chess-playground**. Read AGENTS.md, README.md, docs/ROADMAP.md, docs/S004_QA_REPORT.md, the complete active UI/engine source and existing tests. This is a practical webapp engineering session, not mathematical research. Do not modify the parent endgame-chess repo.
+**Owner activation:** "run next session" authorises immediate execution of S006 in **jfairfaxball-348/engame-chess-playground**. First read AGENTS.md, README.md, docs/ROADMAP.md, the complete app/engine/UI sources, tests and the most recent CI logs/status. This is a practical webapp development session, not a chess-mathematics session. Do **not** modify the parent endgame-chess repository.
 
-## Mandatory release boundaries
+## Immutable scope and policy
 
-Playable K/K+B/K+N are demonstration classes with arbitrary legal choices justified by their completed dead-position theorems. **KRK remains disabled (MATERIAL.krk.playable=false)**. Do not import it until the upstream strategy is truly complete, proved, verified, frozen and expressly approved by the owner. No prebuilt chess engines, tablebases, remote runtime lookups, chess-solving heuristics or invented mathematical work.
+Play only owner-approved, completed, verified and frozen upstream dead-position classes **K/K+B/K+N**. Preserve `MATERIAL.krk.playable=false`, `newGame('krk')` blocked, `chooseDecision('krk')===null`. KRK remains on hold until upstream completion **and** explicit owner approval. No Stockfish, Syzygy, external engines, minimax, unproved heuristics, online move selection, API endpoints or runtime sync with research. The opponent still uses only the released local legal-move demonstration selector.
 
-## Priority order
+## Highest-priority gate: make actual browser QA green
 
-1. **Finish S004 verification first.** Inspect the newest GitHub Actions run, correct any syntax/unit/browser failure in S004 `scripts/browser-qa.mjs`, run npm test, npm run check, npm run build and browser suite to green. On 320/360/390/768/1280 viewports verify stable 64-cell square geometry. Report actual commands, platform and evidence. Do not assert an unobserved Vercel redeploy succeeded.
-2. **Keyboard board navigation.** Make the 8 × 8 grid practical without 64 Tab presses: arrow-key square movement that respects white/black orientation, Enter/Space activate selection and play, Escape cancels selection. Preserve sensible Tab stops and focus through game/computer rerenders. Keep clear per-square ARIA labels and live announcements for check, invalid moves, game end and edit validation.
-3. **Human-friendly game controls.** Provide a clear "Restart from this setup" in addition to "Edit/new game", resetting the full game state/history and cancelling queued opponent turns. Assess a safe "Undo turn" (human move + engine response, or correct partial turn) with explicit deterministic state snapshots; do not implement if legality/history will be inconsistent. Never change engine decision policy.
-4. **Editor ergonomics.** Improve piece palette labels and selected state, replacement/removal affordance, validation messages, first-to-move and black-colour orientation; provide a simple reverse-orientation control only if it stays consistent with play and does not swap chess colours. No illegal arrangement should start a game.
-5. **History usability and visual refinement.** Present turns with clear player/engine separation and restrained last-move indicators, particularly mobile. Board size and 1:1 square geometry must remain invariant through controls, selection, history, resize and move changes. Keep main board visually dominant.
-6. **Regression/integrity.** Extend executable browser tests for added controls and input modes. Assert that only approved material is playable, choosing KRK always fails, `chooseDecision('krk')` returns null, game decisions only come from the locally implemented released rules, and no third-party engine/network/tablebase code enters runtime. Run CI and (when observable) Vercel check.
+1. Inspect the latest GitHub Actions run and the separate **Playground Node + Chromium QA** commit status (do not mistake successful Vercel deployment for successful tests). Confirm `npm test`, `npm run check`, `npm run build` and `node scripts/browser-qa.mjs` individually.
+2. The previous S004 run #35 failed during **mouse drag** after unit/build/geometry/keyboard passed. S005 expanded browser QA with `Mouse drag diagnostics` logging pointerdown/move/up/cancel and click traces; inspect the first failing S005/S006 run, including the updated arrow-navigation fix. Diagnose and fix actual pointer dispatch, square targeting, capture loss or synthetic click behaviour. Correct application logic rather than simply weakening tests. Do not mask a broken mouse drag with an equivalent click.
+3. Require reproducible single-dispatch mouse drag to a legal square, correct snapback for illegal/outside drops, no residual drag ghost, a working immediate click after pointercancel, and working Chrome CDP touch drag on a 390px viewport. Test both board orientations and game/editor modes. All five width geometries 320/360/390/768/1280 must remain 8×8, squares equal, board stable before and after moves and controls.
+4. Verify keyboard roving Tab (only one active square Tab stop), arrows in both white- and black-bottom orientation, Enter/Space play, Escape deselect and focus preservation after rerenders, engine replies, restart, undo and flip. Explicitly investigate `focusin` event order and preserve navigation targets.
 
-## Exit and successor
+## Controls / edge cases
 
-Commit all scoped improvements to playground only; state exact SHAs, commands/results and untested environments. Update README and docs/ROADMAP.md. Install a full **S006** next-session prompt chosen from the largest remaining usability risk found during S005. Keep KRK on hold and do not set a speculative release date.
+5. Exercise repeated Undo turn: immediately after a human move but before engine reply, after computer reply, after captures, after game end and with human Black (computer opening). Check board, side to move, halfmove clock, repetition history, last-move overlay and explanation are restored exactly from the snapshot, never inferred. Restart from this setup must cancel pending timers, clear clocks/history/undoStack, retain the agreed editor setup and refuse invalid arrangements.
+6. Review piece selection/erase/replacement, illegal editor validation, orientation flipping without changing colours, selected-state feedback, mobile history and viewport stability. Verify all code is accessible with a real keyboard and touch (where CI offers it); explicitly report Firefox, Safari/WebKit, Android hardware or pen interaction not tested.
+
+## Release and documentation
+
+7. Fix the first CI failure, commit, then check the new **completed** Actions run and its logs; repeat until the suite is genuinely green, or precisely document an unavailable external test/blocker. Vercel deployment status and code/browser QA status must be reported separately. Do not claim local npm/Playwright runs if they only occurred in GitHub Actions.
+8. Keep README, AGENTS.md, docs/ROADMAP.md and a concise S006 QA report aligned to observed results. Commit all scoped changes to playground main. Install a complete **S007** successor prompt targeting the most important remaining player-facing reliability/usability gap (not upstream mathematics). Include exact commit SHA, tests and action/deployment links in closeout.
+
+This work must improve only the playing interface and its independently implemented released decision machinery; **do not advance, solve, unlock or schedule KRK**.
