@@ -76,4 +76,4 @@ export function chooseDecision(state,computerColor){
     reason:'No locally implemented proof-construction branch covers this turn; independent geometric evaluation and lookahead choose a legal move. Not certified.'};
 }
 export function chooseMove(state,computerColor){return chooseDecision(state,computerColor)?.move || null;}
-export function strategyLabel(material){return material==='krk'?'Proof-pattern moves where implemented; EXPERIMENTAL fallback elsewhere':'Any legal move (dead-position theorem)';}
+export function strategyLabel(material){return material==='krk'?'Proof-pattern moves where implemented; Experimental fallback elsewhere':'Any legal move (dead-position theorem)';}
