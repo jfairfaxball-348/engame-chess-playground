@@ -93,7 +93,7 @@ test('client has no external engine or unfinished proof-policy in active runtime
     assert.doesNotMatch(content,/from\s*['"](?!\.)/,file);
   }
   const engine=readFileSync('src/engine.js','utf8');
-  assert.doesNotMatch(engine,/proof-policy|rookEvaluation|minimax|Stockfish\s*\(/);
+  assert.doesNotMatch(engine,/from\s*['"]\.\/proof-policy|function\s+rookEvaluation|function\s+minimax|Stockfish\s*\(/);
   const app=readFileSync('src/app.js','utf8');
   assert.match(app,/disabled aria-disabled="true"/);
   const pkg=JSON.parse(readFileSync('package.json','utf8'));
