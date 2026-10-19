@@ -1,21 +1,21 @@
 import { MATERIAL, initialSetup, validateSetup, legalMoves, newGame, play, outcome, squareName, opposite } from './chess.js';
-import { chooseMove, strategyLabel } from './engine.js';
+import { chooseDecision, strategyLabel } from './engine.js';
 
 const PIECES={wK:'♔',bK:'♚',wB:'♗',bB:'♝',wN:'♘',bN:'♞',wR:'♖',bR:'♜'};
 const CLASS_DESCRIPTION={
   kk:'Neither king can deliver checkmate. Arbitrary legal movement preserves that fact.',
   kbk:'A lone bishop and king cannot produce checkmate. Losing the bishop leaves K vs K.',
   knk:'A checking knight cannot cover the orthogonal escapes of the defending king.',
-  krk:'A rook and king can force mate in the proven clock-free cases. Live move choices here are experimental, not formally verified.'
+  krk:'Clock-free forcing is proved. Some move constructions are now copied as local rules; a complete verified playing selector does not yet exist.'
 };
 const root=document.getElementById('app');
 let material='kk',human='w',toMove='w',setup=initialSetup(material),mode='editor';
-let active='wK',selected=null,game=null,notice='',busy=false,timeoutId=null;
+let active='wK',selected=null,game=null,notice='',busy=false,timeoutId=null,engineNote='';
 const activeExtra=()=>MATERIAL[material].extra;
 const colorName=c=>c==='w'?'White':'Black';
 function clearPending(){if(timeoutId!==null)clearTimeout(timeoutId);timeoutId=null;busy=false;}
-function startEditor(){clearPending();mode='editor';game=null;selected=null;notice='';render();}
-function setMaterial(id){if(!MATERIAL[id])return;clearPending();material=id;setup=initialSetup(material);toMove='w';active='wK';mode='editor';game=null;selected=null;notice='';render();}
+function startEditor(){clearPending();mode='editor';game=null;selected=null;notice='';engineNote='';render();}
+function setMaterial(id){if(!MATERIAL[id])return;clearPending();material=id;setup=initialSetup(material);toMove='w';active='wK';mode='editor';game=null;selected=null;notice='';engineNote='';render();}
 function placePiece(square){
   if(active==='erase')setup[square]=null;
   else {
@@ -31,16 +31,19 @@ function launch(){
   const error=validateSetup(setup,material,toMove);
   if(error){notice=error;render();return;}
   try{game=newGame(setup,toMove,material);}catch(e){notice=e.message;render();return;}
-  mode='playing';selected=null;notice='';render();queueComputer();
+  mode='playing';selected=null;notice='';engineNote='';render();queueComputer();
 }
 function queueComputer(){
   if(mode!=='playing'||!game||game.turn===human||outcome(game.board,game.turn,game.history,game.halfmove).kind!=='ongoing')return;
   busy=true;render();
   timeoutId=setTimeout(()=>{
     timeoutId=null;
-    const move=chooseMove(game,opposite(human));
+    const decision=chooseDecision(game,opposite(human));
     busy=false;
-    if(move)game=play(game,move);
+    if(decision?.move){
+      game=play(game,decision.move);
+      engineNote=decision.rule+' · '+decision.reason+' ['+(decision.origin==='experimental-heuristic'?'experimental, not proved':'source-guided choice, not a certified complete selector')+']';
+    }
     selected=null;render();
   },340);
 }
@@ -110,7 +113,8 @@ function render(){
         </div>
         <div class="panel"><div class="section-head"><span class="label">03 / ENGINE & RULES</span></div>
           <div class="engine-pill">${strategyLabel(material)}</div>
-          <p class="explain">${rook?'Rook moves use an independent, experimental heuristic with adversarial lookahead. This is NOT an extracted or verified Lean strategy.':'The main theorem rules out all legal checkmate continuations. No special move selection is necessary.'}</p>
+          <p class="explain">${rook?'The engine tries source-pinned, locally implemented KRK construction steps first. Other turns use a clearly disclosed experimental heuristic. Neither path is a formally verified complete selector.':'The main theorem rules out all legal checkmate continuations. No special move selection is necessary.'}</p>
+          ${mode==='playing'&&engineNote?`<p class="engine-explanation"><strong>Last engine decision:</strong> ${engineNote}</p>`:''}
           <p class="rules-note">${rook?'Clock-free forcing is frozen for its stated domain; full FIDE-history and distance parity are not. This playground begins at halfmove 0.':'Exploration mode deliberately suspends FIDE’s immediate dead-position termination so you can keep moving. Mate remains impossible. Move-count and repetition limits are still demonstrated.'}</p>
         </div>
         <div class="panel history"><div class="section-head"><span class="label">04 / MOVE HISTORY</span><span class="mini-tag">${mode==='playing'?game.log.length:0} PLIES</span></div>
