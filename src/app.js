@@ -11,6 +11,7 @@ const CLASS_DESCRIPTION={
 };
 const root=document.getElementById('app');
 let material='kk',human='w',toMove='w',setup=initialSetup(material),mode='editor';
+let orientation='w',focusSquare=4,undoStack=[];
 let active='wK',selected=null,game=null,notice='',busy=false,timeoutId=null,engineNote='',lastMove=null;
 let gesture=null,suppressPointerClick=false;
 const announcer=document.createElement('div');
@@ -22,8 +23,26 @@ root.after(announcer);
 const activeExtra=()=>MATERIAL[material].extra;
 const colorName=c=>c==='w'?'White':'Black';
 function clearPending(){if(timeoutId!==null)clearTimeout(timeoutId);timeoutId=null;busy=false;}
-function startEditor(){clearPending();mode='editor';game=null;selected=null;lastMove=null;notice='';engineNote='';render();}
-function setMaterial(id){if(!MATERIAL[id]?.playable)return;clearPending();material=id;setup=initialSetup(material);toMove='w';active='wK';mode='editor';game=null;selected=null;lastMove=null;notice='';engineNote='';render();}
+function snapshot(){
+  return {game:{...game,board:game.board.slice(),history:game.history.slice(),log:game.log.slice()},
+    lastMove:lastMove?{...lastMove}:null,engineNote};
+}
+function restartFromSetup(){
+  clearPending();
+  try{game=newGame(setup,toMove,material);}catch(e){notice=e.message;render();return;}
+  undoStack=[];mode='playing';selected=null;lastMove=null;engineNote='';notice='';
+  clearGesture();render();queueComputer();
+}
+function undoTurn(){
+  if(mode!=='playing'||!undoStack.length)return;
+  clearPending();clearGesture();
+  const previous=undoStack.pop();
+  game=previous.game;lastMove=previous.lastMove;engineNote=previous.engineNote;
+  selected=null;notice='Turn undone. You can choose a different move.';
+  render();
+}
+function startEditor(){clearPending();clearGesture();mode='editor';game=null;undoStack=[];selected=null;lastMove=null;notice='';engineNote='';render();}
+function setMaterial(id){if(!MATERIAL[id]?.playable)return;clearPending();clearGesture();material=id;setup=initialSetup(material);toMove='w';active='wK';mode='editor';game=null;undoStack=[];selected=null;lastMove=null;notice='';engineNote='';focusSquare=human==='w'?4:60;render();}
 function placePiece(square){
   if(active==='erase')setup[square]=null;
   else {
@@ -39,8 +58,7 @@ function launch(){
   if(!MATERIAL[material]?.playable){notice='Material not yet released for playground play.';render();return;}
   const error=validateSetup(setup,material,toMove);
   if(error){notice=error;render();return;}
-  try{game=newGame(setup,toMove,material);}catch(e){notice=e.message;render();return;}
-  mode='playing';selected=null;lastMove=null;notice='';engineNote='';render();queueComputer();
+  restartFromSetup();
 }
 function queueComputer(){
   if(mode!=='playing'||!game||game.turn===human||outcome(game.board,game.turn,game.history,game.halfmove).kind!=='ongoing')return;
@@ -62,6 +80,7 @@ function commitMove(from,to){
   if(outcome(game.board,game.turn,game.history,game.halfmove).kind!=='ongoing')return false;
   const candidate=legalMoves(game.board,human).find(m=>m.from===from&&m.to===to);
   if(!candidate)return false;
+  undoStack.push(snapshot());
   game=play(game,candidate);
   lastMove={from,to};
   selected=null;notice='';render();queueComputer();
@@ -124,14 +143,14 @@ function pointerMove(event){
   }
   g.ghost.style.left=event.clientX+'px';g.ghost.style.top=event.clientY+'px';
   const board=root.querySelector('.chessboard');
-  const target=board?squareAtPoint(board.getBoundingClientRect(),event.clientX,event.clientY,human):-1;
+  const target=board?squareAtPoint(board.getBoundingClientRect(),event.clientX,event.clientY,orientation):-1;
   root.querySelectorAll('.drop-target').forEach(node=>node.classList.remove('drop-target'));
   if(target>=0)root.querySelector('[data-sq="'+target+'"]')?.classList.add('drop-target');
 }
 function pointerUp(event){
   const g=gesture;if(!g||event.pointerId!==g.pointerId)return;
   const dragged=g.dragged,from=g.from,board=root.querySelector('.chessboard');
-  const to=board?squareAtPoint(board.getBoundingClientRect(),event.clientX,event.clientY,human):-1;
+  const to=board?squareAtPoint(board.getBoundingClientRect(),event.clientX,event.clientY,orientation):-1;
   clearGesture();
   if(!dragged)return; // Native click handles both tap and keyboard activation.
   suppressPointerClick=true;
@@ -162,12 +181,12 @@ function boardMarkup(){
     new Set(legalMoves(game.board,human).filter(m=>m.from===selected).map(m=>m.to)):new Set();
   const cells=[];
   for(let row=0;row<8;row++)for(let col=0;col<8;col++){
-    const sq=squareForCell(row,col,human);
+    const sq=squareForCell(row,col,orientation);
     const [file,rank]=[sq%8,Math.floor(sq/8)];
     const p=b[sq],isLight=(file+rank)%2===1;
     const check=mode==='playing'&&p===`${game.turn}K`&&inCheck(game.board,game.turn);
     const recent=lastMove&&(lastMove.from===sq?'last-from':lastMove.to===sq?'last-to':'');
-    cells.push(`<button type="button" class="sq ${isLight?'light':'dark'} ${selected===sq?'selected':''} ${recent||''} ${check?'in-check':''}" data-sq="${sq}" aria-pressed="${selected===sq}" aria-label="${squareName(sq)} ${pieceLabel(p)}${legal.has(sq)?', legal destination':''}">
+    cells.push(`<button type="button" class="sq ${isLight?'light':'dark'} ${selected===sq?'selected':''} ${recent||''} ${check?'in-check':''}" data-sq="${sq}" tabindex="${sq===focusSquare?0:-1}" aria-pressed="${selected===sq}" aria-label="${squareName(sq)} ${pieceLabel(p)}${legal.has(sq)?', legal destination':''}">
       ${pieceSVG(p)}
       ${legal.has(sq)?`<span class="hint ${p?'capture-hint':''}"></span>`:''}
       ${col===0?`<span class="ranklabel">${rank+1}</span>`:''}
@@ -189,8 +208,8 @@ function render(){
     <div class="layout">
       <section class="board-column">
         <div class="board-top"><span class="label">${mode==='editor'?'Arrange a position':'Your board'}</span><span class="status-dot">${status()}</span></div>
-        <div class="board-frame"><div class="chessboard" role="group" aria-label="Chessboard">${boardMarkup()}</div></div>
-        <div class="below-board"><span>${mode==='editor'?'Choose a piece to place. Drag a piece to reposition it.':'Tap to move or drag a piece. Dots mark legal moves.'}</span><span>${mode==='playing'?`Ply ${game.log.length} · Halfmoves ${game.halfmove}`:'8 × 8 · Chess'}</span></div>
+        <div class="board-frame"><div class="chessboard" role="group" aria-label="Chessboard. Arrow keys navigate squares, Enter or Space activates, Escape clears selection.">${boardMarkup()}</div></div>
+        <div class="below-board"><span>${mode==='editor'?'Choose a piece or Erase, then tap a square. Drag to reposition.':'Tap or drag to move · Arrow keys navigate · Escape clears selection.'}</span><span>${mode==='playing'?`Ply ${game.log.length} · Halfmoves ${game.halfmove}`:'8 × 8 · Chess'}</span></div>
       </section>
       <aside class="sidebar">
         <div class="panel"><div class="section-head"><span class="label">Material</span></div>
@@ -200,8 +219,12 @@ function render(){
         <div class="panel"><div class="section-head"><span class="label">Game setup</span></div>
           <div class="fieldrow"><label for="player">You play</label><select id="player" ${mode==='playing'?'disabled':''}><option value="w" ${human==='w'?'selected':''}>White</option><option value="b" ${human==='b'?'selected':''}>Black</option></select></div>
           <div class="fieldrow"><label for="turn">First to move</label><select id="turn" ${mode==='playing'?'disabled':''}><option value="w" ${toMove==='w'?'selected':''}>White</option><option value="b" ${toMove==='b'?'selected':''}>Black</option></select></div>
-          ${mode==='editor'?`<div class="palette">${palette.map(p=>`<button data-piece="${p}" class="palettepiece ${active===p?'on':''}" title="${p==='erase'?'Erase piece':(p[0]==='w'?'White ':'Black ')+({K:'king',B:'bishop',N:'knight',R:'rook'}[p[1]])}">${p==='erase'?'⌫':pieceSVG(p)}</button>`).join('')}</div>`:''}
-          ${mode==='editor'?`<button class="main-action" id="start">Start game →</button><button class="secondary-action" id="reset">Reset arrangement</button>`:`<button class="secondary-action" id="edit">Edit / new game</button>`}
+          <button class="secondary-action flip-control" id="flip" aria-label="Flip board orientation without changing chess colours">Flip board orientation ↕</button>
+          ${mode==='editor'?`<p class="palette-instruction">Select a piece to place or replace; Erase removes a piece.</p><div class="palette" role="group" aria-label="Position editor piece palette">${palette.map(p=>{
+            const label=p==='erase'?'Erase':pieceLabel(p);
+            return `<button type="button" data-piece="${p}" class="palettepiece ${active===p?'on':''}" aria-label="${label}" aria-pressed="${active===p}" title="${label}">${p==='erase'?'<span class="erase-icon">⌫</span>':pieceSVG(p)}<span class="palette-label">${label}</span></button>`;
+          }).join('')}</div>`:''}
+          ${mode==='editor'?`<button class="main-action" id="start">Start game →</button><button class="secondary-action" id="reset">Reset arrangement</button>`:`<button class="main-action" id="restart">Restart from this setup</button><button class="secondary-action" id="undo" ${undoStack.length?'':'disabled'}>Undo turn</button><button class="secondary-action" id="edit">Edit / new game</button>`}
           ${mode==='editor'&&error?`<p class="validation">${error}</p>`:''}
           ${notice?`<p class="validation">${notice}</p>`:''}
         </div>
@@ -212,7 +235,11 @@ function render(){
           <p class="rules-note">Exploration mode permits moves after a theoretical dead-position draw. KRK remains locked until its upstream strategy is finished and you approve it.</p>
         </div>
         <div class="panel history"><div class="section-head"><span class="label">Moves</span><span class="mini-tag">${mode==='playing'?game.log.length:0} PLIES</span></div>
-        <div class="moves">${mode==='playing'&&game.log.length?game.log.map((line,i)=>`<div class="move-row"><span>${i+1}</span><span>${line}</span></div>`).join(''):'<p class="empty">Moves appear here after starting.</p>'}</div>
+        <div class="moves" aria-label="Move history">${mode==='playing'&&game.log.length?game.log.map((line,i)=>{
+          const space=line.indexOf(' '),colour=line.slice(0,space),notation=line.slice(space+1);
+          const who=(colour==='White'?'w':'b')===human?'You':'Opponent';
+          return `<div class="move-row ${who==='You'?'human-move':'computer-move'}"><span class="move-index">${Math.floor(i/2)+1}${i%2?'…':'.'}</span><span class="move-player">${who} · ${colour}</span><strong>${notation}</strong></div>`;
+        }).join(''):'<p class="empty">Moves appear here after starting.</p>'}</div>
         ${gameOver?`<p class="game-over">${status()}</p>`:''}</div>
       </aside>
     </div><footer>Independent implementation · No tablebases, external chess engine, runtime GitHub calls or API keys · <a href="https://github.com/jfairfaxball-348/engame-chess" target="_blank" rel="noopener noreferrer">Parent research</a> is never modified</footer>
@@ -220,11 +247,14 @@ function render(){
 
   root.querySelectorAll('[data-class]').forEach(node=>node.addEventListener('click',()=>setMaterial(node.dataset.class)));
   root.querySelectorAll('[data-piece]').forEach(node=>node.addEventListener('click',()=>{active=node.dataset.piece;render();}));
-  root.querySelector('#player')?.addEventListener('change',e=>{human=e.target.value;render();});
+  root.querySelector('#player')?.addEventListener('change',e=>{human=e.target.value;orientation=human;focusSquare=human==='w'?4:60;render();});
   root.querySelector('#turn')?.addEventListener('change',e=>{toMove=e.target.value;render();});
   root.querySelector('#start')?.addEventListener('click',launch);
   root.querySelector('#reset')?.addEventListener('click',()=>setMaterial(material));
   root.querySelector('#edit')?.addEventListener('click',startEditor);
+  root.querySelector('#restart')?.addEventListener('click',restartFromSetup);
+  root.querySelector('#undo')?.addEventListener('click',undoTurn);
+  root.querySelector('#flip')?.addEventListener('click',()=>{orientation=opposite(orientation);render();});
   if(focusSelector)root.querySelector(focusSelector)?.focus({preventScroll:true});
   const announcement=notice||(mode==='editor'&&error)||status();
   if(announcer.textContent!==announcement)announcer.textContent=announcement;
@@ -236,6 +266,30 @@ root.addEventListener('click',event=>{
   // Consume only the synthetic click following a completed drag, never a timed window.
   if(suppressPointerClick&&event.detail!==0){suppressPointerClick=false;event.preventDefault();return;}
   interact(Number(node.dataset.sq));
+});
+root.addEventListener('focusin',event=>{
+  const sq=event.target.closest?.('[data-sq]');
+  if(sq)focusSquare=Number(sq.dataset.sq);
+});
+root.addEventListener('keydown',event=>{
+  const node=event.target.closest?.('[data-sq]');
+  if(!node)return;
+  if(event.key==='Escape'){
+    if(mode==='playing'&&selected!==null){event.preventDefault();selected=null;notice='Selection cleared.';render();}
+    return;
+  }
+  if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))return;
+  event.preventDefault();
+  const sq=Number(node.dataset.sq);
+  const rank=Math.floor(sq/8),file=sq%8;
+  const screenRow=orientation==='w'?7-rank:rank;
+  const screenCol=orientation==='w'?file:7-file;
+  const delta={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[event.key];
+  const r=Math.max(0,Math.min(7,screenRow+delta[0]));
+  const c=Math.max(0,Math.min(7,screenCol+delta[1]));
+  focusSquare=squareForCell(r,c,orientation);
+  render();
+  root.querySelector('[data-sq="'+focusSquare+'"]')?.focus({preventScroll:true});
 });
 root.addEventListener('pointerdown',pointerDown);
 root.addEventListener('pointermove',pointerMove);
