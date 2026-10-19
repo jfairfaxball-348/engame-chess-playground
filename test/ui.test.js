@@ -53,3 +53,21 @@ test('game UI keeps both modalities and material release gate visible',()=>{
   assert.match(app,/disabled aria-disabled="true"/);
   assert.doesNotMatch(app,/♔|♚|♗|♝|♘|♞|♖|♜/);
 });
+
+test('S005 keyboard focus and game actions remain local and release-gated',()=>{
+  const app=readFileSync('src/app.js','utf8');
+  const browser=readFileSync('scripts/browser-qa.mjs','utf8');
+  assert.match(app,/tabindex="\$\{sq===focusSquare\?0:-1\}"/);
+  assert.match(app,/root\.addEventListener\('keydown'/);
+  for(const key of ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Escape'])assert.ok(app.includes(key));
+  for(const id of ['restart','undo','flip'])assert.ok(app.includes('id="'+id+'"'));
+  assert.match(app,/undoStack\.push\(snapshot\(\)\)/);
+  assert.match(app,/clearPending\(\);clearGesture\(\)/);
+  assert.doesNotMatch(app,/game:newGame\(/); // snapshots preserve real state, not synthetic reseeding
+  assert.match(app,/game:\{\.\.\.game,board:game\.board\.slice\(\),history:game\.history\.slice\(\),log:game\.log\.slice\(\)\}/);
+  assert.match(browser,/Mouse drag diagnostics/);
+  assert.match(browser,/black-view left/);
+  assert.match(browser,/undo restores pre-human game/);
+  assert.match(browser,/after restart/);
+  assert.doesNotMatch(app,/\bfetch\s*\(|\bWebSocket\s*\(/);
+});
