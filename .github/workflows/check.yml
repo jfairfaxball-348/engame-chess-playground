@@ -12,7 +12,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - run: npm test
       - run: npm run check
       - run: npm run build
+      # Playwright is CI-only; the actual site still has zero dependencies.
+      - run: npm install --no-save --no-package-lock playwright
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/browser-qa.mjs
