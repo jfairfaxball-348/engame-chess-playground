@@ -42,7 +42,7 @@ Vercel import: `jfairfaxball-348/engame-chess-playground`. Framework Other, root
 ## Source of truth and files
 
 - [AGENTS.md](AGENTS.md): **binding upstream-only and KRK hold** rules; explicit owner release gate.
-- [NEXT_SESSION.md](NEXT_SESSION.md): full next session, currently **S004 browser QA and interaction polish only**.
+- [NEXT_SESSION.md](NEXT_SESSION.md): full next session, currently **S005 game controls and editor ergonomics only**.
 - [docs/ROADMAP.md](docs/ROADMAP.md): engineering milestones.
 - `src/chess.js`: locally implemented movement/legality, material availability and game-state rules.
 - `src/engine.js`: available dead-class demonstration move selector, no heuristic or upstream runtime lookup.
@@ -56,3 +56,18 @@ Vercel import: `jfairfaxball-348/engame-chess-playground`. Framework Other, root
 S003 implemented explicit 8-row/8-column equal-track board geometry, locally drawn SVG pieces, legal-move indicators, last-move and check highlights, click/touch selection and pointer drag with capture/cancellation. The geometry and modality smoke assertions run in Node; **real browser rectangle measurements and mobile gesture QA are required in S004** and must not be implied by the pure-helper tests.
 
 The aim is an attractive, accessible chessboard for interacting with **already known, verified results**—not a place to make further mathematical discoveries.
+
+## S004 interaction QA
+
+S004 fixed two user-input risks found in code review: re-rendering the entire board could lose keyboard focus, and an elapsed-time 350 ms drag-click suppression could block a legitimate immediate click. After S004, square/palette/control focus is restored after re-render, drag suppression consumes only a synthetic drag click, cancellation clears the drag ghost, and a persistent polite screen-reader live region announces status and setup errors. Visible inset focus styling was also added.
+
+An executable real-Chromium regression suite is in `scripts/browser-qa.mjs`: 320/360/390/768/1280px 64-square rectangle checks, board stability across turns, keyboard Enter/Space, mouse drag and outside-board drop, synthetic pointercancel + immediate click, editor move/reset/invalid Start, black orientation, and Chrome touch drag. GitHub Actions installs Playwright **only for CI**, keeping the shipped app dependency-free. To run manually:
+
+```sh
+npm test && npm run check && npm run build
+npm install --no-save --no-package-lock playwright
+npx playwright install --with-deps chromium
+node scripts/browser-qa.mjs
+```
+
+The owner's browser check accepted the S003 appearance. The S004 automated browser run and deployment recheck must be reported **separately from that visual acceptance**; do not infer a green CI result or a successful live redeploy from a queued run. See `docs/S004_QA_REPORT.md`.

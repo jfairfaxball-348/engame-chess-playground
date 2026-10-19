@@ -33,15 +33,25 @@ No mathematical changes and NO KRK release.
 - [x] Preserve local engine policy, setup validation, orientation, turn choices, game history, reset, and the disabled KRK button.
 - [x] Added UI-oriented pure-helper and static CSS/interaction regression tests. **Browser-level QA is pending S004**; CI runs test/check/build. No claim of verified zero CLS or Android drag/drop without browser measurement.
 
-## NEXT — S004 browser QA and usability polish
+## S004 — interaction fixes delivered, Chromium CI validation pending
 
-- [ ] Reproduce and measure board and square rectangles in live browser on desktop and mobile; check 1:1 aspect and 64 equal sizes over actions.
-- [ ] Test drag, click, touch, pointercancel, orientations, game transitions and keyboard; resolve actual issues.
-- [ ] Improve focus announcements, status and history presentation as guided by evidence. Keep scope UI-only and KRK locked.
+- [x] Replace 350 ms click suppression with suppression scoped to the completed drag; cancellation permits immediate next click.
+- [x] Retain keyboard focus through board/palette/sidebar rerenders and add visible inset square focus.
+- [x] Add persistent `role=status` live announcement for turn/check/outcomes, editor validation and invalid actions.
+- [x] Add dependency-free production app with **temporary CI-only** Playwright Chromium tests measuring all 64 squares at 320/360/390/768/1280px and exercising mouse, touch, keyboard, editor, invalid drop and pointercancel.
+- [x] Fix previously failing `test/chess.test.js` assertion that confused CSS `last-from` with an external import; no relaxation of external-engine exclusion.
+- [ ] Confirm a **completed passing** GitHub Actions Chromium run; current commits queued when this session was documented.
+- [ ] Independently inspect the deployed Vercel revision in a browser; owner's earlier positive appearance check is acknowledged but not an S004 automated pass.
+
+## NEXT — S005 game controls and editor ergonomics
+
+- [ ] Close any S004 browser/CI defects before new features.
+- [ ] Improve keyboard square navigation, restart/undo accessibility, orientation/editor controls and history presentation.
+- [ ] Add browser regression coverage for each addition. Continue holding KRK.
 
 ## Later usability work (not new mathematics)
 
-- S004: live browser QA and accessible usability refinements; optional arrows, history list UX and editor ergonomics.
+- S005: game usability — arrow-key board navigation, accessible history and safe restart/undo, plus editor quality-of-life changes.
 - Future material releases **only as approved by the owner following completion upstream**. No automatic KRK roadmap, proof extraction schedule, heuristic milestones or deadline.
 
 **Non-goals:** invent mathematics, improve parent proof, implement incomplete KRK strategy, use a prebuilt opponent, bulk tablebase lookup, claim full FIDE history correctness, or advance UWS through this repo.
