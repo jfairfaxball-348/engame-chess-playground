@@ -59,7 +59,8 @@ test('drawn classes never claim a verified rook strategy',()=>{
  assert.match(strategyLabel('krk'),/Experimental/);
 });
 test('rook checkmate is detected as terminal',()=>{
- const b=makeBoard();b[sq(2,5)]='wK';b[sq(0,6)]='wR';b[sq(0,7)]='bK';
- // White Kc6, Ra7; Black Ka8: Ra7 is not mate (black b8 may escape); test only nonterminal.
- assert.equal(outcome(b,'b').kind,'ongoing');
+ const b=makeBoard();b[sq(2,6)]='wK';b[sq(0,0)]='wR';b[sq(0,7)]='bK';
+ // White Kc7 and Ra1 versus Black Ka8: rook gives check along a-file; king guards b8.
+ assert.equal(validateSetup(b,'krk','b'),null);
+ assert.deepEqual(outcome(b,'b'),{kind:'mate',winner:'w'});
 });
