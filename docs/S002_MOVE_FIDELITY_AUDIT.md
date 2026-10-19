@@ -1,5 +1,7 @@
 # S002 — Move-selection fidelity and no-external-engine audit (2026-10-19)
 
+> **HISTORICAL RECORD — SUPERSEDED BY OWNER DIRECTION ON 2026-10-19.** The KRK proof-pattern implementation discussed below was subsequently **removed from the runtime**, KRK was set **not playable**, and the experimental selector was deleted. This is an audit of a retired prototype, NOT a description of today's engine. See [AGENTS.md](../AGENTS.md) for the mandatory frozen-and-complete upstream release/owner-approval gate and [NEXT_SESSION.md](../NEXT_SESSION.md) for the UI-only usability session. Do not restore this prototype before the main KRK work is properly finished and the owner explicitly authorises release.
+
 ## Verdict
 
 **No Stockfish, Syzygy, downloaded per-position answers, engine service, pretrained chess policy or prebuilt engine overlay was found in the execution path.** The static app has no npm dependencies and operates locally in the browser. That alone does **not** establish mathematical fidelity.
