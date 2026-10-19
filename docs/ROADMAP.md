@@ -38,7 +38,7 @@ No mathematical changes and NO KRK release.
 - [x] Corrected stale synthetic drag-click suppression, focus retention and live status announcements.
 - [x] Installed real Chromium QA at 320/360/390/768/1280 CSS px; all 64 squares were measured at each size.
 - [x] GitHub Actions run [#35](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39285471688) **actually passed** npm test, npm run check, npm run build and Chromium geometry/click flow at all five widths, plus keyboard focus.
-- [ ] **Browser suite as a whole was NOT green:** mouse drag then timed out waiting for two plies. The S005 browser runner adds event trace and move diagnostics to isolate the failure. Do not claim drag QA resolved until a completed green run confirms it.
+- [x] S005 traced the S004 drag timeout to **no pointer events generated** in headless Chromium, because the raw Playwright mouse helper targeted an off-viewport bottom-row square on the 1280×850 viewport. Corrected the helper to scroll source into view before measuring raw mouse coordinates and to drop outside the board while still inside the viewport. This is a **test-harness defect**, not demonstrated evidence of an app pointer-handler failure. A complete fresh browser run must still confirm the fix.
 - [ ] Independent manual examination of the current deployed Vercel revision is still outstanding. A successful Vercel deployment is not the same as a successful browser QA run.
 
 ## S005 — player-facing usability implemented, final browser verification gated
@@ -50,7 +50,7 @@ No mathematical changes and NO KRK release.
 - [x] Player/opponent separation in history without moving board geometry.
 - [x] Browser QA expanded to exercise keyboard arrows in both orientations, Escape, roving Tab, undo/restart, orientation flip and previous mouse/touch paths.
 - [x] CI now publishes a separate public Node+Chromium commit status, independent of Vercel's deployment status.
-- [ ] Verify a **completed green** GitHub Actions run for S005; the older S004 mouse-drag failure cannot be waived.
+- [ ] Verify a **completed green** GitHub Actions run for the corrected S005 browser test; prior red runs showed one keyboard focus bug fixed in app.js and the offscreen pointer harness bug fixed in browser-qa.mjs.
 - [ ] Verify a physical Android device, Safari/WebKit, Firefox and pen interactions where possible.
 
 ## NEXT — S006 input reliability and cross-browser polish
