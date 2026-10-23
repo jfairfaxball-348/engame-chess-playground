@@ -1,3 +1,7 @@
+# Research-scope clarification (owner direction, 23 October 2026)
+
+The **independent Engine Playground** now also hosts an exploratory chess-AI research programme, as authorised in S010. Prior statements below that "this repo does not conduct research" apply to the **Maths Endgame / proof-derived opponent only**, not to the new experimental AI arena. Do not import unproved ML moves into Maths Endgame; no KRK promotion, no edits to the upstream endgame theorem repo. S010 is documented in `docs/AI_RESEARCH_WORKSHOP.md`.
+
 # Two independent playground modes — binding scope
 
 The owner authorised (23 October 2026) a **new, independent engine playground** tab with standard chess and real third-party engines. The older restrictions on external engines apply **only to the original Maths endgame mode** and its local rules/opponent code (\`src/chess.js\`, \`src/engine.js\`, proof releases and tests). The new engine arena is explicitly exempt from those restrictions, but must not import its engine choices, heuristics or full-chess rules into the Maths endgame runtime. The app may ship pinned npm dependencies for the separate arena. Preserve original upstream-only rules, the KRK hold, and all existing playable material gates.

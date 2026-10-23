@@ -1,5 +1,7 @@
 # Chess Playground — engineering roadmap
 
+**October 2026 scope update:** the older roadmap below governs only the proof-derived Maths Endgame. The independent Engine Playground has a separately authorised chess-AI research direction; see [S010 workshop](AI_RESEARCH_WORKSHOP.md). Its experiments may use native engines/ML but must not affect the Maths Endgame proof-release gate.
+
 ## Binding direction
 
 This repo **does not conduct chess research**. It translates **finished, formally verified, frozen, owner-approved** results in [endgame-chess](https://github.com/jfairfaxball-348/engame-chess) into a standalone opponent. The parent repo retains all the mathematical work, including its long-term UWS ambition. Any new playable endgame class requires the explicit gate in [AGENTS.md](../AGENTS.md). No chess engines, tablebases or proof-imitating heuristic policies.

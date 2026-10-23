@@ -26,3 +26,7 @@ The independent Engine Playground now fits its board to the visible browser's wi
 ## Play vs engine
 
 In the **Engine Playground** tab, switch Match type to **Play vs engine**. Choose White or Black and either Stockfish 19 Lite or Lozza, then select **Start game**. Click/tap a piece then a highlighted destination, or drag a piece to a legal destination. The engine replies automatically, including an opening move when you choose Black. Promotion has a piece chooser. Undo turn restores the board to before your previous move and the engine's response. New game unlocks your opponent and colour options. Engine-vs-engine spectator play remains available, and Maths Endgame is unchanged.
+
+## S010 experimental chess AI workshop
+
+A new, separate **research programme in Engine Playground** investigates native UCI connections, goal-conditioned chess learning and rigorous Elo testing. Start with [S010 research and architecture workshop](docs/AI_RESEARCH_WORKSHOP.md); the playable proof-derived Maths Endgame and its KRK hold remain unchanged. The workshop is documentation, not a shipped local-engine API.
