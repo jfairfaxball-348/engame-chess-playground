@@ -57,3 +57,11 @@ test('arena has responsive viewport-height limits and spectator capture rows',()
   assert.match(app,/playerStrip\(lower,captured\)/);
   assert.match(app,/this\.worker\.postMessage\('stop'\)/);
 });
+
+test('UCI workers initialise a new game before search (Lozza requires it)',()=>{
+  const app=readFileSync('src/arena-app.js','utf8');
+  const atUci=app.indexOf("if(line==='uciok')");
+  const atNew=app.indexOf("this.worker.postMessage('ucinewgame')",atUci);
+  const atReady=app.indexOf("this.worker.postMessage('isready')",atUci);
+  assert.ok(atUci>=0&&atUci<atNew&&atNew<atReady);
+});

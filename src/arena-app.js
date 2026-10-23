@@ -23,7 +23,13 @@ class UciSession {
       for(const raw of String(event.data).split(/\r?\n/)){
         const line=raw.trim();
         if(line){this.lastMessages.push(line.slice(0,150));if(this.lastMessages.length>8)this.lastMessages.shift();}
-        if(line==='uciok'){this.worker.postMessage('isready');continue;}
+        if(line==='uciok'){
+          // Lozza explicitly requires ucinewgame (or setoption Hash) before
+          // accepting a position/search; Stockfish also supports this UCI step.
+          this.worker.postMessage('ucinewgame');
+          this.worker.postMessage('isready');
+          continue;
+        }
         if(line==='readyok'){
           if(this.resolveReady){clearTimeout(this.startTimer);this.resolveReady();this.resolveReady=null;this.rejectReady=null;}
           continue;
