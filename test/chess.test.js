@@ -97,6 +97,7 @@ test('client has no external engine or unfinished proof-policy in active runtime
   const app=readFileSync('src/app.js','utf8');
   assert.match(app,/disabled aria-disabled="true"/);
   const pkg=JSON.parse(readFileSync('package.json','utf8'));
-  assert.equal(pkg.dependencies,undefined);
+  assert.equal(pkg.dependencies['chess.js'],'1.4.0');
+  assert.equal(pkg.dependencies.stockfish,'19.0.1');
   assert.equal(pkg.devDependencies,undefined);
 });

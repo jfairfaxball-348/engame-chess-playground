@@ -72,3 +72,23 @@ footer{border-top:1px solid #3d493f;padding-top:12px;margin-top:20px;font-size:1
 @media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr);gap:15px}.board-column{max-width:680px}.sidebar{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
 @media(max-width:600px){.shell{padding:12px 8px}.header{margin-bottom:10px}.identity{gap:7px}.mark{height:34px;width:34px;font-size:16px}h1{font-size:19px}.eyebrow{font-size:8px}.source-link{font-size:10px;padding:7px}.board-frame{padding:4px}.board-top{min-height:33px}.sidebar{grid-template-columns:1fr}.panel{padding:13px}.below-board{font-size:10px}.below-board span:last-child{display:none}.drag-ghost{width:50px;height:50px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* Independent engine arena, isolated from the proof-backed endgame board. */
+.mode-tabs{max-width:1240px;margin:0 auto;padding:15px 24px 0;display:flex;gap:8px}
+.mode-tabs button{border:1px solid #506151;border-radius:9px 9px 0 0;background:#27322b;color:#c3d2c2;padding:12px 20px;font-weight:700;font-size:13px}
+.mode-tabs button[aria-selected="true"]{background:#a6c180;border-color:#a6c180;color:#16221a}
+.tab-page[hidden]{display:none!important}
+.arena-runtime{font-size:12px;color:#bed0b9}
+.arena-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));width:100%;aspect-ratio:1 / 1;overflow:hidden;border-radius:3px}
+.arena-cell{position:relative;min-width:0;min-height:0;width:100%;height:100%}
+.arena-cell.light{background:#ebecd0}.arena-cell.dark{background:#779556}
+.arena-cell.arena-recent{background-image:linear-gradient(#e5d55280,#e5d55280)}
+.arena-speed{border-top:1px solid #3a4b3e;padding-top:14px;margin-top:14px}
+.arena-speed select{min-width:85px}
+.arena-move{display:grid;grid-template-columns:38px 1fr 1fr;gap:5px;padding:7px;border-bottom:1px solid #3b493d;font-size:13px}
+.arena-move span{color:#afc0ad}
+.arena-move strong{font-weight:650}
+.arena-shell .history .moves{max-height:300px}
+.arena-shell button:disabled{opacity:.48;cursor:not-allowed}
+@media(max-width:600px){.mode-tabs{padding:10px 8px 0}.mode-tabs button{flex:1;padding:11px 4px;font-size:12px}.arena-runtime{font-size:10px}}

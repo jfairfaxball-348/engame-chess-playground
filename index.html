@@ -4,12 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#161c1b" />
-    <meta name="description" content="Chess endgames played by an independent, locally implemented proof-derived opponent." />
-    <title>Endgame Chess · Playground</title>
+    <meta name="description" content="Maths endgames and independent chess engine-vs-engine playground." />
+    <title>Chess Playground · Maths and Engines</title>
     <link rel="stylesheet" href="/src/styles.css" />
     <script type="module" src="/src/app.js" defer></script>
+    <script type="module" src="/src/arena-app.js" defer></script>
   </head>
   <body>
-    <main id="app"></main>
+    <nav class="mode-tabs" id="mode-tabs" role="tablist" aria-label="Chess playground mode">
+      <button type="button" id="tab-maths" role="tab" aria-selected="true" aria-controls="app" tabindex="0">Maths endgame</button>
+      <button type="button" id="tab-arena" role="tab" aria-selected="false" aria-controls="engine-playground" tabindex="-1">Engine playground</button>
+    </nav>
+    <main id="app" class="tab-page" role="tabpanel" aria-labelledby="tab-maths"></main>
+    <main id="engine-playground" class="tab-page" role="tabpanel" aria-labelledby="tab-arena" hidden></main>
   </body>
 </html>

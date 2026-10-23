@@ -1,81 +1,20 @@
 # Endgame Chess Playground
 
-A standalone browser playground that turns **completed, formally verified, frozen and owner-approved endgame-chess mathematics** into a playable opponent. This repo is **not a research project**: new mathematics, proofs, strategy discovery, theorem freezing and ultra-weak chess solving happen only in [the main endgame-chess repository](https://github.com/jfairfaxball-348/engame-chess).
+Two intentionally separate modes share a single Vercel website:
 
-**Release direction is strictly one-way:** endgame-chess finishes and freezes a result → owner approves its import → this repo implements a fully local, independently tested opponent for that exact scope. There is no runtime import, lookup or sync. No prebuilt chess engine, Stockfish, Syzygy, model API or remote move selection.
+- **Maths endgame** is the original proof-backed, upstream-gated demonstration. K/K, K+B/K, K+N/K alone are released; KRK stays locked and nothing in this mode uses external engines or unproved strategies.
+- **Engine playground** is a standard, full-rules chess spectator arena. Choose a chess engine for White and Black, Play, Pause, advance one move, change the viewing pace, flip the board or Restart. It is NOT a proof-derived mathematical engine.
 
-## What can I play now?
+## Engine playground
 
-| Material | Upstream source | Playground |
-| --- | --- | --- |
-| K vs K | EC-T0003 | Available — any legal move |
-| K+B vs K | EC-T0004 | Available — any legal move |
-| K+N vs K | EC-T0005 | Available — any legal move |
-| K+R vs K | Partial scope EC-T0019 | **Coming later: NOT PLAYABLE** until main KRK work is properly finished and the owner expressly authorises release |
+The initial pair is **Stockfish 19 Lite (single threaded WebAssembly)** and **Lozza (JavaScript UCI)**. The Stockfish Lite edition is significantly smaller and weaker than the full engine. Either can play either colour, including mirror matches. Both run locally in browser Web Workers, require no backend or API keys, and the display is deliberately delayed after each move so the games are watchable. The browser may download roughly 2 MB of engine assets on first use. For fair performance comparison, this arena is a spectator/demo interface, **not a calibrated engine-benchmark harness**.
 
-K/K+B/K+N are *dead-position classes*. FIDE Article 5.2.2 normally ends such a game immediately; the playground deliberately allows further moves to demonstrate the mathematics. This is **exploration**, not a normal FIDE tournament game. The virtual halfmove/repetition history begins at an artificial local starting point, not a certified historic chess game.
+The separate arena uses the standard-chess \`chess.js\` library for legality, promotion, castling, en-passant, checkmate and draw detection. The maths-only \`src/chess.js\` remains untouched and does not gain new material classes.
 
-KRK was previously exposed using incomplete proof-guided move patterns and an experimental heuristic. At the owner's direction that policy has now been **removed**, not merely renamed. The class remains visible as coming later but cannot be selected for play, including through `newGame`. The old S002 audit is historical and superseded by the binding [AGENTS.md](AGENTS.md).
+## Running and deploying
 
-## Using the web app
+Node 20+ and \`npm install\` are required. Run \`npm run dev\` to build and serve the local static site, \`npm test\`, \`npm run check\`, and \`npm run build\`. Vercel's existing \`npm run build\` outputs \`dist/\`.
 
-1. Choose one of the three available material classes; KRK is locked.
-2. Choose your colour and side to move, arrange the pieces in a locally legal position, and start.
-3. Select a piece then its highlighted square **or drag it** to a legal destination (mouse or touch; pen hardware is not independently verified). Arrow keys navigate the board without 64 Tab stops, Enter/Space activate a square, and Escape clears selection. The local opponent replies; illegal drops cannot change the game.
-4. In the editor, choose a labelled piece and tap a square to place/replace it, drag to reposition, or choose Erase. Start validates local legality. Reset restores the arrangement. Choosing Black initially flips the board; Flip orientation lets you change the view independently without changing colours. During play use Restart from this setup or Undo turn (reverses your last move and the computer response, when present).
+Stockfish.js is licensed GPL-3.0: source at https://github.com/nmrugg/stockfish.js, engine source at https://github.com/official-stockfish/Stockfish. Lozza source at https://github.com/op12no2/lozza. chess.js is BSD-2-Clause. Browser engine files are copied unmodified from pinned npm dependencies into static assets during the build.
 
-The position editor checks local chess geometry, not proof that the position can be reached from the standard initial setup.
-
-## Local development / Vercel
-
-No npm dependencies, credentials, subscriptions or backend. Node 20+:
-
-```sh
-npm run dev       # local site: http://localhost:3000
-npm test          # rules, release gate and adversary tests
-npm run check     # JS syntax
-npm run build     # copy static app to dist/
-```
-
-Vercel import: `jfairfaxball-348/engame-chess-playground`. Framework Other, root `/`, build `npm run build`, output `dist` (also in `vercel.json`). Ordinary Git integration can automatically deploy `main`; no runtime variables.
-
-## Source of truth and files
-
-- [AGENTS.md](AGENTS.md): **binding upstream-only and KRK hold** rules; explicit owner release gate.
-- [NEXT_SESSION.md](NEXT_SESSION.md): full next session, currently **S006 input reliability and cross-browser QA**.
-- [docs/ROADMAP.md](docs/ROADMAP.md): engineering milestones.
-- `src/chess.js`: locally implemented movement/legality, material availability and game-state rules.
-- `src/engine.js`: available dead-class demonstration move selector, no heuristic or upstream runtime lookup.
-- `src/app.js`, `src/styles.css`: responsive board, input handlers and interface.
-- `src/pieces.js`: original local SVG piece drawings (no external sprites or font glyphs).
-- `src/board-ui.js`: screen-square orientation and pointer hit-test helpers.
-- `test/ui.test.js`: orientation, SVG and CSS geometry regression tests.
-- `test/chess.test.js`: gameplay geometry, availability gate, no-external-engine checks.
-- [S002 historical move audit](docs/S002_MOVE_FIDELITY_AUDIT.md): audit of now-withdrawn experimental KRK prototype; **not an active policy**.
-
-S003 implemented explicit 8-row/8-column equal-track board geometry, locally drawn SVG pieces, legal-move indicators, last-move and check highlights, click/touch selection and pointer drag with capture/cancellation. The geometry and modality smoke assertions run in Node; **real browser rectangle measurements and mobile gesture QA are required in S004** and must not be implied by the pure-helper tests.
-
-The aim is an attractive, accessible chessboard for interacting with **already known, verified results**—not a place to make further mathematical discoveries.
-
-## S004/S005 browser verification
-
-S004 fixed two user-input risks found in code review: re-rendering the entire board could lose keyboard focus, and an elapsed-time 350 ms drag-click suppression could block a legitimate immediate click. After S004, square/palette/control focus is restored after re-render, drag suppression consumes only a synthetic drag click, cancellation clears the drag ghost, and a persistent polite screen-reader live region announces status and setup errors. Visible inset focus styling was also added.
-
-An executable real-Chromium regression suite is in `scripts/browser-qa.mjs`: 320/360/390/768/1280px 64-square rectangle checks, board stability across turns, keyboard Enter/Space, mouse drag and outside-board drop, synthetic pointercancel + immediate click, editor move/reset/invalid Start, black orientation, and Chrome touch drag. GitHub Actions installs Playwright **only for CI**, keeping the shipped app dependency-free. To run manually:
-
-```sh
-npm test && npm run check && npm run build
-npm install --no-save --no-package-lock playwright
-npx playwright install --with-deps chromium
-node scripts/browser-qa.mjs
-```
-
-The owner's browser check accepted the S003 appearance. S004 [run #35](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39285471688) passed unit/check/build and geometry, but initially failed a **raw mouse test that was targeting an offscreen square**. S005 fixed the test's scroll-before-drag requirement and an actual keyboard focus-restoration bug. The corrected S005 [GitHub Actions run #39304665312](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/39304665312) is **fully green**: Node tests, syntax, build, mouse drag, Chrome touch drag, keyboard, editor and all five viewport geometries. This is browser automation on a GitHub Ubuntu runner, not a physical Android or Safari test. CI and Vercel deployment are reported separately.
-
-## S005 — controls, navigation and editor
-
-S005 added a single keyboard Tab stop for the board, displayed-orientation-aware arrow movement, Escape cancellation, and preserved Enter/Space activation. Restart resets the board from the editor-defined setup, including clocks and history. Undo stores the complete pre-human-turn game snapshot and cancels any outstanding computer timer; undo is not offered until you have made a move. The original upstream-backed decision policy and playable-class gate are unchanged.
-
-The editor has individually named piece/Erase controls with selected state, a flip-orientation button that never swaps colours, and clear validation. Move history distinguishes **You** versus **Opponent**.
-
-S005 extended CI to cover these controls and to publish an explicit **Playground Node + Chromium QA** GitHub commit status in addition to Vercel's deployment status. The completed test suite is green; real-device Android/pen, Firefox and Safari have not yet been independently verified. See [S005 QA report](docs/S005_QA_REPORT.md), `docs/ROADMAP.md` and `NEXT_SESSION.md` for evidence and the S006 handoff.
+Original mathematical release restrictions and controls are described in [AGENTS.md](AGENTS.md), and next engineering tasks in [NEXT_SESSION.md](NEXT_SESSION.md).

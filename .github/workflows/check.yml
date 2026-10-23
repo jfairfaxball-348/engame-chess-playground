@@ -14,10 +14,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: npm install --no-audit --no-fund
       - run: npm test
       - run: npm run check
       - run: npm run build
-      # Playwright is CI-only; the actual site still has zero dependencies.
+      # Playwright is CI-only; the new arena has pinned browser-only dependencies.
       - run: npm install --no-save --no-package-lock playwright
       - run: npx playwright install --with-deps chromium
       - run: node scripts/browser-qa.mjs
