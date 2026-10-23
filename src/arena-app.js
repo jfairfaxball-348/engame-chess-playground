@@ -10,7 +10,7 @@ const maths=document.getElementById('app');
 const mathsTab=document.getElementById('tab-maths');
 const arenaTab=document.getElementById('tab-arena');
 let game=new Chess(), white='lozza', black='stockfish';
-let interval=1500, orientation='w', running=false, sequence=0, seen=null;
+let interval=1500, orientation='w', running=false, thinking=false, sequence=0, seen=null;
 let sessions={w:null,b:null}, last=null, evaluation='', message='Ready to start.', turnCount=0;
 
 class UciSession {
@@ -64,7 +64,7 @@ class UciSession {
   }
 }
 function stop(){
-  running=false;sequence++;
+  running=false;thinking=false;sequence++;
   for(const colour of ['w','b']){sessions[colour]?.close();sessions[colour]=null;}
 }
 function reset(){
@@ -98,9 +98,10 @@ async function moveOnce(epoch){
   return true;
 }
 async function playLoop(one=false){
-  if(running&&!one)return;
+  if(running||thinking)return;
   if(outcome()){message=outcome();render();return;}
   if(!one)running=true;
+  thinking=true;
   const epoch=++sequence;render();
   try{
     do{
@@ -109,14 +110,14 @@ async function playLoop(one=false){
       if(one||outcome())break;
       await new Promise(resolve=>setTimeout(resolve,interval));
     }while(running&&epoch===sequence);
-    if(epoch===sequence){running=false;message=outcome()||'Paused. Resume or play one move.';render();}
+    if(epoch===sequence){running=false;thinking=false;message=outcome()||'Paused. Resume or play one move.';render();}
   }catch(error){
     if(epoch!==sequence)return;
     stop();message='Engine error: '+error.message;render();
   }
 }
 function pause(){
-  if(!running)return;
+  if(!running&&!thinking)return;
   stop();message='Paused. Play resumes from this position.';render();
 }
 function boardMarkup(){
@@ -159,9 +160,9 @@ function render(){
     '<div class="fieldrow"><label for="arena-b">Black</label>'+engineSelect('b',black)+'</div>'+
     '<p class="explain">Engine selection locks after the first move; Restart opens a new match.</p>'+
     '</div><div class="panel"><div class="section-head"><span class="label">Playback</span></div>'+
-    '<button id="arena-play" class="main-action" '+(running||ended?'disabled':'')+'>▶ '+(turnCount?'Resume match':'Play match')+'</button>'+
-    '<button id="arena-pause" class="secondary-action" '+(running?'':'disabled')+'>Ⅱ Pause</button>'+
-    '<button id="arena-step" class="secondary-action" '+(running||ended?'disabled':'')+'>Next move →</button>'+
+    '<button id="arena-play" class="main-action" '+(thinking||running||ended?'disabled':'')+'>▶ '+(turnCount?'Resume match':'Play match')+'</button>'+
+    '<button id="arena-pause" class="secondary-action" '+(running||thinking?'':'disabled')+'>Ⅱ Pause</button>'+
+    '<button id="arena-step" class="secondary-action" '+(thinking||running||ended?'disabled':'')+'>Next move →</button>'+
     '<button id="arena-reset" class="secondary-action">Restart match</button>'+
     '<button id="arena-flip" class="secondary-action">Flip board ↕</button>'+
     '<div class="fieldrow arena-speed"><label for="arena-pace">Time between moves</label>'+
