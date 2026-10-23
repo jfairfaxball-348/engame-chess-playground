@@ -123,3 +123,14 @@ footer{border-top:1px solid #3d493f;padding-top:12px;margin-top:20px;font-size:1
 @media(max-height:560px) and (min-width:601px){
   .arena-shell .board-frame,.arena-shell .arena-player-strip{width:min(100%,max(170px,calc(100dvh - 220px)))}
 }
+
+/* Human play is isolated to Engine Playground; maths board is unchanged. */
+.arena-shell button.arena-cell{appearance:none;border:0;padding:0;border-radius:0;cursor:pointer;touch-action:none;user-select:none}
+.arena-shell button.arena-cell:focus-visible{outline:3px solid #f6e5a4;outline-offset:-3px;z-index:3}
+.arena-shell .arena-selected{background-image:linear-gradient(#f5d35690,#f5d35690)}
+.arena-shell .arena-check{box-shadow:inset 0 0 0 5px #ba302c98}
+.arena-shell .arena-legal{position:absolute;inset:38%;border-radius:50%;background:#27452c77;pointer-events:none}
+.arena-shell .arena-legal.arena-capture{inset:4%;border:5px solid #28452f77;background:transparent}
+.arena-shell .arena-drag-source .piece-icon{opacity:.35}
+.arena-promotion{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:center;margin:10px auto;padding:10px;border-radius:8px;background:#29372e}
+.arena-promotion button{padding:8px;border-radius:6px;border:1px solid #829776;background:#3a503d;color:#fafbef}

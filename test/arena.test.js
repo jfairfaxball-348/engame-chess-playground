@@ -65,3 +65,15 @@ test('UCI workers initialise a new game before search (Lozza requires it)',()=>{
   const atReady=app.indexOf("this.worker.postMessage('isready')",atUci);
   assert.ok(atUci>=0&&atUci<atNew&&atNew<atReady);
 });
+
+test('human mode supports both colours, legal moves, promotion choice and undo',()=>{
+  const app=readFileSync('src/arena-app.js','utf8');
+  for(const id of ['arena-match','arena-human-colour','arena-opponent','arena-start-human','arena-undo'])
+    assert.ok(app.includes(id));
+  assert.match(app,/game\.moves\(\{square:from,verbose:true\}\)/);
+  assert.match(app,/commitPlayerMove\(/);
+  assert.match(app,/game\.undo\(/);
+  assert.match(app,/promotion\.choices/);
+  assert.match(app,/if\(playerSide==='b'\)void engineRespond\(\)/);
+  assert.match(app,/pointerup/);
+});

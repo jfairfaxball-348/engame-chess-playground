@@ -3,7 +3,7 @@
  * A single 100x100 viewBox prevents intrinsic piece metrics from affecting grid tracks.
  */
 const shapes = Object.freeze({
-  K: '<path d="M50 10v26M39 21h22" fill="none" stroke-width="7" stroke-linecap="round"/><path d="M31 56V44c0-11 8-20 19-20s19 9 19 20v12l-9 19H40z"/><path d="M30 54h40M38 64h24" fill="none" stroke-width="3"/><path d="M28 75h44l6 11H22z"/>',
+  K: '<path d="M50 8v26M38 20h24" fill="none" stroke-width="6" stroke-linecap="round"/><path d="M42 34c-12 4-17 14-13 22l7 8-4 9h36l-4-9 7-8c4-8-1-18-13-22z"/><path d="M35 56h30M39 65h22" fill="none" stroke-width="3"/><path d="M29 73h42l5 8H24zM20 83h60v7H20z"/>',
   Q: '<path d="M19 31 28 63 72 63 81 31 64 48 50 22 36 48z"/><circle cx="19" cy="27" r="5"/><circle cx="50" cy="18" r="5"/><circle cx="81" cy="27" r="5"/><path d="M28 66h44l6 10H22zM23 77h54l4 9H19z"/>',
   P: '<circle cx="50" cy="29" r="13"/><path d="M39 42Q32 50 34 61L28 70h44l-6-9q2-11-5-19z"/><path d="M27 72h46l6 14H21z"/>',
   B: '<path d="M48 13c-4 8-18 22-18 35 0 12 9 19 20 19s20-7 20-19c0-13-14-27-18-35z"/><path d="M55 29 39 49" fill="none" stroke-width="4"/><circle cx="50" cy="12" r="4"/><path d="M35 68h30l7 9H28z"/><path d="M25 77h50l4 9H21z"/>',

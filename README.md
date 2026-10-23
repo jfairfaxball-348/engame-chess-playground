@@ -22,3 +22,7 @@ Original mathematical release restrictions and controls are described in [AGENTS
 ## October 2026 spectator improvements
 
 The independent Engine Playground now fits its board to the visible browser's width **and height** (resizing responsively), and displays captured opponent pieces alongside each player's name and a +material advantage figure. Flipping the board flips the player strips too. Lozza searches with bounded `go movetime 450 depth 4` instead of unbounded `go depth 5`, and its worker receives a UCI stop request before an unresponsive-engine error is shown. The playback delay is still independent of engine thinking time. Both real engine workers are covered by the dedicated `scripts/arena-browser-qa.mjs` test; the original mathematical mode remains unchanged.
+
+## Play vs engine
+
+In the **Engine Playground** tab, switch Match type to **Play vs engine**. Choose White or Black and either Stockfish 19 Lite or Lozza, then select **Start game**. Click/tap a piece then a highlighted destination, or drag a piece to a legal destination. The engine replies automatically, including an opening move when you choose Black. Promotion has a piece chooser. Undo turn restores the board to before your previous move and the engine's response. New game unlocks your opponent and colour options. Engine-vs-engine spectator play remains available, and Maths Endgame is unchanged.
