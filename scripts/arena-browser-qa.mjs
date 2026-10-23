@@ -22,14 +22,33 @@ try{
   await page.locator('#tab-arena').click();
   assert.equal(await page.locator('#engine-playground').isVisible(),true);
   assert.equal(await page.locator('.arena-cell').count(),64);
+  assert.equal(await page.locator('.arena-player-strip').count(),2);
+  for(const [width,height] of [[1280,690],[900,600],[390,690],[320,575]]){
+    await page.setViewportSize({width,height});
+    const board=await page.locator('.arena-grid').boundingBox();
+    assert.ok(board&&Math.abs(board.width-board.height)<1,'board must stay square');
+    assert.ok(board.width<=width-12,'board must fit viewport width');
+    assert.ok(board.height<=height-180,'board must fit viewport height');
+    console.log('PASS arena responsive size @ '+width+'x'+height+': '+Math.round(board.width)+'px');
+  }
+  await page.setViewportSize({width:1100,height:850});
   assert.equal(await page.locator('#app').isVisible(),false);
   await page.locator('#arena-step').click();
-  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1,{timeout:30000});
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1,{timeout:22000});
   assert.match(await page.locator('.arena-move').first().innerText(),/1\./);
   console.log('PASS Lozza opening move');
   await page.locator('#arena-step').click();
-  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1 && document.querySelectorAll('.arena-move strong')[1]?.textContent?.length>0,{timeout:30000});
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1 && document.querySelectorAll('.arena-move strong')[1]?.textContent?.length>0,{timeout:22000});
   console.log('PASS Stockfish 19 Lite reply');
+  const captured=await page.evaluate(async ()=>{
+    const {Chess}=await import('/vendor/chess.js');
+    const {captureSummary}=await import('/src/arena-utils.js');
+    const g=new Chess();g.move('e4');g.move('d5');g.move('exd5');
+    return captureSummary(g.history({verbose:true}));
+  });
+  assert.deepEqual(captured.w.pieces,['bP']);
+  assert.equal(captured.w.advantage,1);
+  console.log('PASS real chess.js capture accounting');
   await page.locator('#arena-reset').click();
   assert.equal(await page.locator('.arena-move').count(),0);
   await page.locator('#arena-w').selectOption('stockfish');

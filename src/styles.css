@@ -92,3 +92,34 @@ footer{border-top:1px solid #3d493f;padding-top:12px;margin-top:20px;font-size:1
 .arena-shell .history .moves{max-height:300px}
 .arena-shell button:disabled{opacity:.48;cursor:not-allowed}
 @media(max-width:600px){.mode-tabs{padding:10px 8px 0}.mode-tabs button{flex:1;padding:11px 4px;font-size:12px}.arena-runtime{font-size:10px}}
+
+/* Engine spectator layout: fit the viewport in both dimensions, without
+   changing the independent mathematical endgame board sizing. */
+.arena-shell .board-column{max-width:none}
+.arena-shell .board-frame{
+  width:min(100%,max(190px,calc(100dvh - 265px)));
+  margin-inline:auto;
+}
+.arena-shell .arena-player-strip{
+  width:min(100%,max(190px,calc(100dvh - 265px)));
+  margin:7px auto;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;column-gap:14px;row-gap:5px;min-height:31px;
+  font-size:12px;color:#edf1e7
+}
+.arena-player-name{display:flex;align-items:center;gap:7px;min-width:0}
+.arena-player-colour{width:14px;height:14px;flex:none;border:2px solid #a5b2a8;border-radius:50%}
+.arena-player-colour.w{background:#f4f0e6}
+.arena-player-colour.b{background:#202a24}
+.arena-player-engine{font-size:11px;color:#b3c4af}
+.arena-taken{display:flex;align-items:center;min-height:24px;gap:0;flex-wrap:wrap}
+.arena-taken .taken-piece{width:20px;height:21px;display:inline-grid;place-items:center;margin-right:-2px}
+.arena-taken .taken-piece .piece-icon{position:relative;inset:auto;width:20px;height:20px;max-width:100%;max-height:100%;filter:none}
+.arena-no-taken{font-size:10px;color:#8e9b8f}
+.arena-advantage{font-size:12px;color:#bde099;margin-left:10px}
+@media(max-width:600px){
+  .arena-shell .board-frame,.arena-shell .arena-player-strip{width:min(100%,max(190px,calc(100dvh - 240px)))}
+}
+@media(max-height:560px) and (min-width:601px){
+  .arena-shell .board-frame,.arena-shell .arena-player-strip{width:min(100%,max(170px,calc(100dvh - 220px)))}
+}

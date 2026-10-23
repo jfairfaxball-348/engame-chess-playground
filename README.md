@@ -18,3 +18,7 @@ Node 20+ and \`npm install\` are required. Run \`npm run dev\` to build and serv
 Stockfish.js is licensed GPL-3.0: source at https://github.com/nmrugg/stockfish.js, engine source at https://github.com/official-stockfish/Stockfish. Lozza source at https://github.com/op12no2/lozza. chess.js is BSD-2-Clause. Browser engine files are copied unmodified from pinned npm dependencies into static assets during the build.
 
 Original mathematical release restrictions and controls are described in [AGENTS.md](AGENTS.md), and next engineering tasks in [NEXT_SESSION.md](NEXT_SESSION.md).
+
+## October 2026 spectator improvements
+
+The independent Engine Playground now fits its board to the visible browser's width **and height** (resizing responsively), and displays captured opponent pieces alongside each player's name and a +material advantage figure. Flipping the board flips the player strips too. Lozza searches with bounded `go movetime 450 depth 4` instead of unbounded `go depth 5`, and its worker receives a UCI stop request before an unresponsive-engine error is shown. The playback delay is still independent of engine thinking time. Both real engine workers are covered by the dedicated `scripts/arena-browser-qa.mjs` test; the original mathematical mode remains unchanged.

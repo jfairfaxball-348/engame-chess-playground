@@ -1,7 +1,7 @@
 import { Chess } from '/vendor/chess.js';
 import { pieceSVG } from './pieces.js';
 import { squareForCell } from './board-ui.js';
-import { ENGINE_OPTIONS, engineById, parseBestmove, parseScore } from './arena-utils.js';
+import { ENGINE_OPTIONS, engineById, parseBestmove, parseScore, captureSummary } from './arena-utils.js';
 
 // Independent standard-chess spectator arena. Do not import the proof-gated
 // endgame game's limited rules or opponent into this module.
@@ -32,6 +32,7 @@ class UciSession {
         }
         if(this.pending&&line.startsWith('bestmove ')){
           const task=this.pending;this.pending=null;clearTimeout(task.timeout);
+          clearTimeout(task.stopTimer);
           const move=parseBestmove(line);
           if(move)task.resolve({move,score:task.score});
           else task.reject(Error(this.spec.name+' returned an invalid move: '+line));
@@ -44,15 +45,21 @@ class UciSession {
   fail(error){
     clearTimeout(this.startTimer);
     if(this.rejectReady){this.rejectReady(error);this.resolveReady=null;this.rejectReady=null;}
-    if(this.pending){const task=this.pending;this.pending=null;clearTimeout(task.timeout);task.reject(error);}
+    if(this.pending){const task=this.pending;this.pending=null;clearTimeout(task.timeout);clearTimeout(task.stopTimer);task.reject(error);}
   }
   async search(fen,colour){
     await this.ready;
     if(this.closed)throw Error('Engine stopped');
     if(this.pending)throw Error('Engine already searching');
     return new Promise((resolve,reject)=>{
-      const task={resolve,reject,colour,score:null,timeout:null};
-      task.timeout=setTimeout(()=>this.fail(Error(this.spec.name+' exceeded the 20-second analysis limit.')),20000);
+      const task={resolve,reject,colour,score:null,timeout:null,stopTimer:null};
+      // Engine commands are time-bounded. If an engine fails to return bestmove,
+      // request a UCI stop and allow a short grace period before reporting failure.
+      task.timeout=setTimeout(()=>{
+        if(this.pending!==task)return;
+        this.worker.postMessage('stop');
+        task.stopTimer=setTimeout(()=>this.fail(Error(this.spec.name+' stopped responding during its bounded search. Restart the match or select another engine.')),3500);
+      },8000);
       this.pending=task;
       this.worker.postMessage('position fen '+fen);
       this.worker.postMessage(this.spec.search);
@@ -134,6 +141,16 @@ function boardMarkup(){
   }
   return cells.join('');
 }
+function playerStrip(colour,captures){
+  const spec=engineById(colour==='w'?white:black),detail=captures[colour];
+  const pieces=detail.pieces.map(code=>
+    '<span class="taken-piece" aria-label="'+(code[0]==='w'?'White ':'Black ')+({P:'pawn',N:'knight',B:'bishop',R:'rook',Q:'queen'})[code[1]]+'">'+pieceSVG(code)+'</span>'
+  ).join('');
+  return '<div class="arena-player-strip" aria-label="'+(colour==='w'?'White':'Black')+' player">'+
+    '<div class="arena-player-name"><span class="arena-player-colour '+colour+'"></span><strong>'+(colour==='w'?'White':'Black')+'</strong><span class="arena-player-engine">'+spec.name+'</span></div>'+
+    '<div class="arena-taken" aria-label="'+detail.pieces.length+' pieces captured">'+(pieces||'<span class="arena-no-taken">No captures</span>')+
+    (detail.advantage>0?'<strong class="arena-advantage" aria-label="'+detail.advantage+' point material advantage">+'+detail.advantage+'</strong>':'')+'</div></div>';
+}
 function movesMarkup(){
   const hist=game.history(),lines=[];
   for(let i=0;i<hist.length;i+=2){
@@ -147,13 +164,17 @@ function engineSelect(colour,chosen){
 }
 function render(){
   const ended=Boolean(outcome());
+  const captured=captureSummary(game.history({verbose:true}));
+  const upper=orientation==='w'?'b':'w',lower=orientation;
   root.innerHTML='<div class="shell arena-shell">'+
     '<header class="header"><div class="identity"><div class="mark">♞</div><div><div class="eyebrow">FULL CHESS · ENGINE VS ENGINE</div><h1>Engine <span>Playground</span></h1></div></div>'+
     '<span class="arena-runtime">Runs locally in your browser</span></header>'+
     '<div class="layout"><section class="board-column">'+
     '<div class="board-top"><span class="label">Engine match · '+turnCount+' plies</span><span class="status-dot" role="status">'+message+'</span></div>'+
+    playerStrip(upper,captured)+
     '<div class="board-frame"><div class="arena-grid" role="group" aria-label="Live chess game">'+boardMarkup()+'</div></div>'+
-    '<div class="below-board"><span>White: '+engineById(white).name+'</span><span>Black: '+engineById(black).name+'</span></div>'+
+    playerStrip(lower,captured)+
+    '<div class="below-board"><span>Captured pieces are displayed beside each player</span><span>Standard chess · '+turnCount+' plies</span></div>'+
     '</section><aside class="sidebar">'+
     '<div class="panel"><div class="section-head"><span class="label">Engine matchup</span></div>'+
     '<div class="fieldrow"><label for="arena-w">White</label>'+engineSelect('w',white)+'</div>'+
@@ -171,7 +192,7 @@ function render(){
     '</div><div class="panel"><div class="section-head"><span class="label">Analysis</span></div>'+
     '<div class="engine-pill">'+(seen?'Last mover: '+seen:'Not started')+'</div>'+
     '<p class="explain">'+(evaluation?'Last engine score (White perspective): '+evaluation:'Evaluation available after a move, when reported by the engine.')+'</p>'+
-    '<p class="explain">The first pair is Stockfish 19 Lite (not the full 94 MB build) and Lozza, a JavaScript UCI engine. Both can play either colour.</p>'+
+    '<p class="explain">Stockfish 19 Lite and Lozza are real UCI chess engines. Lozza now has a bounded search time to avoid indefinite calculations.</p>'+
     '</div><div class="panel history"><div class="section-head"><span class="label">Move history</span><span class="mini-tag">'+turnCount+' PLIES</span></div>'+
     '<div class="moves" aria-label="Engine match move history">'+movesMarkup()+'</div>'+
     (ended?'<p class="game-over">'+outcome()+'</p>':'')+'</div></aside></div>'+

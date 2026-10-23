@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {ENGINE_OPTIONS,engineById,parseBestmove,parseScore} from '../src/arena-utils.js';
+import {ENGINE_OPTIONS,engineById,parseBestmove,parseScore,captureSummary} from '../src/arena-utils.js';
 test('two real, distinct browser UCI engines are selectable by both colours',()=>{
   assert.deepEqual(ENGINE_OPTIONS.map(s=>s.id),['stockfish','lozza']);
   assert.ok(ENGINE_OPTIONS.every(s=>s.url.startsWith('/engines/')&&s.search.startsWith('go ')));
@@ -28,4 +28,32 @@ test('maths and engine playgrounds are isolated in separate tabs',()=>{
   assert.doesNotMatch(arena,/from '.\/chess\.js'|from '.\/engine\.js'/);
   assert.match(arena,/new Worker\(/);
   assert.match(arena,/game\.move\(/);
+});
+
+test('both engines use finite analysis commands, especially Lozza',()=>{
+  for(const spec of ENGINE_OPTIONS)assert.match(spec.search,/movetime\s+\d+/);
+  assert.match(engineById('lozza').search,/depth\s+4/);
+});
+test('captured-piece counters track both sides and material differential',()=>{
+  const moves=[
+    {color:'w',captured:'p'},{color:'w',captured:'q'},
+    {color:'b',captured:'n'},{color:'w',captured:'p'},
+    {color:'b',captured:'r'},{color:'w'}
+  ];
+  const c=captureSummary(moves);
+  assert.deepEqual(c.w.pieces,['bQ','bP','bP']);
+  assert.deepEqual(c.b.pieces,['wR','wN']);
+  assert.equal(c.w.value,11);
+  assert.equal(c.b.value,8);
+  assert.equal(c.w.advantage,3);
+  assert.equal(c.b.advantage,0);
+  assert.deepEqual(captureSummary([]).w,{pieces:[],value:0,advantage:0});
+});
+test('arena has responsive viewport-height limits and spectator capture rows',()=>{
+  const css=readFileSync('src/styles.css','utf8');
+  const app=readFileSync('src/arena-app.js','utf8');
+  assert.match(css,/\.arena-shell \.board-frame\s*\{[^}]*100dvh/s);
+  assert.match(app,/playerStrip\(upper,captured\)/);
+  assert.match(app,/playerStrip\(lower,captured\)/);
+  assert.match(app,/this\.worker\.postMessage\('stop'\)/);
 });
