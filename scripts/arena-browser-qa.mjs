@@ -67,6 +67,62 @@ try{
   await page.waitForTimeout(1700);
   assert.equal(await page.locator('.arena-move').count(),frozen);
   assert.equal(await page.locator('#arena-play').isEnabled(),true);
+
+  // Human vs engine is a separate full-rules game, not the Maths Endgame.
+  await page.locator('#arena-match').selectOption('human');
+  assert.equal(await page.locator('#arena-step').count(),0);
+  assert.equal(await page.locator('[data-arena-square]').count(),64);
+  await page.locator('#arena-opponent').selectOption('lozza');
+  await page.locator('#arena-start-human').click();
+  await page.locator('[data-arena-square="b2"]').click();
+  await page.locator('[data-arena-square="b5"]').click(); // illegal, must not change game
+  assert.equal(await page.locator('.arena-move').count(),0);
+  await page.locator('[data-arena-square="e2"]').click();
+  assert.equal(await page.locator('.arena-legal').count()>0,true);
+  await page.locator('[data-arena-square="e4"]').click();
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move strong')[1]?.textContent?.length>0,null,{timeout:20000});
+  assert.match(await page.locator('.arena-move').first().innerText(),/e4/);
+  await page.locator('#arena-undo').click();
+  assert.equal(await page.locator('.arena-move').count(),0);
+  console.log('PASS human White vs Lozza, illegal moves, engine response and undo');
+
+  await page.locator('#arena-reset').click();
+  await page.locator('#arena-human-colour').selectOption('b');
+  await page.locator('#arena-opponent').selectOption('stockfish');
+  await page.locator('#arena-start-human').click();
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move strong')[0]?.textContent?.length>0,null,{timeout:20000});
+  assert.match(await page.locator('#engine-playground [role="status"]').innerText(),/Your turn/);
+  await page.locator('[data-arena-square="e7"]').click();
+  await page.locator('[data-arena-square="e5"]').click();
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move strong')[1]?.textContent?.length>0,null,{timeout:20000});
+  await page.locator('#arena-undo').click();
+  assert.equal(await page.locator('.arena-move').count(),1);
+  console.log('PASS human Black vs Stockfish, automatic opening and undo');
+
+  await page.locator('#arena-reset').click();
+  await page.locator('#arena-opponent').selectOption('lozza');
+  await page.locator('#arena-start-human').click();
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move strong')[0]?.textContent?.length>0,null,{timeout:20000});
+  assert.match(await page.locator('#engine-playground [role="status"]').innerText(),/Your turn/);
+  await page.locator('#arena-reset').click();
+  await page.locator('#arena-human-colour').selectOption('w');
+  await page.locator('#arena-opponent').selectOption('stockfish');
+  await page.locator('#arena-start-human').click();
+  const from=page.locator('[data-arena-square="g1"]');
+  const to=page.locator('[data-arena-square="f3"]');
+  await from.scrollIntoViewIfNeeded();
+  const fr=await from.boundingBox(),tt=await to.boundingBox();
+  await page.mouse.move(fr.x+fr.width/2,fr.y+fr.height/2);
+  await page.mouse.down();
+  await page.mouse.move(tt.x+tt.width/2,tt.y+tt.height/2,{steps:8});
+  await page.mouse.up();
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move strong')[1]?.textContent?.length>0,null,{timeout:20000});
+  assert.match(await page.locator('.arena-move').first().innerText(),/Nf3/);
+  console.log('PASS human Black vs Lozza and human White vs Stockfish with drag-to-move');
+
+  await page.locator('#arena-match').selectOption('engines');
+  assert.equal(await page.locator('#arena-step').isVisible(),true);
+  assert.equal(await page.locator('.arena-move').count(),0);
   await page.locator('#tab-maths').click();
   assert.equal(await page.locator('#engine-playground').isVisible(),false);
   assert.equal(await page.locator('[data-class="krk"]').isDisabled(),true);
