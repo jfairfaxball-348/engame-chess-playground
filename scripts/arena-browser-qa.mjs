@@ -34,11 +34,18 @@ try{
   await page.setViewportSize({width:1100,height:850});
   assert.equal(await page.locator('#app').isVisible(),false);
   await page.locator('#arena-step').click();
-  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1,{timeout:22000});
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1||document.querySelector('[role="status"]')?.textContent.includes('Engine error'),{timeout:20000});
+  if(await page.locator('.arena-move').count()!==1){
+    const status=await page.locator('#engine-playground [role="status"]').innerText();
+    throw Error('Lozza did not make a move: '+status+'; worker page errors='+errors.join(', '));
+  }
   assert.match(await page.locator('.arena-move').first().innerText(),/1\./);
   console.log('PASS Lozza opening move');
   await page.locator('#arena-step').click();
-  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1 && document.querySelectorAll('.arena-move strong')[1]?.textContent?.length>0,{timeout:22000});
+  await page.waitForFunction(()=>document.querySelectorAll('.arena-move').length===1 && document.querySelectorAll('.arena-move strong')[1]?.textContent?.length>0||document.querySelector('#engine-playground [role="status"]')?.textContent.includes('Engine error'),{timeout:20000});
+  if((await page.locator('.arena-move strong').count())<2 || !(await page.locator('.arena-move strong').nth(1).innerText())){
+    throw Error('Stockfish did not make a move: '+await page.locator('#engine-playground [role="status"]').innerText()+'; worker page errors='+errors.join(', '));
+  }
   console.log('PASS Stockfish 19 Lite reply');
   const captured=await page.evaluate(async ()=>{
     const {Chess}=await import('/vendor/chess.js');

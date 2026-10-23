@@ -15,13 +15,14 @@ let sessions={w:null,b:null}, last=null, evaluation='', message='Ready to start.
 
 class UciSession {
   constructor(spec){
-    this.spec=spec; this.closed=false; this.pending=null;
+    this.spec=spec; this.closed=false; this.pending=null; this.lastMessages=[];
     this.worker=new Worker(spec.url);
     this.ready=new Promise((resolve,reject)=>{this.resolveReady=resolve;this.rejectReady=reject;});
     this.startTimer=setTimeout(()=>this.fail(Error(spec.name+' did not initialise within 12 seconds.')),12000);
     this.worker.onmessage=event=>{
       for(const raw of String(event.data).split(/\r?\n/)){
         const line=raw.trim();
+        if(line){this.lastMessages.push(line.slice(0,150));if(this.lastMessages.length>8)this.lastMessages.shift();}
         if(line==='uciok'){this.worker.postMessage('isready');continue;}
         if(line==='readyok'){
           if(this.resolveReady){clearTimeout(this.startTimer);this.resolveReady();this.resolveReady=null;this.rejectReady=null;}
@@ -58,7 +59,7 @@ class UciSession {
       task.timeout=setTimeout(()=>{
         if(this.pending!==task)return;
         this.worker.postMessage('stop');
-        task.stopTimer=setTimeout(()=>this.fail(Error(this.spec.name+' stopped responding during its bounded search. Restart the match or select another engine.')),3500);
+        task.stopTimer=setTimeout(()=>this.fail(Error(this.spec.name+' failed to return a move. Latest UCI: '+(this.lastMessages.slice(-3).join(' / ')||'none'))),3500);
       },8000);
       this.pending=task;
       this.worker.postMessage('position fen '+fen);
