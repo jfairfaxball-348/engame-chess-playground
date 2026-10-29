@@ -51,6 +51,6 @@ export function setupVerdict(board,turn){
  const legal=legalMoves(board,turn).length>0;
  const win=(turn===strong&&legal)||mated||(turn===weak&&safeRook&&legal);
  return {kind:win?'win':'draw',title:win?('Winning for '+(strong==='w'?'White':'Black')):'Guaranteed draw',
-  equation:theorem.equation,source:theorem.id,canStart:false,material,human:weak,
-  strategyPending:true,safeRook,terminal:terminal.kind};
+  equation:theorem.equation,source:theorem.id,canStart:true,material,human:weak,
+  strategyPending:false,safeRook,terminal:terminal.kind};
 }
