@@ -57,6 +57,23 @@ test('KRK proof shows positional safety condition and both mate bounds without a
  assert.ok(p.steps.some(s=>s.math.includes('98')));
  assert.ok(p.steps.some(s=>s.math.includes('SafeRook')));
 });
+test('an exact one-ply KRK witness is explained without enabling gameplay',()=>{
+ const b=blankBoard();
+ b[sq(1,5)]='wK';b[sq(7,0)]='wR';b[sq(0,7)]='bK';
+ const result=setupVerdict(b,'w'),p=proofFor(b,'w');
+ assert.equal(result.kind,'win');
+ assert.equal(result.canStart,false,'a local mate witness must not unlock the full game');
+ assert.equal(p.source,'EC-T0048');
+ assert.equal(p.auxSource,'EC-T0049');
+ assert.match(p.auxSourceUrl,/EC-T0049\/v1\.md$/);
+ assert.match(p.working,/MateNow = true/);
+ assert.match(p.working,/Rh1 → h8#/);
+ assert.ok(p.steps.some(s=>s.math.includes('MateNow')&&s.why.includes('immediate_iff')));
+ assert.match(p.lead,/Full KRK gameplay remains gated/);
+ const weak=proofFor(b,'b');
+ assert.equal(weak,null,'a position illegally checking the player who just moved must not be presented as a valid setup');
+});
+
 test('incomplete or invalid boards cannot be represented as a completed theorem',()=>{
  assert.equal(proofFor(blankBoard(),'w'),null);
  const b=blankBoard();b[sq(4,0)]='wK';b[sq(5,0)]='bK';
