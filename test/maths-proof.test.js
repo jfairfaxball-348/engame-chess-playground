@@ -72,7 +72,8 @@ test('an exact one-ply KRK witness is explained without enabling gameplay',()=>{
  assert.match(p.lead,/Full KRK gameplay remains gated/);
  const weak=proofFor(b,'b');
  assert.ok(weak,'weak-to-move on the same setup is a distinct legal condition');
- assert.equal(weak.auxSource,undefined,'only a strong-turn immediate mating move may be displayed');
+ assert.equal(weak.auxSource,'EC-T0049','weak-turn LastReply is now a separately proved terminal case');
+ assert.match(weak.formal,/KRKLastReply.model_last_iff/);
 });
 
 test('weak-turn frozen LastReply proof explains every legal mate-in-two branch but does not start KRK',()=>{
