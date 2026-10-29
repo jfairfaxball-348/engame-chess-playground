@@ -30,11 +30,13 @@ export function krkWidePivotChoice(state,frame='id'){
   const [sx,sy]=coords(krkTransformSquare(sk,frame));
   const [rx,ry]=coords(krkTransformSquare(rook,frame));
   const [wx,wy]=coords(krkTransformSquare(wk,frame));
-  // The right-oriented wide proof requires central height, not a rook-file\n  // margin: a rook already on the guarded file remains a valid handoff.
-  if(sy+1!==ry||wy!==ry+1||!(sx===3||sx===4)||wx<sx+2)return null;
-  const target=krkTransformSquare(squareAt(sx+1,ry),frame);
-  const original={phase:'READY wide right protected pivot',frame,
-    parent:KRK_PARENT_SHA,rule:KRK_WIDE_PIVOT_LEMMA,
+  // Left and right cuts are independently proved by the Lean declarations.
+  if(sy+1!==ry||wy!==ry+1||!(sx===3||sx===4))return null;
+  const right=wx>=sx+2,left=wx+2<=sx;
+  if(!right&&!left)return null;
+  const target=krkTransformSquare(squareAt(sx+(right?1:-1),ry),frame);
+  const original={phase:'READY wide protected pivot',frame,
+    parent:KRK_PARENT_SHA,rule:right?KRK_WIDE_PIVOT_LEMMA:KRK_LEFT_PIVOT_LEMMA,
     isCompleteWinningPolicy:false,maxMatePlies:null,
     inputHalfmove:state.halfmove,inputHistoryLength:state.history.length,
     premises:'K one rank below rook, weak king one above rook; K file central; |K file-weak file| >=2'};
