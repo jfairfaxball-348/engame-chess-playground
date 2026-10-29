@@ -21,6 +21,8 @@ export function applicableGeometry(sk,rs,wk,frame='id'){
     entry:gap&&margin>=2&&(rx!==sx||sy<ry)&&ry!==sy+1,
     retreat:gap&&sy===ry&&sy>0,
     backrank:gap&&sy===0&&ry===0&&abs(sx,rx)===1,
+    backrankSetup:gap&&sy===0&&ry===0&&abs(sx,wx)<=1&&margin<=1&&abs(sx,rx)!==1,
+    offrankRepair:gap&&ry!==sy&&!wall&&margin<2,
     // The remaining phase cases require a wall. A local step may consume
     // margin and is NOT necessarily followed by another matching step.
     prep:wall&&margin>=2&&Math.max(ry-(sy+1),sx<3?3-sx:sx>4?sx-4:0)>0,
@@ -52,7 +54,7 @@ export function auditKRKPhaseDomains(){
               canon=true;
               const domain=applicableGeometry(sk,rs,wk,f);
               if(domain.wall)wall=true;
-              if(domain.entry||domain.retreat||domain.backrank)first=true;
+              if(domain.entry||domain.retreat||domain.backrank||domain.backrankSetup||domain.offrankRepair)first=true;
               for(const [k,v] of Object.entries(domain))if(v)rules[k]=(rules[k]||0)+1;
             }
             if(canon)total.canonical++;
