@@ -1,5 +1,21 @@
 # Chess Playground — engineering roadmap
 
+## Current owner priority — KRK02 full-game proof-derived release (29 October 2026)
+
+The old S006 and historic "KRK on hold" sections below describe earlier stages. **Authorised now:** continue KRK01's verified local proof-derived components and finish a *total, executable* KRK strategy. See [NEXT_SESSION.md](../NEXT_SESSION.md) for binding requirements. The KRK01 implementation and source-identity audit are documented in [KRK01_PROOF_POLICY_AUDIT.md](KRK01_PROOF_POLICY_AUDIT.md), and the parent executable extraction draft is [endgame-chess PR #3](https://github.com/jfairfaxball-348/engame-chess/pull/3).
+
+- [x] Outcomes EC-T0019/EC-T0048 and supporting EC-T0049 remain frozen and source-locked.
+- [x] Port local concrete rook/king moves, four frames, immediate mating, last defender reply and deterministic partial wall preparation/climb phases.
+- [x] Install cryptographic pinned-Lean-source validation in Playground CI.
+- [ ] Obtain a verified, *total*, deterministic Lean-derived KRK move selector with all-reply decreasing progress, 93/97/98 compatible budgets, full continuation to checkmate and supported history/clock semantics.
+- [ ] Wire complete policy to Maths Start for user-arranged position, both strong colours, either turn and human as lone king; show live proof/phase/working.
+- [ ] Test complete adversarial games, repetition/50-move/capture/undo and mobile browser interactions, with no Engine tab regression.
+- [ ] Merge verified full-game KRK release and confirm main CI + production deployment.
+- [ ] Stage **KQK** as next material-class import using its own frozen proven constructive move policy. KQK is not assumed playable merely because its outcome proof is near completion.
+
+The older Engine Playground S011 next-session prompt was preserved, not overwritten permanently: [ENGINE_S011_DEFERRED.md](ENGINE_S011_DEFERRED.md). KRK01 proof-derived components may be on `main` with `KRK_GAMEPLAY_RELEASED=false`; this is **not** a premature material release.
+
+
 **October 2026 scope update:** the older roadmap below governs only the proof-derived Maths Endgame. The independent Engine Playground has a separately authorised chess-AI research direction; see [S010 workshop](AI_RESEARCH_WORKSHOP.md). Its experiments may use native engines/ML but must not affect the Maths Endgame proof-release gate.
 
 ## Binding direction
