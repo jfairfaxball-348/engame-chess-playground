@@ -87,6 +87,6 @@ test('constructive KRK game alternates real legal moves and never invokes an ext
    assert.ok(g.log.length===n+1);
   }
   console.log('KRK practical 64-ply adversarial path',strong,
-    {plies:g.log.length,material:g.material,last:g.log.slice(-3)});
+    {plies:g.log.length,material:g.material,last:g.log.slice(-3), trace:g.log.join(' | '), board:g.board});
  }
 });
