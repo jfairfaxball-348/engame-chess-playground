@@ -27,6 +27,34 @@ function fen(board,turn){
   return rows.join('/')+' '+turn+' - - 0 1';
 }
 
+/** Read the chosen Lean-derived actions along a DIAGNOSTIC variation.
+ * Replay uses the already-selected source rule at each strong turn; it does
+ * not search for a winning move. This is only for counterexample triage.
+ */
+function annotateSourceTrace(root,variation){
+  let s=root,token=null;
+  const trace=[];
+  for(let ply=0;ply<variation.length;ply++){
+    const expected=variation[ply];
+    if(ply%2===0){
+      const choice=krkTaggedStrongChoice(s,token);
+      if(!choice||uci(choice.move)!==expected)break;
+      trace.push({ply:ply+1,fen:fen(s.board,s.turn),move:expected,
+        rule:choice.rule,phase:choice.phase,sourcePhase:choice.sourcePhase,
+        frame:choice.frame,preparedStage:token?.inner?.stage??null,
+        centralStage:token?.inner?.inner?.stage??null,
+        orientation:token?.inner?.inner?.orientation??null});
+      s=play(s,choice.move);
+      token=choice.continuationPhase;
+    }else{
+      const reply=legalMoves(s.board,s.turn).find(m=>uci(m)===expected);
+      if(!reply)break;
+      s=play(s,reply);
+    }
+  }
+  return trace;
+}
+
 /** Every legal weak continuation from ONE fresh or tagged strong root.
  * maxNodes/maxPlies are diagnostic resource limits, not mathematical bounds.
  */
@@ -90,6 +118,7 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
     return null;
   }
   const error=visit(root,null,0);
+  if(error)error.sourceTrace=annotateSourceTrace(root,error.variation);
   return {...data,ok:!error,firstCounterexample:error??null};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
