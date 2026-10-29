@@ -8,6 +8,7 @@ import {krkImmediateMateWitness} from './krk-immediate-witness.js';
 import {extras,materialOf,setupVerdict} from './maths-model.js';
 
 const root='https://github.com/jfairfaxball-348/engame-chess/blob/main/';
+const krkRoot='https://github.com/jfairfaxball-348/engame-chess/blob/e7de0930fc61caeb11795cf3c10fde11e4774a40/';
 const theoremPaths={
  kk:'theorems/frozen/EC-T0003/v1.md',
  kbk:'theorems/frozen/EC-T0004/v1.md',
@@ -26,7 +27,7 @@ export function proofFor(board,turn){
  const D=distance(kw,kb),[wx,wy]=coords(kw),[bx,by]=coords(kb);
  const dx=Math.abs(wx-bx),dy=Math.abs(wy-by);
  const general={
-  source:v.source,sourceUrl:root+theoremPaths[kind],
+  source:v.source,sourceUrl:(kind==='krk'?krkRoot:root)+theoremPaths[kind],
   rule:'FIDE 5.2.2',result:v.title,material:kind,
   position:'Kings '+squareName(kw)+' / '+squareName(kb)+
    ': d∞ = max('+dx+', '+dy+') = '+D
@@ -98,7 +99,7 @@ export function proofFor(board,turn){
     step('¬Winσ(p) ⇒ Draw','An unsafe rook may be captured, leaving KK, or the position is stalemate. The class outcome is proved; a JavaScript move policy is not yet certified.')
    ],
    formal:immediate?'KRKImmediate.immediate_iff; KRKCentral.fresh_outcome':'KRKCentral.fresh_outcome',
-   ...(immediate?{auxSource:'EC-T0049',auxSourceUrl:root+'theorems/frozen/EC-T0049/v1.md'}:{})
+   ...(immediate?{auxSource:'EC-T0049',auxSourceUrl:krkRoot+'theorems/frozen/EC-T0049/v1.md'}:{})
   };
  }
  return null;
