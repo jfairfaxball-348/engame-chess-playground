@@ -13,7 +13,8 @@ import {
 } from './chess.js';
 
 export const KRK_PARENT_SHA = 'e7de0930fc61caeb11795cf3c10fde11e4774a40';
-export const KRK_GAMEPLAY_RELEASED = true;\nexport const KRK_FORMAL_COMPLETE_POLICY = false;
+export const KRK_GAMEPLAY_RELEASED = true;
+export const KRK_FORMAL_COMPLETE_POLICY = false;
 /**
  * Four involutive board isometries used in the frozen Lean setup proof.
  * `symId`, `symY`, `symSwap` and `symAnti` preserve king distance,
