@@ -21,6 +21,8 @@ jobs:
       - run: npm run verify:krk-sources
       # Pure diagnostic: geometric premise coverage, not an engine/tablebase.
       - run: npm run audit:krk-phase-domains
+      # KRK13 executable legal-root sample is an audit, never a global proof.
+      - run: npm run audit:krk-root-selector
       - run: npm run check
       - run: npm run build
       # Provider-independent Cloudflare Pages handoff: ensure the deployable
