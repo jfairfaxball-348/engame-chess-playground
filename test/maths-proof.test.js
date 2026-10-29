@@ -75,6 +75,21 @@ test('an exact one-ply KRK witness is explained without enabling gameplay',()=>{
  assert.equal(weak.auxSource,undefined,'only a strong-turn immediate mating move may be displayed');
 });
 
+test('weak-turn frozen LastReply proof explains every legal mate-in-two branch but does not start KRK',()=>{
+ const b=blankBoard();
+ b[sq(1,5)]='wK'; b[sq(7,0)]='wR'; b[sq(0,7)]='bK';
+ const verdict=setupVerdict(b,'b'),p=proofFor(b,'b');
+ assert.equal(verdict.canStart,false);
+ assert.equal(verdict.kind,'win');
+ assert.equal(p.source,'EC-T0048');
+ assert.equal(p.auxSource,'EC-T0049');
+ assert.match(p.lead,/mate in at most two plies after EVERY legal weak-king reply/);
+ assert.match(p.working,/LastReply = true/);
+ assert.match(p.working,/bound ≤2 plies/);
+ assert.ok(p.steps.some(s=>s.math.includes('LastReply(K,R,k)')&&s.math.includes('MateWithinσ(2)')));
+ assert.match(p.formal,/KRKLastReply.model_last_iff/);
+});
+
 test('incomplete or invalid boards cannot be represented as a completed theorem',()=>{
  assert.equal(proofFor(blankBoard(),'w'),null);
  const b=blankBoard();b[sq(4,0)]='wK';b[sq(5,0)]='bK';
