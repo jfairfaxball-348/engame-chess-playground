@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  legalMoves,makeBoard,opposite,play,positionKey,squareAt
+  legalMoves,makeBoard,opposite,play,positionKey,squareAt,validateSetup
 } from '../src/chess.js';
 import {KRK_FRAMES,KRK_GAMEPLAY_RELEASED,krkTransformSquare}
   from '../src/krk-local-witness.js';
@@ -110,4 +110,30 @@ test('nonaligned narrow-rook margin follows exact oriented back-file source for 
   }
   assert.equal(checked,32);
   assert.equal(KRK_GAMEPLAY_RELEASED,false);
+});
+
+test('all legal close-rook central wall roots on the full 8x8 coordinate lattice',()=>{
+  // This is an exhaustive FALSIFICATION audit for the narrow-margin entry
+  // domain, not a solver or certificate of a complete KRK mating policy.
+  let cases=0,aligned=0,oriented=0;
+  for(const sx of [3,4])
+    for(let sy=0;sy<=5;sy++)
+      for(let wy=sy+2;wy<=7;wy++)
+        for(let wx=0;wx<8;wx++)
+          for(let rx=0;rx<8;rx++){
+            if(Math.abs(rx-wx)>=2)continue;
+            const s=root('w',[sx,sy],[rx,sy+1],[wx,wy]);
+            if(validateSetup(s.board,'krk','w')!==null)continue;
+            const chosen=krkCentralBoundaryNext(s);
+            assert.equal(chosen?.kind,'step',JSON.stringify({sx,sy,rx,wx,wy,chosen}));
+            const audit=chosen.phase==='central-aligned-rook-rescue'?
+              auditKRKCentralAlignedRescue(s):
+              auditKRKCentralBackRook(s);
+            assert.equal(audit.ok,true,JSON.stringify({sx,sy,rx,wx,wy,audit}));
+            cases++;
+            if(chosen.phase==='central-aligned-rook-rescue')aligned++;else oriented++;
+          }
+  assert.ok(cases>=50,{cases,aligned,oriented});
+  assert.ok(aligned>0&&oriented>0,{cases,aligned,oriented});
+  console.log('KRK06 exhaustive narrow-margin central first pair',{cases,aligned,oriented});
 });
