@@ -75,7 +75,7 @@ export function krkCentralAlignedRescueChoice(state,frame='id'){
     kind:'step',phase:'central-aligned-rook-rescue',frame,move,
     rule:KRK_CENTRAL_ALIGNED_RULE,
     proofSource:KRK_CENTRAL_ALIGNED_SOURCE,
-    proofStatus:'upstream-draft-awaiting-exact-head-CI',
+    proofStatus:'upstream-draft-exact-head-CI-passed-not-merged',
     inputHalfmove:state.halfmove,inputHistoryLength:state.history.length,
     isCompleteWinningPolicy:false,maxMatePlies:null
   });
@@ -103,7 +103,7 @@ export function krkCentralBackRookChoice(state,frame='id'){
     kind:'step',phase:'central-oriented-back-rook',frame,move,
     orientation:forward?'positive-x':'negative-x',
     rule:KRK_CENTRAL_BACK_RULE,proofSource:KRK_CENTRAL_BACK_SOURCE,
-    proofStatus:'upstream-draft-awaiting-exact-head-CI',
+    proofStatus:'upstream-draft-exact-head-CI-passed-not-merged',
     inputHalfmove:state.halfmove,inputHistoryLength:state.history.length,
     isCompleteWinningPolicy:false,maxMatePlies:null
   });
