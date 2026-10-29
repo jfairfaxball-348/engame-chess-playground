@@ -27,6 +27,7 @@ test('READY branch table selects only source-named locally proved moves',()=>{
   const cases=[
     {phase:'ready-upper',sk:[3,1],rook:[0,2],wk:[5,4]},
     {phase:'ready-narrow-tempo',sk:[3,1],rook:[0,2],wk:[4,3]},
+    {phase:'ready-aligned-check',sk:[3,1],rook:[0,2],wk:[3,3]},
     {phase:'ready-wide-pivot',sk:[3,1],rook:[0,2],wk:[5,3]},
     {phase:'guarded-cut',sk:[3,1],rook:[4,2],wk:[5,3]}
   ];
@@ -47,17 +48,38 @@ test('READY branch table selects only source-named locally proved moves',()=>{
     }
 });
 
-test('aligned READY exit is identified, but no invented move or mate budget leaks',()=>{
-  for(const strong of ['w','b'])for(const frame of KRK_FRAMES){
-    const s=mapped(root(strong,[3,1],[0,2],[3,3]),frame);
-    assert.equal(validateSetup(s.board,'krk',strong),null);
-    const c=krkReadyDispatch(s,frame);
-    assert.equal(c?.kind,'handoff');
-    assert.equal(c.phase,'aligned-exit');
-    assert.equal(c.move,null);
-    assert.equal(c.maxMatePlies,null);
-    assert.equal(auditKRKReadyDispatch(s,frame).handoff,true);
-  }
+test('aligned READY selects only the proved checking rook slide and audits every defence',()=>{
+  for(const strong of ['w','b'])for(const frame of KRK_FRAMES)
+    for(const rookFile of [1,0,7]){
+      // Margin 2/3 admits the first check but NOT a certified four-file
+      // king-up continuation; margin 4 admits the separately proved follow.
+      const margin=Math.abs(rookFile-3);
+      const s=mapped(root(strong,[3,1],[rookFile,2],[3,3]),frame);
+      assert.equal(validateSetup(s.board,'krk',strong),null);
+      const c=krkReadyDispatch(s,frame);
+      assert.equal(c?.kind,'step');
+      assert.equal(c.phase,'ready-aligned-check');
+      assert.match(c.rule,/oppositionCheck_sound/);
+      assert.equal(c.maxMatePlies,null);
+      assert.equal(c.isCompleteWinningPolicy,false);
+      assert.equal(c.move.to,krkTransformSquare(squareAt(rookFile,3),frame));
+      const audit=auditKRKReadyDispatch(s,frame);
+      assert.equal(audit.ok,true,JSON.stringify({strong,frame,rookFile,audit}));
+      assert.equal(audit.local.followCertified,margin>=4);
+      // Exhaust the *actual* defender replies on the owner-arranged board,
+      // not a fabricated board/weak-turn position.
+      const checked=applyMove(s.board,c.move);
+      const responses=legalMoves(checked,opposite(strong));
+      assert.ok(responses.length>0);
+      for(const reply of responses){
+        assert.equal(reply.capture,null);
+        const defended=applyMove(checked,reply);
+        const wk=defended.indexOf(opposite(strong)+'K');
+        const framedWk=krkTransformSquare(wk,frame);
+        assert.ok([squareAt(2,4),squareAt(3,4),squareAt(4,4)]
+          .includes(framedWk),JSON.stringify({strong,frame,rookFile,reply}));
+      }
+    }
 });
 
 test('wide pivot is followed by a guarded move after EVERY legal weak reply',()=>{

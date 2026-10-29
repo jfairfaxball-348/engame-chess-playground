@@ -1,23 +1,60 @@
-# KRK04 — Finish source-derived KRK: aligned exit → global certified winning policy
+# KRK05 — Constructive post-check restoration and total KRK source-derived mate policy
 
-**NEXT SESSION — INSTALLED, NOT EXECUTED.** Owner direction: finish a genuinely playable King + Rook versus King Maths adversary, preserving the proof-derived boundary. Do real code, proof verification, tests and GitHub work, not another generic strategy memo. **Vercel has exhausted its daily usage allowance on 29 October 2026:** use GitHub Actions and repository checks; do not manually trigger or claim any production deployment until the deployment budget is available.
+**NEXT SESSION — INSTALLED, NOT EXECUTED.**
 
-## Verified incoming position (29 October 2026)
+Owner goal remains a fully playable, theorem-derived KRK adversary. This
+follow-up is **execution**, not a documentation or release-flag exercise.
+Vercel hit its daily deployment quota on 29 October; develop and run CI
+independently, never claim production is updated without verifying a deploy.
 
-- Playground `main` after KRK03 [PR #6](https://github.com/jfairfaxball-348/engame-chess-playground/pull/6) and [PR #7](https://github.com/jfairfaxball-348/engame-chess-playground/pull/7): `4959dcd1e4c056b979cbdd84435526846752fc8a`. PR #7's [CI #40896046375](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40896046375) passed Node, frozen-source verification, phase-domain audit, syntax, build and both browser QA suites. This **does not prove** a complete KRK opponent. Verify fresh heads and main checks again; do not infer deployment from CI.
-- The new `src/krk-ready-dispatch.js` composes only previously proven local moves for READY upper wall, narrow tempo, wide pivot and guarded cut. `test/krk-ready-dispatch.test.js` checks both strong colours, four board frames and **every actual defender response** in the pivotal wide→guarded fixtures. The aligned READY branch remains an **explicit handoff with no move**. Read [exact scope](docs/KRK03_READY_DISPATCH.md) and [known fivefold failure of unproved practical policy](docs/KRK03_POLICY_FALSIFICATION.md).
-- Frozen mathematical KRK outcome EC-T0019/0048/0049 does not specify executable moves. `KRKWinning.winning_policy` still uses `Classical.choose`. Parent integration [engame-chess PR #4](https://github.com/jfairfaxball-348/engame-chess/pull/4), head `b1daa3808f5afb03cb963471ee784599fb0b89e1`, passed full [Lean CI #40892358268](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40892358268) and ledger CI, but the parent `main` subsequently advanced to `e163515e875d6fe25157246b345f0566a3ffba8c` with independent KPK work; PR #4 was not yet merged. Reconcile live ancestry and preserve every newer KQK/KPK change. Never modify frozen theorem files.
+## Verified boundary coming out of KRK04
 
-## First concrete mathematical/program blocker
+- Parent research `main` was `e163515e875d6fe25157246b345f0566a3ffba8c`;
+  active KQK/KPK must remain intact. Upstream extraction [PR #4]
+  (https://github.com/jfairfaxball-348/engame-chess/pull/4) remains
+  a separate prerequisite.
+- Proof branch [KRK04 parent PR #5]
+  (https://github.com/jfairfaxball-348/engame-chess/pull/5)
+  specialises `oppositionCheck_sound` into a concrete aligned READY
+  check plus its all-reply postcondition. Verify Lean / axioms and
+  reconcile the stacked branch before treating it as a new frozen source.
+- Playground `src/krk-ready-dispatch.js` translates that **already
+  source-proven local** check, keeping `isCompleteWinningPolicy=false`
+  and `maxMatePlies=null`. Both colours, all four frames, and initial
+  rook gaps 2/3/4 are covered by `test/krk-ready-dispatch.test.js`.
+- `docs/KRK04_ALIGNED_CHECK.md` explains the exact remaining obstacle
+  and release status; neither repo's current changes have enabled
+  any KRK Maths gameplay.
 
-READY lower band at **White Kd2 Ra3, Black Kd4, White to move** (framed `sk=(3,1), rs=(0,2), wk=(3,3)`; legal fresh position) satisfies `KRKCentral.ready_cut_bound`'s aligned `ExitBound` case, but has no executable aligned exit in `KRKExecutable`. The current `krkReadyDispatch(state,'id')` returns `{kind:'handoff',phase:'aligned-exit',move:null}`. The distinct regression **White Kd2 Ra3, Black Kf4**, FEN `8/8/8/8/5k2/R7/3K4/8 w - - 0 1`, is now locally wide-pivot→guarded-entry, but does not yet carry an executable path to mate.
+## Required next work
 
-1. Trace `KRKCentral.ExitStep`, `Full`, `Pivot`, `Back`, `Restoration`, `SmallCentral`, `KRKBox.Phase` and `KRKWinning.Actions`. Build a **computable Lean aligned-exit coordinate constructor and all-defender successor theorem** in a new importing `KRKExecutable` module. Do not replace frozen existential `MateWithin` with guessed squares. A checked-in mathematical module belongs in an isolated, explicitly scoped upstream proof branch, preserving the active KPK programme and immutable sources.
-2. Extend beyond aligned exit: guarded-to-column, box/last mate, all setup/root classes, both colours, all defender replies and a single well-founded phase/rank, **without** resetting ranks at handoffs. Track the certified 93/97/98-ply fresh bound correctly and independently handle 50/75-move and repetition semantics. Every strong turn must have an actual legal deterministic coordinate, every weak reply a proved successor or terminal verdict.
-3. Translate each new verified Lean construction to the independent Playground JS runtime; extend the cryptographic source lock to exact imported commits/blobs. The move chooser must NEVER call Stockfish, Lozza, minimax, a tablebase, an unproved geometry heuristic, or a first-legal fallback. Emit real local theorem/phase/remaining progress in the Maths proof panel, without turning partial lemmas into full-game claims.
-4. Assert **complete actual adversarial played games** to mate against varied king defenders and against all replies throughout each finite exact phase domain; both strong colours and initial turns, all frames, rook capture→KK draw, checkmate/stalemate, history, clocks, undo/restart, exact owner-arranged Start position and responsive browser widths 320/390/768/1280. Protect the independent Engine tab.
-5. Only once the **total** selector and mathematical correspondence are proven and full CI green may `KRK_GAMEPLAY_RELEASED`, `MATERIAL.krk.playable` and `setupVerdict(...).canStart` change from false. Run `npm test`, `npm run verify:krk-sources`, `npm run audit:krk-phase-domains`, `npm run check`, `npm run build`, Maths/Engine Chromium QA, and Lean build + axiom report. Merge cleanly after exact-head CI. Defer production until Vercel quota permits; explicitly report deployed versus repository-only status.
+1. Start with White Kd2 Ra3 vs Black Kd4, white to move,
+   FEN `8/8/8/8/3k4/R7/3K4/8 w - - 0 1`. The checked
+   rook move is Ra4+, and all weak king replies retreat upward.
+   Gap is 3 files: existing `oppositionFollow_sound` explicitly
+   **cannot** justify a generic next `Kd3` move.
+2. In a fresh upstream importing Lean module, extract the
+   `KRKCentral.Restoration` rescue/catch-up cases into coordinate
+   functions and prove each reply total and decreasing over its *exact*
+   input type. Preserve KQK/KPK and immutable source theorems; build
+   `lake` and print axioms for the exact new head. Reconcile PRs #4/#5,
+   do not force-merge conflicting main.
+3. Compose `ReadyCut` narrow/wide/aligned and guarded/column/box phases
+   into all-defender, well-founded and clock/history-aware *global* source
+   policy. Finish non-wall setup and both colours/turns/frames. No heuristic,
+   engine, tablebase, minimax, arbitrary first-legal or known-FEN lookup.
+4. Translate ONLY verified new Lean steps into the independent local
+   Playground JS, maintain immutable source/blob locks, add legal complete
+   adversarial games to checkmate and verify all replay/claim/75-move
+   semantics. Preserve exact arranged board and Engine tab behaviour.
+5. Run `npm test`, `npm run verify:krk-sources`,
+   `npm run audit:krk-phase-domains`, `npm run check`, `npm run build`,
+   browser suites and Lean+axiom CI. Merge only exact tested heads.
+   **Only after** fully certified global selection and owner-approved
+   release, enable `KRK_GAMEPLAY_RELEASED` and KRK Maths Start.
+   Otherwise preserve a separate proof-progress branch and clear blocker
+   record, with KRK still **not fully playable**.
 
-## Genuine blocker rule
-
-If an aligned-exit or further all-phase Lean declaration cannot be built and verified, preserve only proved **local** functionality on a separate reviewed branch/PR, pin the smallest FEN and failed precondition or defender continuation, keep the game gate closed, and state **KRK is not fully playable**. Do not claim a solved opponent because a local bridge or 16 finite playthroughs passed. Continue the exact missing proof obligation on the next owner-authorised session. KQK remains separately gated; Engine S011 remains deferred.
+Install KRK06 only when a genuinely distinct, precisely verified
+next proof obligation remains; do not turn successor prompts into a
+substitute for actually constructing the policy.
