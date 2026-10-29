@@ -1,0 +1,122 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import {
+  makeBoard, squareAt, validateSetup, newGame,
+  legalMoves, applyMove, outcome, positionKey
+} from '../src/chess.js';
+import { chooseDecision } from '../src/engine.js';
+import {
+  KRK_PARENT_SHA, KRK_GAMEPLAY_RELEASED, KRK_WITNESS_RULES,
+  krkLocalWitness, auditKRKLocalWitness
+} from '../src/krk-local-witness.js';
+
+const s = squareAt;
+function state(strong='w', sk=[3,0], rs=[4,2], wk=[5,3], halfmove=0) {
+  const b=makeBoard(), weak=strong==='w'?'b':'w';
+  b[s(...sk)]=strong+'K'; b[s(...rs)]=strong+'R'; b[s(...wk)]=weak+'K';
+  return {board:b,turn:strong,material:'krk',halfmove,
+    history:[positionKey(b,strong)],log:[]};
+}
+function exercise(st,rule) {
+  const w=krkLocalWitness(st,rule);
+  if(!w)return false;
+  assert.equal(w.origin,'local-lean-geometric-witness');
+  assert.equal(w.rule,KRK_WITNESS_RULES[rule]);
+  assert.equal(w.parent,KRK_PARENT_SHA);
+  assert.equal(w.maxMatePlies,null);
+  assert.equal(w.isCompleteWinningPolicy,false);
+  assert.ok(legalMoves(st.board,st.turn).some(m=>m.from===w.move.from&&m.to===w.move.to));
+  const audit=auditKRKLocalWitness(st,w);
+  assert.equal(audit.ok,true,`all-reply violation: ${rule} ${JSON.stringify(st.board)}`);
+  assert.ok(audit.replies>0);
+  return true;
+}
+
+test('release remains fail-closed; a local witness is not an autoplay selector',()=>{
+  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+  const st=state();
+  assert.throws(()=>newGame(st.board,st.turn,'krk'),/not released/);
+  assert.equal(chooseDecision(st,st.turn),null);
+  assert.equal(krkLocalWitness(st,'automatic'),null);
+  assert.equal(krkLocalWitness(st,undefined),null);
+  const text=readFileSync('src/krk-local-witness.js','utf8');
+  assert.doesNotMatch(text,/stockfish|lozza|syzygy|tablebase|fetch\s*\(|minimax|retrograde/i);
+});
+
+test('rook-rescue witness uses the exact far file and preserves all replies for both colours',()=>{
+  for(const colour of ['w','b']){
+    const st=state(colour);
+    assert.equal(validateSetup(st.board,'krk',colour),null);
+    assert.equal(exercise(st,'rescue'),true);
+    const w=krkLocalWitness(st,'rescue');
+    assert.equal(w.move.from,s(4,2));
+    assert.equal(w.move.to,s(0,2));
+  }
+});
+
+test('wall tempo and pursuit are separate local lemmas, not a looping policy',()=>{
+  for(const colour of ['w','b']){
+    const wall=state(colour,[3,0],[3,2],[5,5]);
+    assert.equal(exercise(wall,'wall'),true);
+    assert.equal(krkLocalWitness(wall,'wall').move.to,s(0,2));
+    const pursuit=state(colour,[2,1],[0,2],[5,3]);
+    assert.equal(exercise(pursuit,'pursuit'),true);
+    assert.equal(krkLocalWitness(pursuit,'pursuit').move.to,s(3,1));
+  }
+});
+
+test('no fabricated certificates on invalid geometry, missing metadata or wrong turn',()=>{
+  const st=state(),op=st.turn==='w'?'b':'w';
+  assert.equal(krkLocalWitness({...st,turn:op},'rescue'),null);
+  assert.equal(krkLocalWitness({...st,history:null},'rescue'),null);
+  assert.equal(krkLocalWitness({...st,halfmove:-1},'rescue'),null);
+  assert.equal(krkLocalWitness({...st,material:'kk'},'rescue'),null);
+  assert.equal(krkLocalWitness(state('w',[3,0],[4,2],[5,3]),'pursuit'),null);
+  const w=krkLocalWitness(st,'rescue');
+  assert.equal(auditKRKLocalWitness(st,{...w,move:{...w.move,to:s(7,7)}}).ok,false);
+  assert.equal(auditKRKLocalWitness(st,{...w,parent:'unverified'}).ok,false);
+});
+
+test('a clock-close or incoming-history state never gains an invented fresh mate bound',()=>{
+  const st=state('w',[3,0],[4,2],[5,3],99);
+  st.history=[...Array(4).fill('other'),positionKey(st.board,st.turn)];
+  const w=krkLocalWitness(st,'rescue');
+  assert.ok(w);assert.equal(w.maxMatePlies,null);
+  assert.equal(w.inputHalfmove,99);
+  assert.equal(w.inputHistoryLength,5);
+  assert.equal(auditKRKLocalWitness(st,w).ok,true);
+});
+
+test('KRK terminal, safe-rook capture and KK transition remain explicit and gated',()=>{
+  const st=state('w',[4,0],[4,5],[4,6]);
+  assert.equal(validateSetup(st.board,'krk','b'),null);
+  const capture=legalMoves(st.board,'b').find(m=>m.to===s(4,5));
+  assert.ok(capture);
+  const kk=applyMove(st.board,capture);
+  assert.equal(kk.filter(Boolean).length,2);
+  assert.equal(krkLocalWitness({...st,board:kk},'rescue'),null);
+  const mate=state('w',[2,6],[0,7],[0,0]);
+  assert.equal(outcome(mate.board,'b').kind,'ongoing'); // not a legal mate arrangement
+  assert.equal(krkLocalWitness({...mate,turn:'b'},'wall'),null);
+});
+
+test('broad deterministic adversarial diagnostics across legal framed positions',()=>{
+  // These are diagnostics, not proof: all legal defender replies are checked
+  // for each applicable ONE-STEP witness over selected rank bands.
+  const cases=[[0,2,3],[0,3,6],[1,2,3],[1,3,7],[2,4,6],[3,5,7]];
+  const counts={w:{rescue:0,wall:0,pursuit:0},b:{rescue:0,wall:0,pursuit:0}};
+  for(const colour of ['w','b'])for(const [sy,ry,wy] of cases){
+    for(let sx=0;sx<8;sx++)for(let rx=0;rx<8;rx++)for(let wx=0;wx<8;wx++){
+      const st=state(colour,[sx,sy],[rx,ry],[wx,wy]);
+      if(validateSetup(st.board,'krk',colour))continue;
+      for(const rule of Object.keys(KRK_WITNESS_RULES)){
+        if(exercise(st,rule))counts[colour][rule]++;
+      }
+    }
+  }
+  for(const colour of ['w','b'])for(const rule of Object.keys(KRK_WITNESS_RULES)){
+    assert.ok(counts[colour][rule]>0, `${colour} ${rule}: no covered fixtures`);
+  }
+  console.log('KRK01 applicable local witnesses by colour and rule:',counts);
+});
