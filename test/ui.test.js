@@ -60,10 +60,10 @@ test('new Maths tab retains keyboard, undo and drag interactions independently o
   for(const key of ['Escape','Delete','Backspace'])assert.ok(app.includes(key));
   for(const id of ['maths-undo','maths-clear','maths-start','maths-edit'])assert.ok(app.includes(id));
   for(const pointer of ['pointerdown','pointermove','pointerup','pointercancel'])assert.ok(app.includes(pointer));
-  assert.match(app,/history\\.push\\(save\\(\\)\\)/);
+  assert.match(app,/history\.push\(save\(\)\)/);
   assert.match(app,/hasPointerCapture/);
   assert.match(browser,/tray drag placed white king/);
   assert.match(browser,/weak-side ownership/);
   assert.match(browser,/64 squares/);
-  assert.doesNotMatch(app,/\\bfetch\\s*\\(|\\bWebSocket\\s*\\(/);
+  assert.doesNotMatch(app,/\bfetch\s*\(|\bWebSocket\s*\(/);
 });
