@@ -16,7 +16,7 @@ import {
   applyMove,coords,distance,findKing,inCheck,legalMoves,opposite,outcome,
   squareAt,validateSetup
 } from './chess.js';
-import {KRK_FRAMES,krkLocalWitness} from './krk-local-witness.js';
+import {KRK_FRAMES,krkLocalWitness,krkTransformSquare} from './krk-local-witness.js';
 import {krkImmediateMateWitness} from './krk-immediate-witness.js';
 import {krkWallClimbChoice} from './krk-wall-climb.js';
 import {krkConstructiveStep} from './krk-constructive-phases.js';
@@ -149,8 +149,24 @@ function cornerEscort(state,strong){
   if(!(wx===0||wx===7||wy===0||wy===7)||distance(sk,wk)<=2)return null;
   const manhattan=(a,c)=>{const [x,y]=coords(a),[u,v]=coords(c);return diff(x,u)+diff(y,v);};
   const initial=manhattan(sk,wk);
-  const moves=legalMoves(b,strong).filter(m=>m.from===sk&&
-     safeMove(state,m,strong)&&manhattan(m.to,wk)<initial);
+  // Build a rook wall BEFORE escort: chasing without confinement permits
+  // a weak king to escape and resets the entire geometric progress.
+  const wall=(board,frame)=>{
+    const t=x=>coords(krkTransformSquare(x,frame))[1];
+    return t(findKing(board,strong))<t(board.indexOf(strong+'R'))&&
+      t(board.indexOf(strong+'R'))<t(findKing(board,weak));
+  };
+  const frames=[...new Set([state.krkFrame,...KRK_FRAMES].filter(f=>KRK_FRAMES.includes(f)))];
+  const active=frames.filter(frame=>wall(b,frame));
+  if(!active.length)return null;
+  const moves=legalMoves(b,strong).filter(m=>{
+    if(m.from!==sk||!safeMove(state,m,strong)||manhattan(m.to,wk)>=initial)return false;
+    const after=applyMove(b,m);
+    // The king advance must preserve the SAME strict wall throughout all
+    // legal weak replies, not merely be legal and rook-safe immediately.
+    return active.some(frame=>wall(after,frame)&&
+      legalMoves(after,weak).every(reply=>wall(applyMove(after,reply),frame)));
+  });
   // The first preferred approach is an ordinary forward king step toward
   // the confined king, not an arbitrary rook swing across the board.
   moves.sort((a,c)=>manhattan(a.to,wk)-manhattan(c.to,wk)||
