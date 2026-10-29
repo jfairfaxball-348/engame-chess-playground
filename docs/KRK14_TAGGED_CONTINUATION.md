@@ -48,8 +48,7 @@ With the same starting root and `--nodes=1200`, the diagnostic saw **1,201 nodes
 termination. A dedicated regression checks the previously false positive.
 The diagnostic also gains `sourceTrace` on any failure so that nested
 Lean rule, stage and orientation can be inspected without turning the
-test traversal into a move selector. A larger 40,000-node check is being
-run separately; its result must be read before claims about that bound.
+test traversal into a move selector. The larger **40,000-node cap diagnostic** on exact code head `d21e52bc8de0e09bc81490c498eec15830e3017e` passed CI [#40973257601](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40973257601): **40,001 nodes, 16,482 checkmate leaves, maximum 45 plies**, no observed cycle or unsupported continuation before the **node cap**. This is not a complete tree proof. The full all-defender mathematical certificate and source-to-JS selection equivalence remain OPEN.
 
 ## Remaining mathematical work
 
