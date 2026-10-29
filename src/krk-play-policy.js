@@ -137,6 +137,31 @@ function geometricSetup(state,strong,legal){
     certifiedLocalStep:false,globalPlyBound:null};
 }
 
+/** At the outer edge, advance the escorting king before moving the wall
+ * sideways again. This implements the practical 'corner escort' phase:
+ * each step reduces the file+rank separation and keeps the rook safe.
+ * No claim of a formal finite bound is attached to this move.
+ */
+function cornerEscort(state,strong){
+  const b=state.board,weak=opposite(strong);
+  const wk=findKing(b,weak),sk=findKing(b,strong);
+  const [wx,wy]=coords(wk),[sx,sy]=coords(sk);
+  if(!(wx===0||wx===7||wy===0||wy===7))return null;
+  const manhattan=(a,c)=>{const [x,y]=coords(a),[u,v]=coords(c);return diff(x,u)+diff(y,v);};
+  const initial=manhattan(sk,wk);
+  const moves=legalMoves(b,strong).filter(m=>m.from===sk&&
+     safeMove(state,m,strong)&&manhattan(m.to,wk)<initial);
+  // The first preferred approach is an ordinary forward king step toward
+  // the confined king, not an arbitrary rook swing across the board.
+  moves.sort((a,c)=>manhattan(a.to,wk)-manhattan(c.to,wk)||
+     distance(c.to,wk)-distance(a.to,wk)||a.to-c.to);
+  if(!moves.length)return null;
+  return {move:moves[0],origin:'krk-geometric-setup',
+    mode:KRK_POLICY_MODE,rule:'KRKCentral king approach / corner escort',
+    reason:'Move the supporting king toward the confined lone king while protecting the rook.',
+    certifiedLocalStep:false,globalPlyBound:null};
+}
+
 export function chooseKRKDecision(state,strong){
   if(!state||state.material!=='krk'||state.turn!==strong||
     !['w','b'].includes(strong)||!Array.isArray(state.board)||!Array.isArray(state.history))return null;
@@ -149,6 +174,14 @@ export function chooseKRKDecision(state,strong){
   // An immediate geometrically proved mate takes precedence over setup.
   const mate=krkImmediateMateWitness(state);
   if(mate)return {...wrap(mate,'exact MateNow',state.krkFrame||'id'),frame:state.krkFrame||'id'};
+  // Complete the prior frozen four-ply opposition sequence before reorienting.
+  if(state.krkProofContext){
+    const follow=krkOppositionFollowChoice(state,state.krkProofContext);
+    if(follow&&safeMove(state,follow.move,strong))
+      return wrap(follow,'continued opposition king-up',state.krkProofContext.frame);
+  }
+  const escort=cornerEscort(state,strong);
+  if(escort)return escort;
   for(const frame of frames){
     for(const [source,w] of possibleWitnesses(state,frame)){
       if(!isMove(w)||!safeMove(state,w.move,strong))continue;
