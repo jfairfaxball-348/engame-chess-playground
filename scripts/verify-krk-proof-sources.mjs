@@ -68,10 +68,42 @@ export async function verifyKRKProofSources(lock=readLock(),fetchSource=fetch){
   return checked;
 }
 
+/** Separate immutable lock for the unreleased routing extraction. */
+export async function verifyKRKRoutingSources(
+  lock=JSON.parse(readFileSync('proof-sources/krk09-routing.lock.json','utf8')),
+  fetchSource=fetch
+){
+  if(lock?.schemaVersion!==1||lock.status!=='draft-unreleased'||
+     lock.gameplayReleased!==false||
+     lock.sourceRepository!=='jfairfaxball-348/engame-chess'||
+     !/^[0-9a-f]{40}$/.test(lock.sourceCommit)||
+     !Array.isArray(lock.sources)||lock.sources.length<14)
+    throw Error('Invalid unreleased KRK routing lock');
+  const paths=new Set();
+  for(const {path,gitBlob} of lock.sources){
+    if(!/^formal\/EndgameChess\/Rules\/KRK(?:Executable|Central)\/[A-Za-z]+\.lean$/.test(path)||
+       paths.has(path)||!/^[0-9a-f]{40}$/.test(gitBlob))
+      throw Error('Invalid routing source: '+path);
+    paths.add(path);
+    const response=await fetchSource('https://raw.githubusercontent.com/'+
+      lock.sourceRepository+'/'+lock.sourceCommit+'/'+path);
+    if(!response.ok)throw Error('Routing source unavailable: '+path);
+    if(gitBlobHash(Buffer.from(await response.arrayBuffer()))!==gitBlob)
+      throw Error('Routing source mismatch: '+path);
+  }
+  if(!paths.has('formal/EndgameChess/Rules/KRKExecutable/LowerRouting.lean')||
+     !readFileSync('src/krk-lower-band.js','utf8').includes(
+       "KRK_ROUTING_SOURCE_SHA = '"+lock.sourceCommit+"'"))
+    throw Error('Missing routing extraction or mismatched local source anchor');
+  return paths.size;
+}
+
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
   try{
     const count=await verifyKRKProofSources();
     console.log('KRK proof provenance verified:',count,'frozen upstream files, no runtime Lean execution');
+    const routing=await verifyKRKRoutingSources();
+    console.log('KRK routing provenance verified:',routing,'draft source files; gameplay remains unreleased');
   }catch(e){
     console.error(e);
     process.exitCode=1;

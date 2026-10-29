@@ -1,8 +1,10 @@
 /**
- * KRK08 experimental CENTRAL-WALL composition (UNRELEASED).
+ * KRK09 phase-indexed CENTRAL-WALL composition (UNRELEASED).
  *
- * This combines previously source-derived lower pursuit, central rescue,
- * rank advance and post-check restoration on the ORIGINAL chess state.
+ * LowerRouting.lean proves all-reply lower-phase termination and the
+ * off-centre upper lift. Explicit continuation tags distinguish pursuit,
+ * restoration after a lift, centre alignment, and full central re-entry.
+ * The original board, clocks and history remain attached throughout.
  * A successful bounded falsification audit is not a Lean proof of
  * universal game selection; do not wire to Maths gameplay.
  *
@@ -10,15 +12,15 @@
  * frozen/new Lean constructor. Game-tree traversal is DIAGNOSTIC ONLY.
  */
 import {
-  coords,findKing,legalMoves,opposite,outcome,play,positionKey,validateSetup
+  applyMove,coords,findKing,legalMoves,opposite,outcome,play,positionKey,validateSetup
 } from './chess.js';
 import {KRK_FRAMES,krkTransformSquare}
   from './krk-local-witness.js';
-import {krkLowerBandChoice} from './krk-lower-band.js';
+import {krkLowerBandChoice,krkLowerBandExit} from './krk-lower-band.js';
+import {krkConstructiveStep} from './krk-constructive-phases.js';
 import {
   krkCentralAlignedRescueChoice,krkCentralBackRookChoice
 } from './krk-central-boundary.js';
-import {krkCentralUpperPhaseChoice} from './krk-central-upper-phase.js';
 import {krkOppositionCheckChoice} from './krk-opposition.js';
 import {krkRestorationChainNext} from './krk-restoration-chain.js';
 
@@ -41,42 +43,78 @@ const claim=s=>s.halfmove>=100||
   s.history.filter(k=>k===positionKey(s.board,s.turn)).length>=3;
 
 /**
- * A conservative, restricted dispatcher from a FULL central wall and
- * its restoration descendants. It NEVER chooses a generic legal move.
+ * A restricted dispatcher from a FULL central wall and tagged descendants.
+ * Context is returned with each move, then supplied after the weak reply.
+ * This JS composition has no formal whole-game clock bound yet.
  */
-export function krkCentralSequenceChoice(state,frame='id'){
+export function krkCentralSequenceChoice(state,frame='id',context=null){
   const g=geometry(state,frame);
   if(!g||claim(state)||state.halfmove+12>=100||
     outcome(state.board,state.turn,state.history,state.halfmove).kind!=='ongoing')
     return null;
-  // The upper/check rook lift leaves the king two ranks below the wall.
-  // Existing KRK05 constructor restores an actual central FULL premise.
-  if(g.sy+2===g.ry&&g.ry<g.wy){
-    const restoration=krkRestorationChainNext(state,frame);
-    return restoration?.kind==='step'?restoration:null;
+  let stage='central';
+  if(context){
+    // A tag is tied to the exact strong move and its original history.
+    if(context.frame!==frame||context.strong!==state.turn||
+      context.afterStrongKey!==state.history.at(-2)||
+      context.historyLength!==state.history.length||
+      context.halfmove!==state.halfmove||context.wallRank!==g.ry||
+      !['central','lower','restore','centre'].includes(context.stage))return null;
+    stage=context.stage;
+  }else if(![3,4].includes(g.sx)||g.sy+1!==g.ry||g.ry>=g.wy){
+    return null;
   }
-  // The last restoration alignment step may need one more king pair.
-  if(g.sy+1===g.ry&&g.ry<g.wy&&![3,4].includes(g.sx)){
-    const restoration=krkRestorationChainNext(state,frame);
-    return restoration?.kind==='step'?restoration:null;
+  const emit=(choice,nextStage,orientation=null)=>{
+    if(choice?.kind!=='step'||!choice.move)return null;
+    const after=applyMove(state.board,choice.move);
+    const afterStrongKey=positionKey(after,opposite(state.turn));
+    if(state.history.filter(k=>k===afterStrongKey).length>=2)return null;
+    const [,wallRank]=coords(krkTransformSquare(
+      after.indexOf(state.turn+'R'),frame));
+    return Object.freeze({...choice,continuationPhase:Object.freeze({
+      stage:nextStage,orientation,frame,strong:state.turn,wallRank,
+      afterStrongKey,
+      historyLength:state.history.length+2,halfmove:state.halfmove+2
+    })});
+  };
+  if(stage==='restore'){
+    if(g.sy+2!==g.ry||g.ry>=g.wy)return null;
+    const choice=krkRestorationChainNext(state,frame);
+    if(choice?.kind!=='step')return null;
+    const after=applyMove(state.board,choice.move);
+    const [sx,sy]=coords(krkTransformSquare(findKing(after,state.turn),frame));
+    return emit(choice,sy===g.sy?'restore':[3,4].includes(sx)?'central':'centre');
   }
-  if(![3,4].includes(g.sx)||g.sy+1!==g.ry||g.ry>=g.wy)return null;
-  // An aligned weak king with margin debt needs the special far rescue.
-  if(g.sx===g.wx&&g.margin<2)
-    return krkCentralAlignedRescueChoice(state,frame);
-  // Nonaligned lower band: constructive chase / back-rook wait.
-  if(g.wy===g.ry+1&&g.sx!==g.wx)
-    return krkLowerBandChoice(state,frame);
-  // An upper weak king and narrow rook margin first require orientation.
-  if(g.wy>=g.ry+2&&g.margin<2)
-    return krkCentralBackRookChoice(state,frame);
-  // The aligned lower-band opposition move advances into restoration or
-  // directly checkmates at the edge.
+  if(stage==='centre'){
+    if(g.sy+1!==g.ry||g.ry>=g.wy||![2,5].includes(g.sx))return null;
+    return emit(krkRestorationChainNext(state,frame),'central');
+  }
+  if(g.sy+1!==g.ry||g.ry>=g.wy||g.sx<1||g.sx>6)return null;
+  if(stage==='central'){
+    if(![3,4].includes(g.sx))return null;
+    if(g.sx===g.wx&&g.margin<2)
+      return emit(krkCentralAlignedRescueChoice(state,frame),'central');
+    if(g.wy>=g.ry+2&&g.margin<2)
+      return emit(krkCentralBackRookChoice(state,frame),'central');
+  }else{
+    const exit=krkLowerBandExit(state,frame);
+    if(!exit){
+      const orientation=g.wx>g.sx?'positive-x':'negative-x';
+      if(context.orientation!==orientation)return null;
+    }
+  }
+  if(g.wy===g.ry+1&&g.sx!==g.wx){
+    const choice=krkLowerBandChoice(state,frame);
+    return emit(choice,'lower',choice?.orientation);
+  }
   if(g.wy===g.ry+1&&g.sx===g.wx)
-    return krkOppositionCheckChoice(state,frame);
-  // Upper READY: advance rook rank, then restore the full central wall.
-  if(g.wy>=g.ry+2&&g.margin>=2)
-    return krkCentralUpperPhaseChoice(state,frame);
+    return emit(krkOppositionCheckChoice(state,frame),'restore');
+  if(g.wy>=g.ry+2&&g.margin>=2){
+    // offCentreUpper_sound / rank_two_pair allows ALL interior king files.
+    const witness=krkConstructiveStep(state,'rankTwo',frame);
+    return emit(witness&&{...witness,kind:'step',phase:'exit-upper-lift',
+      rule:'EndgameChess.Rules.KRKExecutable.offCentreUpper_sound'},'restore');
+  }
   return null;
 }
 
@@ -92,11 +130,11 @@ export function auditKRKCentralSequence(root,frame='id',maxNodes=40000){
   });
   const g=geometry(root,frame);
   if(!g||![3,4].includes(g.sx)||g.sy+1!==g.ry||
-    g.ry>=g.wy||g.ry>6||claim(root)||root.halfmove!==0)
+    g.ry>=g.wy||g.ry>6||claim(root)||root.halfmove!==0||root.history.length!==1)
     return bad('outside fresh full central-wall scope');
   let nodes=0,terminalMates=0,maximumPlies=0;
   const path=new Set();
-  function visit(s,plies){
+  function visit(s,plies,context=null){
     if(++nodes>maxNodes)return 'diagnostic node cap reached';
     maximumPlies=Math.max(maximumPlies,plies);
     const o=outcome(s.board,s.turn,s.history,s.halfmove);
@@ -106,9 +144,13 @@ export function auditKRKCentralSequence(root,frame='id',maxNodes=40000){
     }
     if(o.kind!=='ongoing'||claim(s))return 'draw, stalemate or claim';
     if(plies>=98)return 'FIDE-safe bound exceeded';
-    const key=positionKey(s.board,s.turn);
+    // The same board may occur once during centre restoration and later
+    // during pursuit. Those have different certified next actions. FIDE
+    // threefold still counts the actual board/turn through claim(s).
+    const key=positionKey(s.board,s.turn)+'|'+(context?.stage??'central')+
+      '|'+(context?.orientation??'');
     if(path.has(key))return 'repeated position';
-    const move=krkCentralSequenceChoice(s,frame);
+    const move=krkCentralSequenceChoice(s,frame,context);
     if(!move||move.kind!=='step'||!move.move)
       return 'no proved constructive next move';
     path.add(key);
@@ -120,6 +162,7 @@ export function auditKRKCentralSequence(root,frame='id',maxNodes=40000){
       path.delete(key);return null;
     }
     if(next.kind!=='ongoing'){path.delete(key);return 'stalemate or automatic draw after strong move';}
+    if(claim(after)){path.delete(key);return 'defender draw claim after strong move';}
     const replies=legalMoves(after.board,after.turn);
     if(!replies.length){path.delete(key);return 'missing legal defender reply';}
     for(const reply of replies){
@@ -127,7 +170,7 @@ export function auditKRKCentralSequence(root,frame='id',maxNodes=40000){
         path.delete(key);return 'rook capture or unproved defending move';
       }
       const child=play(after,reply);
-      const error=visit(child,plies+2);
+      const error=visit(child,plies+2,move.continuationPhase);
       if(error){path.delete(key);return error;}
     }
     path.delete(key);
