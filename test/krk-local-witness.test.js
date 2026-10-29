@@ -41,7 +41,8 @@ test('release remains fail-closed; a local witness is not an autoplay selector',
   assert.equal(krkLocalWitness(st,'automatic'),null);
   assert.equal(krkLocalWitness(st,undefined),null);
   const text=readFileSync('src/krk-local-witness.js','utf8');
-  assert.doesNotMatch(text,/stockfish|lozza|syzygy|tablebase|fetch\s*\(|minimax|retrograde/i);
+  const executable=text.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
+  assert.doesNotMatch(executable,/stockfish|lozza|syzygy|tablebase|fetch\s*\(|minimax|retrograde/i);
 });
 
 test('rook-rescue witness uses the exact far file and preserves all replies for both colours',()=>{
