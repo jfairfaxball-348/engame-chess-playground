@@ -4,7 +4,7 @@ import {makeBoard,squareAt,positionKey,opposite,validateSetup}
   from '../src/chess.js';
 import {KRK_FRAMES,KRK_GAMEPLAY_RELEASED,krkTransformSquare}
   from '../src/krk-local-witness.js';
-import {krkGuardedEntryChoice,auditKRKGuardedEntry,KRK_GUARDED_LEMMA}
+import {krkGuardedEntryChoice,auditKRKGuardedEntry,KRK_GUARDED_LEMMA,KRK_GUARDED_LEFT_LEMMA}
   from '../src/krk-guarded-entry.js';
 
 function p(c,sk,rs,wk){
@@ -48,7 +48,29 @@ test('guarded geometry holds against all weak moves in both colours and four fra
  assert.ok(tries>200);assert.ok(replies>150);
  console.log('KRK02 guarded all-reply cases:',{tries,replies});
 });
+test('mirrored guarded left-side entry preserves the confined defender region',()=>{
+  const s=p('w',[4,1],[3,2],[2,3]);
+  const c=krkGuardedEntryChoice(s);
+  assert.ok(c,JSON.stringify(c));
+  assert.equal(c.rule,KRK_GUARDED_LEFT_LEMMA);
+  assert.equal(c.move.from,squareAt(4,1));
+  assert.equal(c.move.to,squareAt(4,2));
+  assert.ok(auditKRKGuardedEntry(s).ok);
+  let tries=0;
+  for(const colour of ['w','b'])for(const iso of KRK_FRAMES)
+  for(const rx of [2,3,4])for(let ry=1;ry<7;ry++)
+  for(let wx=0;wx<rx;wx++)for(let wy=ry+1;wy<8;wy++){
+    const st=frame(p(colour,[rx+1,ry-1],[rx,ry],[wx,wy]),iso);
+    if(validateSetup(st.board,'krk',colour))continue;
+    const w=krkGuardedEntryChoice(st,iso);
+    assert.ok(w,JSON.stringify({colour,iso,rx,ry,wx,wy}));
+    const audit=auditKRKGuardedEntry(st,iso);
+    assert.ok(audit.ok,JSON.stringify({colour,iso,rx,ry,wx,wy,audit}));
+    tries++;
+  }
+  assert.ok(tries>150);
+});
 test('guarded entry is not a game-playing policy and rejects other orientations',()=>{
- assert.equal(krkGuardedEntryChoice(p('w',[4,1],[3,2],[2,3])),null);
+ assert.equal(krkGuardedEntryChoice(p('w',[4,1],[4,2],[2,3])),null);
  assert.equal(KRK_GAMEPLAY_RELEASED,false);
 });
