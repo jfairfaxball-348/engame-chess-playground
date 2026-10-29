@@ -150,7 +150,10 @@ function proofMarkup(pos,side){
   '<ol class="maths-proof-steps">'+p.steps.map(x=>'<li><span class="maths-proof-math">'+escapeText(x.math)+
      '</span><span class="maths-proof-reason">'+escapeText(x.why)+'</span></li>').join('')+'</ol>'+
   '<a class="maths-theorem" target="_blank" rel="noopener noreferrer" href="'+escapeText(p.sourceUrl)+'">'+
-  escapeText(p.source)+' · Read frozen Lean proof ↗</a></div>';
+  escapeText(p.source)+' · Read frozen Lean proof ↗</a>'+
+  (p.auxSourceUrl?'<a class="maths-theorem" target="_blank" rel="noopener noreferrer" href="'+
+  escapeText(p.auxSourceUrl)+'">'+escapeText(p.auxSource)+' · Exact mating-move theorem ↗</a>':'')+
+  '</div>';
 }
 function render(){
  if(gesture)cancelGesture();
