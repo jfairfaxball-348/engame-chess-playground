@@ -30,7 +30,7 @@ export function put(board,piece,to){
 }
 export function relocate(board,from,to){
  if(!Number.isInteger(from)||from<0||from>63||!board[from])return null;
- if(!Number.isInteger(to)||to<0||to>63||(to!==-1&&(to===from||board[to])))return null;
+ if(!Number.isInteger(to)||to< -1||to>63||(to!==-1&&(to===from||board[to])))return null;
  const next=board.slice(),piece=next[from];next[from]=null;if(to!==-1)next[to]=piece;return next;
 }
 export function setupVerdict(board,turn){
