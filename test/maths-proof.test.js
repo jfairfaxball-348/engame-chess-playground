@@ -97,7 +97,7 @@ test('Maths proof panel shows the exact constructive entry and local theorem, no
  const v=setupVerdict(b,'w'),p=proofFor(b,'w');
  assert.equal(v.canStart,true);
  assert.ok(p.steps.some(s=>s.math.includes('R g6 → g2')&&s.why.includes('krk_clear_vertical_entry_force')));
- assert.ok(p.steps.some(s=>s.why.includes('no global mate policy')));
+ assert.ok(p.steps.some(s=>s.why.includes('full all-position move policy is not formally extracted')));
  assert.equal(p.source,'EC-T0048');
 });
 
