@@ -16,6 +16,9 @@ jobs:
           node-version: '22'
       - run: npm install --no-audit --no-fund
       - run: npm test
+      # Check exact frozen Lean proofs and theorem versions at their immutable SHA.
+      # This validates provenance, not an unimplemented global KRK algorithm.
+      - run: npm run verify:krk-sources
       - run: npm run check
       - run: npm run build
       # Playwright is CI-only; the new arena has pinned browser-only dependencies.
