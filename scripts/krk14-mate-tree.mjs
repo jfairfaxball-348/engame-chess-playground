@@ -44,8 +44,18 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
     if(++data.nodes>maxNodes)return fail('node cap',s);
     data.maximumPlies=Math.max(data.maximumPlies,ply);
     if(ply>maxPlies)return fail('ply cap',s);
-    const key=positionKey(s.board,s.turn)+'|'+(token?.mode??'root')+
-      '|'+(token?.inner?.stage??token?.inner?.kind??'start');
+    // Central policy has TWO independent tags: PreparedWall continuation
+    // stage='central' and the nested CentralRun control stage
+    // ('centre', 'lower', 'restore', ...). Omitting the latter creates a
+    // FALSE cycle at an identical board reached during different stages.
+    const control=token?.inner?.inner;
+    const key=positionKey(s.board,s.turn)+'|'+JSON.stringify({
+      mode:token?.mode??'root',
+      frame:token?.frame??null,
+      stage:token?.inner?.stage??null,
+      centralStage:control?.stage??null,
+      orientation:control?.orientation??null
+    });
     if(stack.has(key))return fail('phase-position cycle',s);
     const o=outcome(s.board,s.turn,s.history,s.halfmove);
     if(o.kind!=='ongoing')return fail('terminal before strong action: '+o.kind,s);
