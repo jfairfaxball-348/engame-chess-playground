@@ -11,6 +11,7 @@ import {
 } from '../src/krk-tagged-strategy.js';
 import {auditKRK14Continuations}
   from '../scripts/krk14-continuation-audit.mjs';
+import {auditKRK14MateTree} from '../scripts/krk14-mate-tree.mjs';
 
 function fixture(colour,frame,sk,rs,wk,turn=colour){
   const local=makeBoard(),board=makeBoard();
@@ -120,4 +121,18 @@ test('KRK14 sampled falsification returns exact legal-reply counts and does not 
   assert.ok(result.totals.secondHandoffs<=result.totals.secondLegalReplies);
   assert.equal(result.completeMateProof,false);
   assert.equal(result.fideClockHistoryCertified,false);
+});
+
+test('KRK14 tree falsification checks all defender branches under an explicit node cap',()=>{
+  const root=fixture('w','id',[2,1],[0,2],[5,3]);
+  const result=auditKRK14MateTree(root,{maxNodes:15});
+  assert.equal(result.scope,'one root, ALL legal defender replies');
+  assert.equal(result.completeGlobalMateProof,false);
+  assert.equal(result.fideClockHistoryCertified,false);
+  assert.ok(result.nodes>=1);
+  if(!result.ok){
+    assert.ok(result.firstCounterexample);
+    assert.equal(typeof result.firstCounterexample.atFEN,'string');
+    assert.ok(Array.isArray(result.firstCounterexample.variation));
+  }
 });
