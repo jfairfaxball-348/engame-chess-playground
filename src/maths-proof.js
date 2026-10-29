@@ -5,6 +5,7 @@
  */
 import {coords,findKing,distance,squareName,legalMoves,outcome,positionKey} from './chess.js';
 import {krkImmediateMateWitness} from './krk-immediate-witness.js';
+import {krkLastReplyWitness} from './krk-last-reply.js';
 import {extras,materialOf,setupVerdict} from './maths-model.js';
 
 const root='https://github.com/jfairfaxball-348/engame-chess/blob/main/';
@@ -76,19 +77,25 @@ export function proofFor(board,turn){
   const on=turn===strong;
   // In setup the board is an explicitly fresh, zero-clock root; there is no
   // implicit per-move refresh and no claim for a running KRK policy.
-  const immediate=on?krkImmediateMateWitness({
-    board,turn,material:'krk',halfmove:0,history:[positionKey(board,turn)]
-  }):null;
+  const fresh={board,turn,material:'krk',halfmove:0,history:[positionKey(board,turn)]};
+  const immediate=on?krkImmediateMateWitness(fresh):null;
+  const lastReply=!on&&!mate?krkLastReplyWitness(fresh):null;
   return {...general,
    lead:immediate?'An exact frozen mate-in-one witness applies to this fresh setup. Full KRK gameplay remains gated.':
+    lastReply?'The frozen LastReply theorem certifies mate in at most two plies after EVERY legal weak-king reply. Full KRK gameplay remains gated.':
     'The frozen theorem classifies each fresh-clock KRK outcome against every defence.',
    working:'d∞(R,k) = '+near+';  rook defended by K = '+(guard?'yes':'no')+
     ';  SafeRook = '+(v.safeRook?'true':'false')+
-    (immediate?';  MateNow = true; R'+squareName(immediate.move.from)+' → '+squareName(immediate.move.to)+'#':''),
+    (immediate?';  MateNow = true; R'+squareName(immediate.move.from)+' → '+squareName(immediate.move.to)+'#':'')+
+    (lastReply?';  LastReply = true; legal weak replies = '+lastReply.defenderReplyCount+'; bound ≤2 plies':''),
    steps:[
     ...(immediate?[step('MateNow(K,R,k) ⇒ R'+squareName(immediate.move.to)+'#',
       'The explicit '+immediate.case+' rook target satisfies the frozen geometric terminal criterion. '+
       'KRKImmediate.immediate_iff proves the legal move gives checkmate in one ply (EC-T0049).')]:[]),
+    ...(lastReply?[step('LastReply(K,R,k) ⇒ ∀r ∈ LegalWeak(p), MateNow(K,R,kᵣ) ⇒ MateWithinσ(2)',
+      'For this '+lastReply.axis+' terminal geometry, the frozen model_last_iff checks all '+
+      lastReply.defenderReplyCount+' legal defender replies, each followed by an explicit rook mating move. '+
+      'This is a fresh-position 2-ply terminal certificate, not a general mating policy (EC-T0049).')]:[]),
     step('SafeRook ⇔ d∞(R,k) ≥ 2 ∨ d∞(R,K) = 1','Here: rook on '+squareName(rookSquare)+', weak king '+squareName(weakKing)+
       ', strong king '+squareName(strongKing)+'.'),
     step('Winσ(p) ⇔ (t = σ) ∨ Mateσ(p) ∨ (SafeRook ∧ Reply(p))',
@@ -98,8 +105,9 @@ export function proofFor(board,turn){
     step('Weak to move ∧ SafeRook ∧ Reply ⇒ MateWithin(98)','For a winning weak-turn root, mate is forced within 98 plies; both bounds fit the 50-move rule.'),
     step('¬Winσ(p) ⇒ Draw','An unsafe rook may be captured, leaving KK, or the position is stalemate. The class outcome is proved; a JavaScript move policy is not yet certified.')
    ],
-   formal:immediate?'KRKImmediate.immediate_iff; KRKCentral.fresh_outcome':'KRKCentral.fresh_outcome',
-   ...(immediate?{auxSource:'EC-T0049',auxSourceUrl:krkRoot+'theorems/frozen/EC-T0049/v1.md'}:{})
+   formal:immediate?'KRKImmediate.immediate_iff; KRKCentral.fresh_outcome':
+     lastReply?'KRKLastReply.model_last_iff; KRKCentral.fresh_outcome':'KRKCentral.fresh_outcome',
+   ...((immediate||lastReply)?{auxSource:'EC-T0049',auxSourceUrl:krkRoot+'theorems/frozen/EC-T0049/v1.md'}:{})
   };
  }
  return null;
