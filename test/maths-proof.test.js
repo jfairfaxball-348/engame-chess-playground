@@ -91,6 +91,16 @@ test('weak-turn frozen LastReply proof explains every legal mate-in-two branch b
  assert.match(p.formal,/KRKLastReply.model_last_iff/);
 });
 
+test('Maths proof panel shows the exact constructive entry and local theorem, not an opponent policy',()=>{
+ const b=blankBoard();
+ b[sq(3,0)]='wK';b[sq(6,5)]='wR';b[sq(4,6)]='bK';
+ const v=setupVerdict(b,'w'),p=proofFor(b,'w');
+ assert.equal(v.canStart,false);
+ assert.ok(p.steps.some(s=>s.math.includes('R g6 → g2')&&s.why.includes('krk_clear_vertical_entry_force')));
+ assert.ok(p.steps.some(s=>s.why.includes('no global mate policy')));
+ assert.equal(p.source,'EC-T0048');
+});
+
 test('incomplete or invalid boards cannot be represented as a completed theorem',()=>{
  assert.equal(proofFor(blankBoard(),'w'),null);
  const b=blankBoard();b[sq(4,0)]='wK';b[sq(5,0)]='bK';
