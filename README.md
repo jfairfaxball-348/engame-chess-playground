@@ -1,5 +1,9 @@
 # Endgame Chess Playground
 
+## KRK02 proof-to-player execution update — 29 October 2026
+
+The KRK02 executable-policy audit confirmed a **genuine missing total selector**, including READY lower-band to protected pivot/exit and endgame finish, despite the upstream 97/98-ply forced-outcome theorem. The unreleased KRK02 audit branch adds a narrow READY rook-tempo proof extraction/JS diagnostic and all-reply tests, but **does not enable KRK gameplay**. See [exact blocker/repro](docs/KRK02_EXACT_BLOCKER.md), [next-session steps](NEXT_SESSION.md) and [KQK03 readiness](docs/KQK03_IMPORT_READINESS.md). Independent Engine Playground and currently released drawn classes remain unaffected.
+
 ## Current Maths KRK position — 29 October 2026
 
 KRK01 is incorporated as **proof-sourced infrastructure, not yet playable**: named constructive rook/king moves, board symmetries, geometric mate-in-one and two-ply terminal cases, local wall-preparation and wall-climb progress machinery, all-reply tests and pinned upstream Lean source verification (`proof-sources/krk.lock.json` / `npm run verify:krk-sources`). The entire implementation is JavaScript in the standalone Playground; **the site does not run Lean or access GitHub while playing**.
