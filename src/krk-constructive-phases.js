@@ -20,7 +20,8 @@ export const KRK_CONSTRUCTIVE_RULES=Object.freeze({
   retreat:'EndgameChess.Rules.krk_same_rank_retreat_force',
   backrank:'EndgameChess.Rules.krk_backrank_protected_force',
   offrankRepair:'EndgameChess.Rules.krk_offrank_setup_force',
-  backrankSetup:'EndgameChess.Rules.krk_backrank_setup_force'
+  backrankSetup:'EndgameChess.Rules.krk_backrank_setup_force',
+  wallFarRepair:'EndgameChess.Rules.krk_wall_rook_move'
 });
 const diff=(a,b)=>Math.abs(a-b);
 export const krkCentreDistance=x=>x<3?3-x:x>4?x-4:0;
@@ -82,6 +83,17 @@ export function krkConstructiveStep(state,rule,isometry='id'){
       'K.y=R.y=0; k.y>=2; |K.x-k.x|<=1; |R.x-k.x|<=1; |K.x-R.x|!=1',
       'After every weak reply, K and R remain on back rank with rook protected by king (one-file difference).',
       {type:'backrank-protection',targetKingFile:wx});
+  }
+  if(rule==='wallFarRepair'){
+    // Central Prep's actual wallFarFile repair branch: 4-file initial margin,
+    // hence >=3 files after every legal weak king step. It is the needed
+    // quantified progress action for the executable centralisation loop.
+    if(!(sy<ry&&ry<wy&&diff(rx,wx)<2))return null;
+    const far=wx>=4?0:7;
+    return emit(state,f,rule,rook,squareAt(far,ry),
+      'K.y<R.y<k.y; |R.x-k.x|<2; farFile gives >=4-file initial gap',
+      'All defender replies preserve wall and at least 3 files of rook margin.',
+      {type:'prepMarginRepair',afterMarginAtLeast:3});
   }
   if(rule==='entry'){
     // ClearEntry: strong king at least two ranks below weak; distinct rook file
@@ -172,6 +184,9 @@ export function auditKRKConstructiveStep(state,witness){
     }
     if(witness.ruleKey==='backrank'){
       return distance(sk,rs)===1;
+    }
+    if(witness.ruleKey==='wallFarRepair'){
+      return ry===f.ry&&diff(rx,wx)>=3;
     }
     if(witness.ruleKey==='prep'){
       return krkPrepDistance(ry,sx,sy)===expected.localRank.after &&
