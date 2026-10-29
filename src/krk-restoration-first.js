@@ -48,7 +48,7 @@ export function krkRestorationFirstChoice(state,frame='id'){
     squareAt(wx>=4?0:7,ry):
     squareAt(sx<3?sx+1:sx>4?sx-1:sx,sy+1);
   const source=ruleKey==='far'?rs:sk;
-  const from=krkTransformSquare(krkTransformSquare(source,f),f);
+  const from=source; // already in the original, untransformed board
   const to=krkTransformSquare(destination,f);
   const move=legalMoves(b,strong).find(m=>m.from===from&&m.to===to);
   if(!move)return null;
