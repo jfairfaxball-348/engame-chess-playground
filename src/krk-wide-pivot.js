@@ -1,9 +1,7 @@
 /**
- * KRK02 constructive RIGHT wide READY pivot. This ports ONLY the right
- * subcase of the new KRKExecutable.WidePivot.pivotRightCut_sound.
- * A rook already on the guarded cut is a handoff, not a no-op. The existing
- * theorem's left subcase is obtained by symX; until an exact local selector
- * and trace are extracted for it, we fail closed rather than guessing.
+ * KRK02 constructive wide READY pivot. Both file directions have explicit
+ * verified coordinates and every-defender-region lemmas in KRKExecutable.WidePivot.
+ * A rook already on the guarded cut is a handoff, not a no-op.
  *
  * Not a total KRK policy; no gameplay import, search, tables or fallback.
  */
@@ -17,6 +15,8 @@ import {krkPrepState} from './krk-prep-controller.js';
 
 export const KRK_WIDE_PIVOT_LEMMA =
   'EndgameChess.Rules.KRKExecutable.pivotRightCut_sound';
+export const KRK_LEFT_PIVOT_LEMMA =
+  'EndgameChess.Rules.KRKExecutable.pivotLeftCut_sound';
 export const KRK_GUARDED_HANDOFF =
   'KRKCentral.Guarded.guarded_bound (existence only; executable continuation pending)';
 
@@ -37,7 +37,7 @@ export function krkWidePivotChoice(state,frame='id'){
     parent:KRK_PARENT_SHA,rule:KRK_WIDE_PIVOT_LEMMA,
     isCompleteWinningPolicy:false,maxMatePlies:null,
     inputHalfmove:state.halfmove,inputHistoryLength:state.history.length,
-    premises:'K one rank below rook, weak king one above rook; K file central; weak file >= K file+2'};
+    premises:'K one rank below rook, weak king one above rook; K file central; |K file-weak file| >=2'};
   if(rook===target){
     return Object.freeze({...original,kind:'handoff',
       reason:'Protected vertical cut already exists: guarded phase must execute next',
@@ -46,7 +46,7 @@ export function krkWidePivotChoice(state,frame='id'){
   const move=legalMoves(state.board,strong).find(m=>m.from===rook&&m.to===target);
   if(!move)return null;
   return Object.freeze({...original,kind:'step',move,
-    continuation:'Every weak reply leaves its king above the rook and to the right of its protected rook file.'});
+    continuation:'Every weak reply leaves its king above the rook and beyond the protected rook file.'});
 }
 
 /** Local all-actual-reply check of the right-oriented protected cut. */
@@ -58,6 +58,9 @@ export function auditKRKWidePivot(state,frame='id'){
   const b=applyMove(state.board,choice.move),replies=legalMoves(b,weak);
   if(!replies.length)return {ok:false,replies:0};
   const [rx,ry]=coords(krkTransformSquare(choice.move.to,frame));
+  const [sxBefore]=coords(krkTransformSquare(findKing(state.board,strong),frame));
+  const [wxBefore]=coords(krkTransformSquare(findKing(state.board,weak),frame));
+  const right=wxBefore>sxBefore;
   for(const reply of replies){
     if(reply.capture||reply.piece!==weak+'K')
       return {ok:false,replies:replies.length,failedReply:reply};
@@ -66,7 +69,8 @@ export function auditKRKWidePivot(state,frame='id'){
     if(sk<0||wk<0)return {ok:false,replies:replies.length,failedReply:reply};
     const [sx,sy]=coords(krkTransformSquare(sk,frame));
     const [wx,wy]=coords(krkTransformSquare(wk,frame));
-    if(sx+1!==rx||sy+1!==ry||wx<=rx||wy<=ry)
+    if(sx+(right?1:-1)!==rx||sy+1!==ry||
+       (right?wx<=rx:wx>=rx)||wy<=ry)
       return {ok:false,replies:replies.length,failedReply:reply};
   }
   return {ok:true,replies:replies.length,continuation:'guarded',maxMatePlies:null};
