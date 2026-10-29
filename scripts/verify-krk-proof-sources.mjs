@@ -49,6 +49,9 @@ export async function verifyKRKProofSources(lock=readLock(),fetchSource=fetch){
     const data=Buffer.from(await response.arrayBuffer());
     const actual=gitBlobHash(data);
     if(actual!==gitBlob)throw Error('Pinned Lean source mismatch: '+path+' expected '+gitBlob+' got '+actual);
+    const theorem=/^theorems\\/frozen\\/(EC-T\\d+)\\/v1\\.md$/.exec(path);
+    if(theorem && !data.toString('utf8').includes(lock.frozenProofSourceCommits[theorem[1]]))
+      throw Error('Frozen theorem source commit does not match lock: '+theorem[1]);
     checked++;
   }
   const localSource=readFileSync('src/krk-local-witness.js','utf8');
