@@ -4,9 +4,10 @@ import {chooseDecision} from './engine.js';
 import {pieceSVG,pieceLabel} from './pieces.js';
 import {squareForCell,squareAtPoint} from './board-ui.js';
 import {INVENTORY,blankBoard,available,put,relocate,setupVerdict} from './maths-model.js';
+import {proofFor} from './maths-proof.js';
 const root=document.getElementById('app');
 let board=blankBoard(),turn='w',human='w',game=null,phase='setup',picked=null,selected=-1;
-let facing='w',last=null,notice='',timer=null,busy=false,gesture=null,suppress=false,history=[];
+let facing='w',last=null,notice='',timer=null,busy=false,gesture=null,suppress=false,history=[],openingPending=false;
 const name=c=>c==='w'?'White':'Black',ongoing=()=>outcome(game.board,game.turn,game.history,game.halfmove).kind==='ongoing';
 const announcement=document.createElement('div');
 announcement.className='sr-only';announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.after(announcement);
@@ -17,8 +18,8 @@ function cancelGesture(){
  root.querySelectorAll('.maths-drop,.maths-drag-source').forEach(x=>x.classList.remove('maths-drop','maths-drag-source'));
 }
 function cancel(){if(timer!==null)clearTimeout(timer);timer=null;busy=false;cancelGesture();}
-function reset(){cancel();board=blankBoard();turn='w';game=null;phase='setup';picked=null;selected=-1;last=null;notice='';history=[];facing='w';render();}
-function edit(){cancel();phase='setup';game=null;picked=null;selected=-1;last=null;history=[];notice='';render();}
+function reset(){cancel();board=blankBoard();turn='w';game=null;phase='setup';picked=null;selected=-1;last=null;notice='';history=[];openingPending=false;facing='w';render();}
+function edit(){cancel();phase='setup';game=null;picked=null;selected=-1;last=null;history=[];openingPending=false;notice='';render();}
 function trayClick(piece){if(phase!=='setup'||!available(board,piece))return;picked=picked===piece?null:piece;selected=-1;notice='';render();}
 function putOrMove(sq){
  if(picked){const next=put(board,picked,sq);if(next){board=next;picked=null;notice='';}else notice='Choose an empty square.';}
@@ -32,20 +33,27 @@ function putOrMove(sq){
 function launch(){
  const v=setupVerdict(board,turn);
  if(!v.canStart)return;
- cancel();human=v.human;facing=human;
+ cancel();human=v.human;
+ // Keep the original board orientation and ALL placed squares at the game start.
  try{game=newGame(board,turn,v.material);}catch(e){notice=e.message;render();return;}
- phase='playing';selected=-1;picked=null;last=null;history=[];notice='';render();opponent();
+ phase='playing';selected=-1;picked=null;last=null;history=[];notice='';
+ openingPending=game.turn!==human&&outcome(game.board,game.turn,game.history,game.halfmove).kind==='ongoing';
+ render();
 }
-function save(){return {game:{...game,board:game.board.slice(),history:game.history.slice(),log:game.log.slice()},last:last?{...last}:null};}
-function undo(){if(!history.length)return;cancel();const h=history.pop();game=h.game;last=h.last;selected=-1;notice='';render();}
+function save(){return {game:{...game,board:game.board.slice(),history:game.history.slice(),log:game.log.slice()},last:last?{...last}:null,openingPending};}
+function undo(){if(!history.length)return;cancel();const h=history.pop();game=h.game;last=h.last;openingPending=h.openingPending;selected=-1;notice='';render();}
 function humanMove(from,to){
  if(phase!=='playing'||busy||game.turn!==human||!ongoing())return false;
  const m=legalMoves(game.board,human).find(m=>m.from===from&&m.to===to);
  if(!m)return false;
  history.push(save());game=play(game,m);last={from,to};selected=-1;notice='';render();opponent();return true;
 }
+function playOpeningMove(){
+ if(phase!=='playing'||!openingPending||busy||game.turn===human)return;
+ history.push(save());openingPending=false;opponent();
+}
 function opponent(){
- if(phase!=='playing'||game.turn===human||!ongoing())return;
+ if(phase!=='playing'||openingPending||game.turn===human||!ongoing())return;
  busy=true;render();
  timer=setTimeout(()=>{
   timer=null;const decision=chooseDecision(game,opposite(human));busy=false;
@@ -132,24 +140,36 @@ function up(e){
   render();
  }else{if(to>=0)humanMove(g.from,to);else render();}
 }
+const escapeText=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function proofMarkup(pos,side){
+ const p=proofFor(pos,side);
+ if(!p)return '';
+ return '<div class="maths-equation" aria-label="Outcome equation">'+escapeText(setupVerdict(pos,side).equation)+'</div>'+
+  '<div class="maths-proof"><h2>Proof</h2><p class="maths-proof-lead">'+escapeText(p.lead)+'</p>'+
+  '<div class="maths-worked"><span>For this board</span><strong>'+escapeText(p.working)+'</strong></div>'+
+  '<ol class="maths-proof-steps">'+p.steps.map(x=>'<li><span class="maths-proof-math">'+escapeText(x.math)+
+     '</span><span class="maths-proof-reason">'+escapeText(x.why)+'</span></li>').join('')+'</ol>'+
+  '<a class="maths-theorem" target="_blank" rel="noopener noreferrer" href="'+escapeText(p.sourceUrl)+'">'+
+  escapeText(p.source)+' · Read frozen Lean proof ↗</a></div>';
+}
 function render(){
  if(gesture)cancelGesture();
  const el=root.contains(document.activeElement)?document.activeElement:null;
  const attr=['data-sq','data-slot','id'].find(x=>el?.hasAttribute(x));
  const value=attr?el.getAttribute(attr):null;
- const v=setupVerdict(board,turn),playing=phase==='playing';
+ const playing=phase==='playing',v=setupVerdict(current(),playing?game.turn:turn);
  const final=playing?outcome(game.board,game.turn,game.history,game.halfmove):null;
  const title=final?.kind==='mate'?name(final.winner)+' wins':
   final&&['stalemate','75-move','fivefold'].includes(final.kind)?'Draw':v.title;
- const formula=v.equation?'<div class="maths-equation" aria-label="Mathematical guarantee">'+v.equation+
-  '</div><div class="maths-theorem">'+v.source+'</div>':'';
+ const formula=v.equation?proofMarkup(current(),playing?game.turn:turn):'';
  root.innerHTML='<section class="maths-shell"><h1 class="maths-heading">Chess <span>· Mathematics</span></h1>'+
   '<div class="maths-layout"><aside class="maths-side maths-white">'+rack('w')+'</aside>'+
   '<div class="maths-centre"><div class="maths-board" role="group" aria-label="Endgame chessboard">'+boardMarkup()+'</div>'+
   '<div class="maths-controls">'+(playing?
+   (openingPending?'<button id="maths-first" class="maths-primary">Play opponent’s first move</button>':'')+
    '<button id="maths-undo" '+(history.length?'':'disabled')+'>Undo</button>'+
    '<button id="maths-edit">New position</button><span class="maths-turn">You play '+name(human)+
-   ' · '+(busy?'Opponent moving':name(game.turn)+' to move')+'</span>':
+   ' · '+(openingPending?'Starting position · Opponent to move':busy?'Opponent moving':name(game.turn)+' to move')+'</span>':
    '<button id="maths-turn-w" class="'+(turn==='w'?'maths-active':'')+'">White to move</button>'+
    '<button id="maths-turn-b" class="'+(turn==='b'?'maths-active':'')+'">Black to move</button>'+
    '<button id="maths-start" class="maths-primary" '+(v.canStart?'':'disabled')+'>Start game</button>'+
@@ -165,6 +185,7 @@ function render(){
  root.querySelector('#maths-clear')?.addEventListener('click',reset);
  root.querySelector('#maths-edit')?.addEventListener('click',edit);
  root.querySelector('#maths-undo')?.addEventListener('click',undo);
+ root.querySelector('#maths-first')?.addEventListener('click',playOpeningMove);
  if(attr&&value!==null)root.querySelector('['+attr+'="'+value+'"]')?.focus({preventScroll:true});
  announcement.textContent=title+(notice?' · '+notice:'');
 }
