@@ -70,8 +70,8 @@ test('four coordinate frames and both strong colours strictly decrease potential
 
 test('complete all-adversary rook-climb/repair/centralisation trees reach a lower-band handoff',()=>{
  const roots=[
-  state('w',[3,0],[0,1],[5,5]),
-  state('w',[1,0],[0,2],[5,6])
+  state('w',[3,3],[0,4],[5,7]),
+  state('w',[1,3],[0,5],[5,7])
  ];
  let branches=0,leaves=0;
  for(const root of roots){
