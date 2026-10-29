@@ -136,3 +136,14 @@ test('KRK14 tree falsification checks all defender branches under an explicit no
     assert.ok(Array.isArray(result.firstCounterexample.variation));
   }
 });
+
+test('KRK14 preserves nested central route tags; a board with different control stages is not a cycle',()=>{
+  const root=fixture('w','id',[2,1],[0,2],[5,3]);
+  // Before the fix the tree falsely reported a cycle at node 53 / ply 28:
+  // the wrapped PreparedWall stage was 'central' on both visits but the
+  // *inner* CentralRun stage was 'centre' versus 'lower'.
+  const diagnostic=auditKRK14MateTree(root,{maxNodes:60});
+  assert.equal(diagnostic.firstCounterexample?.reason,'node cap');
+  assert.equal(diagnostic.nodes,61);
+  assert.ok(diagnostic.terminalMates>0);
+});
