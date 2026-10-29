@@ -1,5 +1,9 @@
 # Chess Playground — engineering roadmap
 
+## KRK02 continued constructive implementation
+
+The [KRK02 execution record](KRK02_EXECUTION_CONTINUATION.md) documents **actual new Lean declarations** for two-direction protected rook pivots, guarded entry, column king step, concrete opposition check and king-up follow, with local JS translations, targeted all-defence tests, and two-step chain verification into wall geometry (48 / 288 / 288 branches). The upstream Lean build passed on extraction SHA `c8a77755c69adc63ffee6e32eeeebdfa35b7bea4`; the Playground candidate passed 102 Node tests plus Maths/Engine Chromium QA on `e8bb98d0e6ff9628fb1189a3f8387cf1b6f682ed`. **These do not close the full-phase selector, starting-root coverage, history or 97/98-ply strategy budget.** KRK must remain gated.
+
 ## KRK02 execution follow-up — 29 October 2026
 
 [KRK02 exact proof-policy blocker](KRK02_EXACT_BLOCKER.md) identifies the remaining genuine READY/exit/pivot/global dispatcher deficiency and pins a legal reproduction FEN. [KQK03 readiness](KQK03_IMPORT_READINESS.md) records queen-specific import gates. On the isolated parent draft extraction branch, a narrow-band deterministic rook tempo and all-reply phase split has been added in `KRKExecutable/ReadyCutTempo.lean` (subject to its own CI). Its **unreleased** JS counterpart `src/krk-ready-cut-tempo.js` and both-colour/four-frame tests are on the KRK02 audit branch, without changing `MATERIAL.krk.playable=false`. This is incremental and not a production KRK release.
