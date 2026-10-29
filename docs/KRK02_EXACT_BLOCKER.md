@@ -23,6 +23,14 @@ The corresponding [Lean `KRKExecutable.wallNext`](https://github.com/jfairfaxbal
 
 The mathematical existence theorem [`KRKCentral.ready_cut_bound`](https://github.com/jfairfaxball-348/engame-chess/blob/e7de0930fc61caeb11795cf3c10fde11e4774a40/formal/EndgameChess/Rules/KRKCentral/ReadyCut.lean) proves a bounded continuation by branching among exit, alignment, protected pivot, and rook-tempo cases; its `MateWithin` conclusion **does not itself expose a total deterministic square-to-square executor with a recursive progress certificate**. `KRKWinning.winning_policy` still uses `Classical.choose`.
 
+## Narrow-band constructive extraction added in this session
+
+After the initial blocker was recorded, the parent **draft extraction branch** acquired `KRKExecutable.ReadyCutTempo.lowerBandTempo_sound` in a new importing module (branch head at the time: `3619907b77424dea033a66859ed477f17a35ac20`; [targeted Lean CI](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40881240292)). It exposes a computable `wallWaitFile` rook move for a **narrow**, unaligned READY lower band, and classifies **every** legal weak reply into *upper exit*, *aligned exit*, or *wide pivot*. Its proof still requires the upstream branch CI to pass and it does not follow those continuations to mate.
+
+The downstream [isolated, unreleased translation](../src/krk-ready-cut-tempo.js) applies the actual frozen wall witness on the original board/clock, checks exact READY narrow premises, and exposes a strict all-reply classification diagnostic, with [both-colour/four-frame tests](../test/krk-ready-cut-tempo.test.js). There is **no** game-loop import and **no** `maxMatePlies` claim. For instance, White Kd2, Ra3 vs Black Ke4 (`8/8/8/8/4k3/R7/3K4/8 w - - 0 1`) qualifies; the move `Ra3-b3` is a one-step witness, **not a completed winning game**. The originally reported Kd2/Ra3 vs Kf4 root is the still-unextracted **wide-pivot** handoff.
+
+This narrows the missing scope; it does **not** satisfy the total-dispatch, certified root-bound, history and production release gates.
+
 ## Exact missing verified declarations
 
 To discharge the gate, add new **importing** Lean modules (no frozen-source mutations):
