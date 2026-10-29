@@ -6,7 +6,8 @@
 
 | Source | Main or immutable freeze |
 | --- | --- |
-| Maths parent `jfairfaxball-348/engame-chess` main at inspection | `e7de0930fc61caeb11795cf3c10fde11e4774a40` |
+| Maths parent `jfairfaxball-348/engame-chess` main at original inspection | `e7de0930fc61caeb11795cf3c10fde11e4774a40` |
+| Parent main at continuation inspection (KRK proof files unchanged; KQK-only addition) | `6f64110b7db1fd57493a5478f0ae303798537fbc` |
 | Playground main at branch creation | `6bad2d9c5e653f6d2aa301b250789a6c8209812d` |
 | EC-T0019 v1 frozen proof-source commit | `4acc3e8638a916f329788d4c2b5f0db6f2c9bf67` |
 | EC-T0048 v1 frozen proof-source commit | `2311abe71bc1a4eed47026feccd5ba5a0760d5bb` |
@@ -38,6 +39,22 @@ An existence theorem cannot safely be implemented by choosing the first legal mo
 The implementation checks exact three-piece KRK, player turn, setup legality, ongoing state and the chosen lemma's geometric hypotheses. It returns the actual legal chess move, declaration name, input history/clock metadata, and **`maxMatePlies: null`**. It will never advertise a progress rank or a mating deadline it has not derived. All-reply runtime checks are supplementary diagnostics, not new proofs.
 
 `test/krk-local-witness.test.js` includes both strong colours, fixed rescue/wall/pursuit examples, invalid geometry, tampering, clock-near-limit metadata, capture-to-KK, explicit non-release assertions, and deterministic broad fixture sweeps of all legal weak replies for each applicable single-step witness. **It does not claim full legal KRK enumeration, complete adversarial games, or theorem verification.**
+
+## KRK01 continuation — proved geometry in all four certified frames and mate in one
+
+This continuation adds *explicit* geometry but still no recursive winning move selector:
+
+1. `src/krk-local-witness.js` now takes an explicit isometry `id`, `flip-rank`, `swap-axis` or `anti-axis`. These are exactly the coordinate actions of the parent `symId`, `symY`, `symSwap` and `symAnti` from `KRKForcing/AxisWalls.lean`. The parent `KRKForcing/StrategyTransport.lean` and `KRKBound/Transport.lean` prove the corresponding move/forcing transport. In JavaScript each square map is an involution; the candidate is pulled back and legality is checked on the **original board and original clock/history**, not a reset or transformed history. There is **no auto-choice** of symmetry/phase, and no original 97/98 guarantee asserted for a local move.
+2. `src/krk-immediate-witness.js` ports `KRKImmediate.rankTarget`, `fileTarget`, `MateNow`, `immediate_iff`, `KRKMateGeometry.Horizontal` and `kernel_mate_iff`. Rank target = `(rook.file, weakKing.rank)`; file target = `(weakKing.file, rook.rank)`. `Horizontal` requires a checked king on the bottom/top edge, a strong king on the corresponding rank 2/5, the >=2-file rook clearance, and corner/interior coverage exactly as in Lean. The transposed case gives vertical mate. A legal rook-ray candidate satisfying the exact predicate is checked to produce actual mate, then returned with a **1-ply** terminal certificate only. A non-mating or malformed position gets no witness.
+3. In the Maths proof panel, if an owner-arranged **strong-to-move fresh position** satisfies `MateNow`, the panel explains the rook move, the exact 1-ply deduction and EC-T0049 source. The Start button **remains disabled for all KRK**. No Maths adversarial policy imports either one-step library; the separate Engine Playground is unchanged.
+
+### Actually observed verification at continuation stage
+
+[Successful workflow #40864315527](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40864315527) completed **58/58** Node tests (after symmetry and terminal witness additions, before the optional Maths proof-panel annotation), `npm run check`, `npm run build`, Maths Chromium browser QA at widths 320/390/768/1280 and independent Engine Chromium QA. Its finite immediate-mate diagnostic independently compared 6,792 legal edge-family KRK strong-turn boards with actual legal mate results, including 420 immediate-mate boards, with no disagreement. Four frame sweeps tested local witnesses for both colours and every legal defender reply in their defined family. These are **finite diagnostics**, not a proof of a total strategy or automatic phase composition.
+
+The later proof-panel annotation has its own subsequent CI gate; never transfer a prior success to a later commit until its workflow has completed.
+
+**Trust boundary remains:** mate-in-one is a complete executable terminal *case* only, not a complete KRK winning strategy; local wall witnesses do not supply a globally decreasing rank or an adversarial full-game route to this terminal case.
 
 ## Outstanding mathematical/engineering release obligation (smallest sound next step)
 
