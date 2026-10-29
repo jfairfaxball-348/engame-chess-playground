@@ -18,7 +18,7 @@ The downstream independent implementations are `src/krk-restoration-first.js` an
 
 The Playground CI verifies the individual local source-to-board contracts, regression fixtures, untouched Maths/Engine browser behaviour and the static Pages output. It **does not** prove that concatenating those local actions creates a total winning strategy.
 
-The mathematical Lean import must separately typecheck and pass its standard-axiom gate at the exact upstream PR head. The first full Lean check exposed an out-of-scope `king_below_pair` symbol; its namespace was corrected on PR #7, pending a green recheck. Do not treat the provisional JS modules as frozen upstream imports before that proof CI is green and the exact source/blob hashes are locked.
+The local mathematical extraction **passed the full Lean build, forbidden-proof-escape and standard-axiom CI** on upstream PR #7 head `b4690afeb85f315c94164cfd1d43b9435948eb2b` ([verified run #40908371875](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40908371875)). This certifies the new **local** Lean lemmas, not a global policy. PR #7 is still draft, stacked on unmerged upstream work; the executable source/blob hashes must be frozen and reviewed before any future material release.
 
 Remaining prerequisites for **full playable KRK**:
 
