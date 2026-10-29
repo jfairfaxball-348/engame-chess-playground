@@ -1,5 +1,12 @@
 # Endgame Chess Playground
 
+## Current Maths KRK position — 29 October 2026
+
+KRK01 is incorporated as **proof-sourced infrastructure, not yet playable**: named constructive rook/king moves, board symmetries, geometric mate-in-one and two-ply terminal cases, local wall-preparation and wall-climb progress machinery, all-reply tests and pinned upstream Lean source verification (`proof-sources/krk.lock.json` / `npm run verify:krk-sources`). The entire implementation is JavaScript in the standalone Playground; **the site does not run Lean or access GitHub while playing**.
+
+The user has authorised KRK02 to finish the complete proof-derived adversarial policy and **conditionally** enable KRK only once proven all-phase, all-reply, history and 97/98-root-bound requirements are met. Read [NEXT_SESSION.md](NEXT_SESSION.md) and [the KRK01 proof audit](docs/KRK01_PROOF_POLICY_AUDIT.md). The independent S011 Engine workshop is preserved at [docs/ENGINE_S011_DEFERRED.md](docs/ENGINE_S011_DEFERRED.md), and KQK is the next planned material class when its own upstream proof/extraction gates are met.
+
+
 Two intentionally separate modes share a single Vercel website:
 
 - **Maths endgame** starts with an empty board and two full piece trays. The only currently arrangeable material is both kings plus at most one bishop, knight or rook; queen and pawn slots remain dark. Its outcome panel is backed by frozen theorems. K/K, K+B/K and K+N/K are playable against a legal-move draw adversary. Newly completed KRK is classified using the frozen fresh-clock theorem, but KRK *play* stays gated until a faithful executable winning policy is derived and verified. There is no engine, search or tablebase in this mode.
