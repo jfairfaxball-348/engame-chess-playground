@@ -3,7 +3,8 @@
  * These explain the upstream proofs; they do NOT execute Lean or choose moves.
  * Neither the Engine Playground nor any remote tablebase is used.
  */
-import {coords,findKing,distance,squareName,legalMoves,outcome} from './chess.js';
+import {coords,findKing,distance,squareName,legalMoves,outcome,positionKey} from './chess.js';
+import {krkImmediateMateWitness} from './krk-immediate-witness.js';
 import {extras,materialOf,setupVerdict} from './maths-model.js';
 
 const root='https://github.com/jfairfaxball-348/engame-chess/blob/main/';
@@ -72,11 +73,21 @@ export function proofFor(board,turn){
   const legal=legalMoves(board,turn).length,terminal=outcome(board,turn);
   const mate=terminal.kind==='mate'&&terminal.winner===strong;
   const on=turn===strong;
+  // In setup the board is an explicitly fresh, zero-clock root; there is no
+  // implicit per-move refresh and no claim for a running KRK policy.
+  const immediate=on?krkImmediateMateWitness({
+    board,turn,material:'krk',halfmove:0,history:[positionKey(board,turn)]
+  }):null;
   return {...general,
-   lead:'The frozen theorem classifies each fresh-clock KRK outcome against every defence.',
+   lead:immediate?'An exact frozen mate-in-one witness applies to this fresh setup. Full KRK gameplay remains gated.':
+    'The frozen theorem classifies each fresh-clock KRK outcome against every defence.',
    working:'d∞(R,k) = '+near+';  rook defended by K = '+(guard?'yes':'no')+
-    ';  SafeRook = '+(v.safeRook?'true':'false'),
+    ';  SafeRook = '+(v.safeRook?'true':'false')+
+    (immediate?';  MateNow = true; R'+squareName(immediate.move.from)+' → '+squareName(immediate.move.to)+'#':''),
    steps:[
+    ...(immediate?[step('MateNow(K,R,k) ⇒ R'+squareName(immediate.move.to)+'#',
+      'The explicit '+immediate.case+' rook target satisfies the frozen geometric terminal criterion. '+
+      'KRKImmediate.immediate_iff proves the legal move gives checkmate in one ply (EC-T0049).')]:[]),
     step('SafeRook ⇔ d∞(R,k) ≥ 2 ∨ d∞(R,K) = 1','Here: rook on '+squareName(rookSquare)+', weak king '+squareName(weakKing)+
       ', strong king '+squareName(strongKing)+'.'),
     step('Winσ(p) ⇔ (t = σ) ∨ Mateσ(p) ∨ (SafeRook ∧ Reply(p))',
@@ -86,7 +97,8 @@ export function proofFor(board,turn){
     step('Weak to move ∧ SafeRook ∧ Reply ⇒ MateWithin(98)','For a winning weak-turn root, mate is forced within 98 plies; both bounds fit the 50-move rule.'),
     step('¬Winσ(p) ⇒ Draw','An unsafe rook may be captured, leaving KK, or the position is stalemate. The class outcome is proved; a JavaScript move policy is not yet certified.')
    ],
-   formal:'KRKCentral.fresh_outcome'
+   formal:immediate?'KRKImmediate.immediate_iff; KRKCentral.fresh_outcome':'KRKCentral.fresh_outcome',
+   ...(immediate?{auxSource:'EC-T0049',auxSourceUrl:root+'theorems/frozen/EC-T0049/v1.md'}:{})
   };
  }
  return null;
