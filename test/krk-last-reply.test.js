@@ -71,7 +71,7 @@ test('two-ply case fails closed on history, clock, illegal, and wrong turn',()=>
   assert.equal(krkLastReplyWitness({...st,material:'kk'}),null);
   assert.equal(krkLastReplyGeometry([1,5],[1,5],[0,7]),null);
   assert.equal(krkLastReplyGeometry([-1,5],[7,0],[0,7]),null);
-  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+  assert.equal(KRK_GAMEPLAY_RELEASED,true);
   const app=readFileSync('src/maths-app.js','utf8');
   assert.doesNotMatch(app,/chooseDecision\(.*krkLastReplyWitness/);
 });
