@@ -78,6 +78,6 @@ if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
   const report=auditKRKPhaseDomains();
   console.log('KRK01 frozen phase premise coverage (NOT a playing-policy proof):');
   console.log(JSON.stringify(report,null,2));
-  if(report.total.legal===0||report.total.canonical!==report.total.legal)
+  if(report.total.legal===0||report.total.canonical!==report.total.legal||report.total.uncovered!==0)
     process.exitCode=1;
 }
