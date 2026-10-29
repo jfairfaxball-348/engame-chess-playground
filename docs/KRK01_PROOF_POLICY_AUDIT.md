@@ -54,13 +54,66 @@ This continuation adds *explicit* geometry but still no recursive winning move s
 
 ### Authentic cross-repository source link (this continuation)
 
-The Playground now has `proof-sources/krk.lock.json` containing the immutable upstream parent SHA `e7de0930fc61caeb11795cf3c10fde11e4774a40`, per-file Git blob identifiers for **11** relevant frozen Lean files and theorem records, and the independent freeze-source SHAs for EC-T0019/0048/0049. The new `npm run verify:krk-sources` reads those exact bytes from the pinned upstream GitHub raw URL, recomputes Git blob hashes, and fails closed on unavailable, mismatched, or missing sources; theorem record text is additionally checked against its frozen proof-source commit. `.github/workflows/check.yml` now requires this verification in PR and main builds, alongside Node tests and two browser QA suites. Unit tests additionally exercise lock validation, tampered bytes and unavailable-source failure.
+The Playground now has `proof-sources/krk.lock.json` containing the immutable upstream parent SHA `e7de0930fc61caeb11795cf3c10fde11e4774a40`, per-file Git blob identifiers for **12** relevant frozen Lean files and theorem records, and the independent freeze-source SHAs for EC-T0019/0048/0049. The new `npm run verify:krk-sources` reads those exact bytes from the pinned upstream GitHub raw URL, recomputes Git blob hashes, and fails closed on unavailable, mismatched, or missing sources; theorem record text is additionally checked against its frozen proof-source commit. `.github/workflows/check.yml` now requires this verification in PR and main builds, alongside Node tests and two browser QA suites. Unit tests additionally exercise lock validation, tampered bytes and unavailable-source failure.
 
 The Maths proof panel's KRK links now target the **immutable pinned source commit**, not a mutable `main` URL. Source-code headers have been reconciled with the same SHA. This is a **real read-only code/proof provenance link at build time**; it is emphatically *not* loading Lean as a chess engine or extracting a total computational winning policy. Hash verification proves exact source identity, not JS-to-Lean functional correctness of new code. Normal application play has no GitHub network dependency.
 
 [Source-lock CI #40867233138](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40867233138) passed; the final amended head's own workflow must also pass before treating the PR as green.
 
 **Trust boundary remains:** mate-in-one is a complete executable terminal *case* only, not a complete KRK winning strategy; local wall witnesses do not supply a globally decreasing rank or an adversarial full-game route to this terminal case.
+
+## KRK01 continuation — complete two-ply terminal case, but not the full strategy
+
+`src/krk-last-reply.js` now directly evaluates the frozen Lean
+`EndgameChess.Rules.KRKLastReply.HorizontalLast` and
+`LastReply := SafeRook ∧ (HorizontalLast ∨ transposed HorizontalLast)`.
+The rules cover left/right corner guards, both interior file configurations,
+both weak-king edges, and the transposed board orientation, without looking up
+a position or selecting a move via search. The source file
+`formal/EndgameChess/Rules/KRKLastReply.lean` is now the **12th** immutable
+Git-blob-verified upstream source in `proof-sources/krk.lock.json`.
+
+For an *exact fresh* weak-to-move KRK position satisfying the geometric
+criterion, the module checks **every legal weak-king reply** against the
+already-portable geometric `KRKImmediate.immediate_iff` mate-in-one certificate
+and returns the concrete rook mating move for each branch. It refuses
+non-fresh clocks and arbitrary incoming histories, malformed/terminal
+states, unsupported moves and any unexpected mismatch. The full original
+unrestricted history/50-move semantics are not inferred from this case.
+
+The Maths proof panel can now explain the complete two-ply terminal
+derivation, including a line for **every** defender move and the consequent
+rook mate, and shows the exact frozen EC-T0049 provenance. The board remains
+a setup editor; **the KRK Start button is not enabled** by this certificate.
+
+### Observed independent test evidence
+
+[Successful build/provenance/browser QA run #40869958788](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40869958788) included 67 passing Node tests, 12/12 upstream provenance
+hashes, both browser QA suites and the new diagnostic sweep. The
+two-ply calculation was independently cross-checked against direct
+legal weak replies in **23,792** legal weak-turn edge-family positions,
+including **432** positives, with no mismatch. This is a finite diagnostic
+of the exactly-portable `LastReply` case, not a global proof of a winning
+selector. Final subsequent proof-panel and audit commits have their own
+CI runs and are not attributed to this prior run.
+
+### Why the full KRK release gate still cannot pass
+
+Neither `MateNow`, `LastReply`, nor the local wall/rescue/pursuit witness
+modules explain **how to reach** these terminal regions from *all*
+ordinary winning positions. The global `winning_policy` uses
+`Classical.choose`, an existence choice. The quantitative 97/98-ply
+`MateWithin` theorem likewise does not export a total computable
+case discriminator or a recursive certificate for the chosen specific moves.
+
+The missing mathematical artifact is a constructive
+`KRKChooseMove : (full-state + phase + original history) →
+  Option (legal-move × next-phase × decreasing-certificate)`
+across *all* source position classes. To claim the result in the Maths tab,
+its Lean-to-JS correspondence and root-bound preservation must be established
+for all legal defender replies, not only the two terminal cases. Neither a
+game-tree search nor an external engine is permitted as a substitute. Until
+that exists and is verified, keep the release fail-closed and draft PR open.
 
 ## Outstanding mathematical/engineering release obligation (smallest sound next step)
 
