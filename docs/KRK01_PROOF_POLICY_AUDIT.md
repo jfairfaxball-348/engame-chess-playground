@@ -189,6 +189,58 @@ solve global KRK. The executable extraction functions are intended to
 become the precise Lean↔JS interface, instead of merely mirroring
 geometric prose.
 
+## KRK01 — executable terminating wall-preparation controller
+
+`src/krk-prep-controller.js` is a **deterministic local phase** extracted
+from frozen `KRKCentral.PrepPair`, `KRKCentral.PrepDefinitions` and
+`KRKForcing.WallActions`. At strong-to-move strict rank walls, define
+
+```text
+n      = prepDistance(rook.rank, strongKing)
+repair = 1 if |rook.file - weakKing.file| < 2; otherwise 0
+R      = 2*n + repair
+```
+
+An applicable move is selected from exactly two concrete constructions:
+if `repair=1`, move the rook to `wallFarFile weakKing.file` on its
+original rank (the frozen `krk_wall_rook_move` with a >=4 initial file
+margin); after *every* legal defender reply the file margin is >=3,
+so `repair'=0` and `R'<R`. Otherwise, if `n>0`, play the explicit
+`prep_pair` king step towards the centre and one rank nearer the rook;
+the geometry proof gives `n'=n-1` after all replies and `repair'<=1`,
+so again `R'<R`. When `R=0`, return a **READY certificate**, not a
+chess move: king file 3/4, king one rank below rook, and rook separated
+by >=2 files from the weak king.
+
+No minimax, state search, engine, tablebase, or game oracle chooses
+these moves. The policy is a straight, two-branch dispatch over proved
+coordinate expressions. Because the nonnegative rank strictly decreases
+per two plies, this phase reaches READY in at most `2*R` board plies,
+subject to the scoped legal-state/history assumptions. It does **not**
+assert checkmate or preserve the global 97/98 clock0 bound.
+
+[GitHub Actions #40874818739](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40874818739)
+passed 78 tests. Independent deterministic checks covered **5,376**
+applicable wall-preparation fixture positions (336 READY and 5,040
+move cases) across both strong colours, including every legal weak
+reply to each chosen move. A further complete adversarial branching
+tree of 40 visited nodes reached READY at all 34 leaves without a
+repeated strong-turn state. These finite diagnostics support translation
+correctness and test the rank inequality; they are not a new kernel Lean
+proof of the full phase. The parents' separate executable extraction
+Lean PR remains independently gated on its build.
+
+### Still missing for KRK victory
+
+The READY → full-central wall → protected cut/exit → mating terminal
+phases, total recursive dispatch at every opponent branch, preservation
+of the source's **93/97/98** budget and actual history/50-move semantics
+are not yet exported as one constructive program. The preparation
+controller can reach READY, but cannot claim that READY has an
+executable winning continuation. Until that is proved and connected,
+`KRK_GAMEPLAY_RELEASED=false` and `MATERIAL.krk.playable=false`
+remain intentional safety controls.
+
 ## Outstanding mathematical/engineering release obligation (smallest sound next step)
 
 Provide an executable, proof-corresponding **total move-selection interface** for strong-to-move KRK with:
