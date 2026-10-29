@@ -27,6 +27,8 @@ jobs:
       # KRK14 falsification: test actual first/second weak replies and weak-to-move
       # root partitions. Record failures, but do not claim global mate proof.
       - run: npm run audit:krk14-continuations -- --limit=2048
+      # Bounded all-defender game tree on one source-wall root; no fallback.
+      - run: npm run audit:krk14-mate-tree -- --nodes=1200
       - run: npm run check
       - run: npm run build
       # Provider-independent Cloudflare Pages handoff: ensure the deployable
