@@ -125,8 +125,8 @@ try{
   assert.equal(await page.locator('.arena-move').count(),0);
   await page.locator('#tab-maths').click();
   assert.equal(await page.locator('#engine-playground').isVisible(),false);
-  assert.equal(await page.locator('[data-class="krk"]').isDisabled(),true);
-  assert.equal(await page.locator('.sq').count(),64);
+  assert.equal(await page.locator('#maths-start').isDisabled(),true);
+  assert.equal(await page.locator('.maths-cell').count(),64);
   assert.deepEqual(errors,[]);
   console.log('PASS play/pause/colour-swap/tabs; minimal Maths release gate intact');
   await page.close();
