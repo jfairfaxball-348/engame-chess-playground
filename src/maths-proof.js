@@ -95,7 +95,11 @@ export function proofFor(board,turn){
     ...(lastReply?[step('LastReply(K,R,k) ⇒ ∀r ∈ LegalWeak(p), MateNow(K,R,kᵣ) ⇒ MateWithinσ(2)',
       'For this '+lastReply.axis+' terminal geometry, the frozen model_last_iff checks all '+
       lastReply.defenderReplyCount+' legal defender replies, each followed by an explicit rook mating move. '+
-      'This is a fresh-position 2-ply terminal certificate, not a general mating policy (EC-T0049).')]:[]),
+      'This is a fresh-position 2-ply terminal certificate, not a general mating policy (EC-T0049).'),
+      ...lastReply.branches.map(v=>step(
+       'k: '+squareName(v.responseFrom)+' → '+squareName(v.responseTo)+
+       '  ·  R: '+squareName(v.matingMove.from)+' → '+squareName(v.matingMove.to)+'#',
+       'Actual legal defender reply and exact rook mating destination. Proven terminal case: KRKImmediate.immediate_iff.'))]:[]),
     step('SafeRook ⇔ d∞(R,k) ≥ 2 ∨ d∞(R,K) = 1','Here: rook on '+squareName(rookSquare)+', weak king '+squareName(weakKing)+
       ', strong king '+squareName(strongKing)+'.'),
     step('Winσ(p) ⇔ (t = σ) ∨ Mateσ(p) ∨ (SafeRook ∧ Reply(p))',
