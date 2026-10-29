@@ -54,7 +54,7 @@ This continuation adds *explicit* geometry but still no recursive winning move s
 
 ### Authentic cross-repository source link (this continuation)
 
-The Playground now has `proof-sources/krk.lock.json` containing the immutable upstream parent SHA `e7de0930fc61caeb11795cf3c10fde11e4774a40`, per-file Git blob identifiers for **12** relevant frozen Lean files and theorem records, and the independent freeze-source SHAs for EC-T0019/0048/0049. The new `npm run verify:krk-sources` reads those exact bytes from the pinned upstream GitHub raw URL, recomputes Git blob hashes, and fails closed on unavailable, mismatched, or missing sources; theorem record text is additionally checked against its frozen proof-source commit. `.github/workflows/check.yml` now requires this verification in PR and main builds, alongside Node tests and two browser QA suites. Unit tests additionally exercise lock validation, tampered bytes and unavailable-source failure.
+The Playground now has `proof-sources/krk.lock.json` containing the immutable upstream parent SHA `e7de0930fc61caeb11795cf3c10fde11e4774a40`, per-file Git blob identifiers for **20** relevant frozen Lean files and theorem records, and the independent freeze-source SHAs for EC-T0019/0048/0049. The new `npm run verify:krk-sources` reads those exact bytes from the pinned upstream GitHub raw URL, recomputes Git blob hashes, and fails closed on unavailable, mismatched, or missing sources; theorem record text is additionally checked against its frozen proof-source commit. `.github/workflows/check.yml` now requires this verification in PR and main builds, alongside Node tests and two browser QA suites. Unit tests additionally exercise lock validation, tampered bytes and unavailable-source failure.
 
 The Maths proof panel's KRK links now target the **immutable pinned source commit**, not a mutable `main` URL. Source-code headers have been reconciled with the same SHA. This is a **real read-only code/proof provenance link at build time**; it is emphatically *not* loading Lean as a chess engine or extracting a total computational winning policy. Hash verification proves exact source identity, not JS-to-Lean functional correctness of new code. Normal application play has no GitHub network dependency.
 
@@ -114,6 +114,80 @@ its Lean-to-JS correspondence and root-bound preservation must be established
 for all legal defender replies, not only the two terminal cases. Neither a
 game-tree search nor an external engine is permitted as a substitute. Until
 that exists and is verified, keep the release fail-closed and draft PR open.
+
+## KRK01 further continuation — constructive progress cases, exhaustive setup coverage and parent extraction branch
+
+Eight **additional** named coordinate constructions are implemented in
+`src/krk-constructive-phases.js`, each selected only by explicit rule and
+board frame and checked for legal moves and all weak replies:
+
+| Frozen theorem | Concrete strong move | Scope of *local* result |
+| --- | --- | --- |
+| `krk_clear_vertical_entry_force` | Move rook vertically to rank strongKing.rank+1 | A rank wall after every weak reply, **not necessarily a safe rook** |
+| `KRKCentral.prep_pair` | King moves one step inward/up toward centre | `prepDistance` drops **exactly one** at the strong move; after each weak reply the wall remains, but distant-rook margin may be lost |
+| `KRKCentral.rank_two_pair` | Raise rook one rank | All weak replies remain above raised wall; no guarantee of distant rook after reply |
+| `krk_rank_advance` | Raise rook one rank with strong file margin | `7-rookRank` strictly drops and all weak replies retain a **distant** barrier |
+| `krk_same_rank_retreat_force` | Retreat king one rank behind same-rank rook | Rank wall after each weak reply; rook may require rescue next |
+| `krk_backrank_protected_force` | Raise protected rook from back rank to rank 1 | Rank wall; rook remains adjacent to, and protected by, strong king |
+| `krk_offrank_setup_force` close-file branch | Move non-wall, off-rank rook to opposite far file | Actual weak replies preserve rook file safety; further entry decisions still needed |
+| `krk_backrank_setup_force` unprotected close-file branch | Shift strong king onto weak king's file | After weak replies the back-rank rook becomes king-protected, allowing the separate protected entry |
+
+These steps are based on concrete source expressions in Lean, not a guessed
+chess engine or arbitrary search. The first adversarial sweep caught an
+important false JS postcondition: clear-wall entry does **not** guarantee a
+distant rook after *all* weak replies. The postcondition was corrected and a
+specific entry → threatening defender reply → proven rook-rescue regression
+was added. This illustrates why linking a theorem name to an unverified JS
+claim is insufficient.
+
+The immutable build-time proof lock now contains **20** frozen Lean source
+files/theorem records, including the seven extra constructive files and
+`KRKForcing/OffRankSetup.lean`.
+
+### Complete geometric setup-premise audit — NOT complete playing policy
+
+`scripts/krk-phase-coverage.mjs` exhaustively enumerates strong-to-move
+three-piece boards admitted by Playground setup legality (both colours;
+fresh-board model), and evaluates the **premises** of all ported first-step
+constructions in each of the four proved board frames. It never selects
+moves by recursion, generates a tablebase, solves positions, or stores a
+position-value atlas.
+
+[Green CI #40872847358](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40872847358)
+reported:
+
+- **350,336** distinct legal strong-turn board arrangements;
+- **350,336** have at least one suitable king-separation frame;
+- **175,616** have a strict rank wall in at least one frame;
+- **304,576** have at least one applicable extracted setup-step premise;
+- **zero** positions left without a wall or at least one recognised setup-step
+  premise.
+
+Counts overlap and must not be added. **Zero first-step geometric coverage
+gaps is categorically NOT a valid full-game certificate.** Repeated tempos,
+unsafe-rook rescues, restoration, central/ready/full transitions, opposition,
+mate finishing, history and the 97/98 remaining root budget are still
+uncombined. First-step coverage alone does not rule out loops or draws.
+
+The same green run reported **73 passing Node tests** and upstream source
+verification and both existing browser QA suites. The standalone coverage
+audit now runs in PR CI; additional builds check newly added fixtures.
+
+### A new constructive Lean extraction branch (not a frozen modification)
+
+Separate draft in the authoritative mathematics repository:
+[engame-chess PR #3](https://github.com/jfairfaxball-348/engame-chess/pull/3)
+(`krk-executable-extraction`). New files under
+`formal/EndgameChess/Rules/KRKExecutable/` define *computable coordinate
+functions* for the exact rook tempo, rook rank advance and prep king
+step, each accompanied by a Lean soundness theorem proving a legal
+realisation, local progress where supported, and all legal defender
+responses. The branch imports these modules into the aggregate Lean build.
+**Do not assert the new soundness theorems are certified until the parent
+Lean CI reports success.** This branch does not rewrite frozen results or
+solve global KRK. The executable extraction functions are intended to
+become the precise Lean↔JS interface, instead of merely mirroring
+geometric prose.
 
 ## Outstanding mathematical/engineering release obligation (smallest sound next step)
 
