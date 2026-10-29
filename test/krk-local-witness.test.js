@@ -144,7 +144,7 @@ test('all four explicit frames transport each witness and preserve every defendi
   };
   for(const colour of ['w','b'])for(const iso of KRK_FRAMES){
     for(const [rule,sample] of Object.entries(samples)){
-      const b=sample.board.map(p=>p?(colour+p[1]):null);
+      const b=sample.board.map(p=>p?(colour==='w'?p:(p[0]==='w'?'b':'w')+p[1]):null);
       const base={...sample,board:b,turn:colour,history:[positionKey(b,colour)]};
       const st=transformedState(base,iso);
       assert.equal(validateSetup(st.board,'krk',colour),null);
