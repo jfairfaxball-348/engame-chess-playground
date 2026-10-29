@@ -19,6 +19,7 @@ import {krkPrepState,krkPrepChoice} from './krk-prep-controller.js';
 import {krkCentralSequenceChoice,krkCentralStaticBound}
   from './krk-central-sequence.js';
 
+export const KRK_PREPARED_SOURCE_SHA = '7cfd8462a9fd36c8e37250221ee809b5b8287836';
 export const KRK_PREPARED_POLICY_RULE =
   'EndgameChess.Rules.KRKExecutable.policy_prepared_wall_run';
 
@@ -36,6 +37,7 @@ export function krkPreparedWallStaticBound(state,frame='id'){
   if(wallRank<1||wallRank>6)return null;
   return Object.freeze({
     plies:2*prep.rank+18*(6-wallRank)+11,
+    sourceCommit:KRK_PREPARED_SOURCE_SHA,
     prepRank:prep.rank,wallRank,frame,
     rule:KRK_PREPARED_POLICY_RULE,
     scope:'source-selected preparation to central-wall mate; strict oriented rank wall',
