@@ -1,3 +1,7 @@
+# Owner update — Maths tab, 29 October 2026
+
+KRK is now completed **for outcome classification** in the parent programme (EC-T0048; see parent's current KRK completion report). The owner authorises an empty-board Maths redesign with full piece trays, selectable KRK placements and theorem-backed outcome annotation. **This supersedes the previous blanket ban on showing/selecting KRK in the editor only.** It does NOT approve an uncertified KRK move selector: the earlier gate remains on KRK gameplay until a reviewed, faithful, locally executable constructive policy is available. Never describe a theorem of winning-policy *existence* as a verified JavaScript move algorithm. Neither the separate Engine Playground nor the upstream research repo may be changed by this Maths UI work.
+
 # Research-scope clarification (owner direction, 23 October 2026)
 
 The **independent Engine Playground** now also hosts an exploratory chess-AI research programme, as authorised in S010. Prior statements below that "this repo does not conduct research" apply to the **Maths Endgame / proof-derived opponent only**, not to the new experimental AI arena. Do not import unproved ML moves into Maths Endgame; no KRK promotion, no edits to the upstream endgame theorem repo. S010 is documented in `docs/AI_RESEARCH_WORKSHOP.md`.

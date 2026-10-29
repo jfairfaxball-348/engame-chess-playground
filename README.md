@@ -2,7 +2,7 @@
 
 Two intentionally separate modes share a single Vercel website:
 
-- **Maths endgame** is the original proof-backed, upstream-gated demonstration. K/K, K+B/K, K+N/K alone are released; KRK stays locked and nothing in this mode uses external engines or unproved strategies.
+- **Maths endgame** starts with an empty board and two full piece trays. The only currently arrangeable material is both kings plus at most one bishop, knight or rook; queen and pawn slots remain dark. Its outcome panel is backed by frozen theorems. K/K, K+B/K and K+N/K are playable against a legal-move draw adversary. Newly completed KRK is classified using the frozen fresh-clock theorem, but KRK *play* stays gated until a faithful executable winning policy is derived and verified. There is no engine, search or tablebase in this mode.
 - **Engine playground** is a standard, full-rules chess spectator arena. Choose a chess engine for White and Black, Play, Pause, advance one move, change the viewing pace, flip the board or Restart. It is NOT a proof-derived mathematical engine.
 
 ## Engine playground
