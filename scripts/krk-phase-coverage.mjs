@@ -7,6 +7,7 @@
  * This script intentionally neither solves boards nor stores position values.
  */
 import {makeBoard,coords,distance,validateSetup} from '../src/chess.js';
+import {pathToFileURL} from 'node:url';
 import {KRK_FRAMES,krkTransformSquare} from '../src/krk-local-witness.js';
 const abs=(a,b)=>Math.abs(a-b);
 export function applicableGeometry(sk,rs,wk,frame='id'){
@@ -71,7 +72,7 @@ export function auditKRKPhaseDomains(){
   }
   return {total,ruleFrameMatches:rules,samples};
 }
-if(import.meta.url===new URL('file://'+process.argv[1]).href){
+if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
   const report=auditKRKPhaseDomains();
   console.log('KRK01 frozen phase premise coverage (NOT a playing-policy proof):');
   console.log(JSON.stringify(report,null,2));
