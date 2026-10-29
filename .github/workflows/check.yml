@@ -19,6 +19,8 @@ jobs:
       # Check exact frozen Lean proofs and theorem versions at their immutable SHA.
       # This validates provenance, not an unimplemented global KRK algorithm.
       - run: npm run verify:krk-sources
+      # Pure diagnostic: geometric premise coverage, not an engine/tablebase.
+      - run: npm run audit:krk-phase-domains
       - run: npm run check
       - run: npm run build
       # Playwright is CI-only; the new arena has pinned browser-only dependencies.
