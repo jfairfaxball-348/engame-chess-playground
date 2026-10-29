@@ -146,7 +146,7 @@ function cornerEscort(state,strong){
   const b=state.board,weak=opposite(strong);
   const wk=findKing(b,weak),sk=findKing(b,strong);
   const [wx,wy]=coords(wk),[sx,sy]=coords(sk);
-  if(!(wx===0||wx===7||wy===0||wy===7))return null;
+  if(!(wx===0||wx===7||wy===0||wy===7)||distance(sk,wk)<=2)return null;
   const manhattan=(a,c)=>{const [x,y]=coords(a),[u,v]=coords(c);return diff(x,u)+diff(y,v);};
   const initial=manhattan(sk,wk);
   const moves=legalMoves(b,strong).filter(m=>m.from===sk&&
