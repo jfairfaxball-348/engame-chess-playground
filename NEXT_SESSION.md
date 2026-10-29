@@ -1,65 +1,73 @@
-# KRK11 — Finish the clock-safe selected policy and legal-root coverage
+# KRK12 — Complete global root-to-mate constructive KRK strategy
 
 **NEXT EXECUTION SESSION — INSTALLED, NOT EXECUTED.**
 
-Continue the KRK10 draft stack, not main's stale KRK05 handoff.
-The owner still wants the complete proof-derived playable KRK opponent.
+## Owner priority (29 October 2026)
 
-## Verified incoming result
+**Finish the proof-derived winning strategy. Defer the 50-move/repetition
+claim project for now.** Chess Playground may eventually expose a clearly
+labelled mathematical gameplay mode that continues to mate even where
+ordinary FIDE claims would apply; it must not claim to be a standard
+rules-certified game or quietly alter the Engine tab. The conditional
+mathematical release gate remains: exact proved moves, total selection,
+all-defender coverage, no third-party engine/tablebase/minimax/heuristic.
 
-- [Parent PR #11](https://github.com/jfairfaxball-348/engame-chess/pull/11),
-  branch `krk10-central-policy`, exact source
-  `2433df9ea1ccbba000740cb89f2f0f276ce65d37`, stacked on PR #10.
-  Full Lean/axiom CI #40933068414 passed; focused local build passed 91
-  targets. The three main declarations have standard-only axioms.
-- `KRKExecutable/CentralPolicy.lean` defines actual guarded coordinate
-  choices, central/lower/exit/restore/centre tags and `CentralRun`, an
-  all-legal-defender finite derivation counting real chess plies.
-  `policy_uncut_central_bound` proves the selected uncut CENTRAL policy
-  reaches mate. `centralRun_mateWithin` connects it to the kernel.
-- The exact bound is `18*((7-y)-1)+11`: rook ranks 1–6 give
-  **101, 83, 65, 47, 29, 11 plies**. Rank >=2 has a proved 83-ply run.
-  These are static full-central-wall statements, not all-root or FIDE
-  history certificates. A 101 upper bound is not a 101-ply lower bound.
-- Playground `krkCentralStaticBound` exposes this honest scope, checks
-  audited traces against the static bound, and preserves all release
-  flags. `proof-sources/krk10-central-policy.lock.json` pins 15 files;
-  original frozen and KRK09 source locks remain independent.
-- All 137 local Node tests pass. Check final-head Playground CI for
-  source provenance, phase domains, syntax, build and both browser suites.
-  See `docs/KRK10_CENTRAL_POLICY.md` and the draft PR's final CI links.
+## Incoming stacked drafts
 
-## Actual next obligation
+- Parent `engame-chess`: [KRK10 PR #11](https://github.com/jfairfaxball-348/engame-chess/pull/11),
+  source `2433df9ea1ccbba000740cb89f2f0f276ce65d37`;
+  selected tagged central policy proves actual checkmate from every full
+  central wall in <=101 static plies (depending on rook rank).
+- Parent [KRK11 PR #12](https://github.com/jfairfaxball-348/engame-chess/pull/12),
+  `krk11-prepared-wall-policy`: adds proof source
+  `PreparedWallPolicy.lean` and embeds the concrete rank-decreasing
+  prep controller into selected `CentralRun`, extending winning
+  certificates to **all oriented strict rank-wall roots**. VERIFY exact
+  final-head Lean build and axiom output; do not assume green before checking.
+- Playground [KRK10 PR #17](https://github.com/jfairfaxball-348/engame-chess-playground/pull/17)
+  and [KRK11 PR #18](https://github.com/jfairfaxball-348/engame-chess-playground/pull/18),
+  branch `krk11-history-claims-audit`. The KRK11 JS adapter and tests
+  implement prep-to-central handoff and preserve original positions/history.
+  Confirm final-head CI; see `docs/KRK11_PREPARED_WALL.md`.
+- `MATERIAL.krk.playable=false`, `KRK_GAMEPLAY_RELEASED=false`.
+  Draft proof branches are stacked, not merged into main. KQK/KPK,
+  frozen parent and Engine tab are untouched.
 
-1. Close the quantitative budget gap for the **selected** policy. The
-   parent's tighter full-central 85-ply proof uses protected perpendicular
-   cuts; current JS uses the uncut pursuit/restoration policy. Do not
-   transfer the parent's 85/95/97/98 bounds to different selected moves.
-   Either prove a genuinely sharper bound on this same tagged policy,
-   coupling lower-phase progress with the following restoration cost,
-   or compose the proved cut phases and translate their full continuation.
-   No heuristics, minimax, tablebase, engine or arbitrary move fallback.
-2. Prove fresh-history repetition and 50-move safety for the resulting
-   selected policy, including the board occurring under two different
-   control tags. Count actual board/turn keys for claims; preserve the
-   arranged board, clocks and history. Retain honest 75-move semantics.
-3. Compose every legal KRK root: off-wall setup, weak-to-move, both colours,
-   frames, captured/capturable rook, drawn roots and terminal cases. The
-   current proof starts only at a full central wall; do not enable the
-   material class on that restricted result.
-4. Translate only source-verified additions; update immutable locks and
-   complete all-defender games. Capped reply trees are neither successful
-   verification nor mathematical counterexamples. Keep every branch.
-5. Run exact-head Lean/axiom CI, Node tests, all source locks, phase domains,
-   syntax, build, static package and Maths/Engine browser suites. Keep
-   KQK/KPK, parent main and frozen modules intact. Keep the draft stack
-   separate until coherent tested integration and release gates pass.
-6. `KRK_GAMEPLAY_RELEASED` and `MATERIAL.krk.playable` remain false until
-   the complete source-derived opponent and rule semantics pass. The owner
-   already authorised the conditional full release; no new inferred
-   approval flow. Verify actual Cloudflare Workers deployment before any
-   production claim; Vercel remains rollback.
+## Core mission
 
-This is no longer a local-helper or central-cycle problem: the selected
-central policy is now proved to mate. Finish its clock-safe whole-class
-composition, rather than installing another helper-only successor.
+1. Audit strong-to-move legal-root geography **outside every oriented
+   strict rank wall**, and select finite, source-derived entry actions.
+   Use actual frozen upstream `KRKForcing` constructors and
+   `KRKExecutable` extensions, not an existence theorem,
+   `Classical.choose`, generic first legal move, minimax or engine.
+2. Prove a deterministic typed phase/rank controller: non-wall setup
+   -> strict oriented wall -> KRK11 prep -> KRK10 central -> actual mate.
+   Each action chooses a concrete coordinate; every legal lone-king
+   reply must preserve a named next phase with decreasing well-founded
+   budget. Handle all rotations/reflections and both strong colours.
+3. Integrate weak-to-move roots explicitly: already mated, stalemate,
+   capturable/unprotected rook -> dead KK draw; otherwise every legal
+   defending move transfers to a proven strong-turn winning root.
+   Do not invent a strong-side move while the weak side is to move.
+4. Translate ONLY final-head kernel-verified choices to local JS,
+   with exact immutable source SHA + Git blob lock, positive/negative
+   branch tests, and a global fail-closed dispatch. Keep the user's
+   arranged board and exact side-to-move (never switch to a canned FEN).
+5. Add end-to-end games reaching actual checkmate under every legal
+   defender response for representative complete phase domains;
+   independently audit each phase's entire input domain, not just a
+   hand-picked best defender line. Retain source phase and proof working
+   in the Maths UI. No lookup of precomputed winning tables.
+6. Defer mathematical proof of 50-move/repetition/75-move semantics:
+   label the intended Maths mode appropriately and ensure it cannot
+   masquerade as conventional FIDE chess. No release if the selected
+   constructive *winning* strategy remains partial.
+7. Run final-head Lean compilation, explicit axiom audits, Node tests,
+   immutable source verification, domain audits, syntax, build, Maths
+   and Engine browser QA, compare heads, then merge only verified
+   coherent stacks. Cloudflare Workers Builds is preferred; verify
+   actual deployment and browser smoke tests before claiming live KRK.
+
+If this mission is incomplete, leave specific proof counterexamples/
+missing preconditions and an executable tested partial branch; **do not
+replace strategy work with another prompt-only session**.
