@@ -9,24 +9,32 @@
   },
   "sources": [
     {
-      "path": "formal/EndgameChess/Rules/KRKForcing/RookRescue.lean",
-      "gitBlob": "12cecd71180c989f076228b3cf5357a69cfa8281"
-    },
-    {
-      "path": "formal/EndgameChess/Rules/KRKForcing/WallActions.lean",
-      "gitBlob": "7c3a2910ecfcb3ca42c1d9692fcd75511355eae9"
+      "path": "formal/EndgameChess/Rules/KRKCentral/FreshOutcome.lean",
+      "gitBlob": "f255801dcb7fd78d6c1e824dc112e470f59404c5"
     },
     {
       "path": "formal/EndgameChess/Rules/KRKForcing/AxisWalls.lean",
       "gitBlob": "8fe21829b6966cb0c6b8d36d00526d13f42810c1"
     },
     {
+      "path": "formal/EndgameChess/Rules/KRKForcing/RookRescue.lean",
+      "gitBlob": "12cecd71180c989f076228b3cf5357a69cfa8281"
+    },
+    {
       "path": "formal/EndgameChess/Rules/KRKForcing/StrategyTransport.lean",
       "gitBlob": "da9299015de64a2920ac9b43b6c5c3be954c8eb3"
     },
     {
+      "path": "formal/EndgameChess/Rules/KRKForcing/WallActions.lean",
+      "gitBlob": "7c3a2910ecfcb3ca42c1d9692fcd75511355eae9"
+    },
+    {
       "path": "formal/EndgameChess/Rules/KRKImmediate.lean",
       "gitBlob": "171e286f18cd43a7862d54122dfc2dcedb7fd320"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKLastReply.lean",
+      "gitBlob": "2a48ca20d4dfd2726153ef8735fb615c663f27a3"
     },
     {
       "path": "formal/EndgameChess/Rules/KRKMateGeometry.lean",
@@ -35,10 +43,6 @@
     {
       "path": "formal/EndgameChess/Rules/KRKWinning/Policy.lean",
       "gitBlob": "a60f2aeab4f5fe4efa6c2f48125e8450bf2a13cf"
-    },
-    {
-      "path": "formal/EndgameChess/Rules/KRKCentral/FreshOutcome.lean",
-      "gitBlob": "f255801dcb7fd78d6c1e824dc112e470f59404c5"
     },
     {
       "path": "theorems/frozen/EC-T0019/v1.md",
