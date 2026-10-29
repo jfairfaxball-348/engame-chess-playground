@@ -128,7 +128,7 @@ try{
   assert.equal(await page.locator('[data-class="krk"]').isDisabled(),true);
   assert.equal(await page.locator('.sq').count(),64);
   assert.deepEqual(errors,[]);
-  console.log('PASS play/pause/colour-swap/tabs; original maths gate intact');
+  console.log('PASS play/pause/colour-swap/tabs; minimal Maths release gate intact');
   await page.close();
 }finally{
   await browser.close();
