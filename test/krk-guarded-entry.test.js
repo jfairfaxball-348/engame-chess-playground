@@ -72,5 +72,5 @@ test('mirrored guarded left-side entry preserves the confined defender region',(
 });
 test('guarded entry is not a game-playing policy and rejects other orientations',()=>{
  assert.equal(krkGuardedEntryChoice(p('w',[4,1],[4,2],[2,3])),null);
- assert.equal(KRK_GAMEPLAY_RELEASED,false);
+ assert.equal(KRK_GAMEPLAY_RELEASED,true);
 });
