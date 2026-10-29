@@ -20,13 +20,17 @@ heuristic, position atlas or first-legal fallback to choose Maths moves.
   `7cfd8462a9fd36c8e37250221ee809b5b8287836` passed Lean build
   [#40936122548](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40936122548).
   The executable global root selector is NOT thereby completed.
-- New KRK13 Playground [PR #20](https://github.com/jfairfaxball-348/engame-chess-playground/pull/20)
-  adds the two pre-existing source-proved off-rank far-file and back-rank
-  king-alignment setup moves; guards real-board/reply continuation and
-  tests colour/frame/all-reply branches. Read
-  `docs/KRK13_TWO_STEP_SETUP.md`. Confirm **exact final head CI**
-  before promoting it, and check whether it has been integrated into
-  staging; do not assume PR #20 is merged.
+- KRK13 [PR #20](https://github.com/jfairfaxball-348/engame-chess-playground/pull/20)
+  was merged by strict fast-forward into this draft staging branch at
+  `be3bc3efe66974ae0975b86066c217ef3815e034`.
+  [CI #40941467989](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40941467989)
+  PASSED: 149/149 tests, source locks, build, Maths/Engine browser QA and a
+  full **exhaustive** root audit of all 262,144 square triples / both colours.
+  All **350,336 legal ongoing fresh strong-turn roots** had an actual legal
+  proof-derived first move (175,616 prepared, 147,704 direct,
+  27,016 two-step, 0 unsupported). This is NOT a proof that each subsequent
+  all-defender path reaches checkmate. See `docs/KRK13_TWO_STEP_SETUP.md`
+  and `scripts/krk13-root-selector-audit.mjs`.
 - `krkPartialRootChoice` is still deliberately a PARTIAL selector.
   KRK Maths release flags remain OFF.
 
@@ -36,15 +40,18 @@ heuristic, position atlas or first-legal fallback to choose Maths moves.
    repository's main branch. Read the global
    `KRKForcing.SafeSetup.krk_strong_force_of_not_check` proof and each
    setup case, translating only exact kernel-verified coordinates.
-2. Build an **exhaustive legal-root domain report**, both colours and
-   source frames, for every strong-to-move KRK board: classify by proved
-   phase, test legality of returned action, and record precise FENs for
-   any uncovered legal root. The domain audit must not be a move chooser.
-3. Complete the deterministic TOTAL selector, including any remaining
-   setup+entry frame transitions, with all-defender finite composition
-   into KRK11 `PreparedRun` and KRK10 `CentralRun`. Prove totality,
-   source correspondence and well-founded global mate termination in
-   NEW importing Lean modules. No empirical coverage substitutes for proof.
+2. **Do not repeat the completed 350,336-root first-move coverage audit.**
+   Instead enumerate every legal weak reply AFTER the chosen first action,
+   especially all 27,016 two-step setup roots; classify whether the exact
+   tagged continuation reaches a prepared wall, another source phase, or
+   a genuine missing subcase. Record exact root/reply FENs and source
+   lemma for every failure. This is falsification, never a move chooser.
+3. Finish the deterministic TOTAL **continuation** selector and global
+   finite proof: arbitrary root -> source setup or direct wall -> KRK11
+   `PreparedRun` -> KRK10 `CentralRun` -> checkmate, against ALL
+   legal defending replies. Prove source correspondence and a global
+   well-founded mating rank in fresh importing Lean modules. The
+   successful exhaustive first-move JS audit is not a mate proof.
 4. Classify all **weak-to-move** roots: mate, stalemate, immediate rook
    capture to KK draw, and every safe legal weak reply into the winning
    strong-turn selector. Do not move for the weak side.
