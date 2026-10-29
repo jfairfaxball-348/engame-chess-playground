@@ -37,6 +37,10 @@
       "gitBlob": "ee398432ddda0a4cc9fb432d5e881f74e1a11dcd"
     },
     {
+      "path": "formal/EndgameChess/Rules/KRKForcing/OffRankSetup.lean",
+      "gitBlob": "7aab43b8ebd5be9bf9d02556a594f83f9181b13f"
+    },
+    {
       "path": "formal/EndgameChess/Rules/KRKForcing/RankAdvance.lean",
       "gitBlob": "38ab080688f5d0ceb000a7bb3d824f061e457d2a"
     },
