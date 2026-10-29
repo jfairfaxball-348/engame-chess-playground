@@ -1,59 +1,22 @@
-# KRK08 — Complete the central lower-band recursion and global proof-derived mate policy
+# KRK09 — Fix off-centre central pursuit cycle; finish source-derived mate policy
 
-**NEXT SESSION — INSTALLED, NOT EXECUTED.** This is execution: code,
-Lean proof, tests and release governance, NOT another diagnostic-only
-iteration. Owner's target is a genuinely playable KRK Maths opponent.
+**NEXT EXECUTION SESSION — INSTALLED, NOT EXECUTED.**
 
-## Exact incoming state
+## Incoming verified evidence
 
-- [Playground KRK07 draft PR #14](https://github.com/jfairfaxball-348/engame-chess-playground/pull/14)
-  is stacked on [KRK06 PR #13](https://github.com/jfairfaxball-348/engame-chess-playground/pull/13),
-  itself stacked on [KRK05 PR #12](https://github.com/jfairfaxball-348/engame-chess-playground/pull/12).
-- KRK07 adds `src/krk-central-upper-phase.js` and complete all-defender
-  phase audits from upper READY via the rank-two rook lift and at most
-  three restorative pairs to a FULL central wall one rank higher.
-  Source is existing, proof-tested `KRKExecutable.readyUpperDestination_sound`,
-  `KRKCentral.restoration_bound` and `exit_step_bound`.
-  See `docs/KRK07_CENTRAL_UPPER_PHASE.md`.
-- [Lean KRK06 PR #8](https://github.com/jfairfaxball-348/engame-chess/pull/8)
-  is a proof draft stacked on upstream PR #7; KQK/KPK on main must be
-  preserved. Do not force-merge or treat an existential theorem as an
-  executable move selector.
-- Neither global mate policy nor full FIDE-safe action certificate
-  exists; **KRK Maths Start remains disabled**. Vercel quota remains a
-  deployment limitation, not permission to skip CI or claim release.
+- Lean constructive lower pursuit [PR #9](https://github.com/jfairfaxball-348/engame-chess/pull/9), source branch `krk08-lower-pursuit-pair`, exact Lean/axiom CI passed at `e920a7752665d025d30f81db7c0e7ec73ff77591`. Prints **no `sorryAx`**.
+- Playground [KRK08 PR #15](https://github.com/jfairfaxball-348/engame-chess-playground/pull/15), stacked on KRK07 PR #14, adds `src/krk-lower-band.js` (32 all-reply colour/frame cases to ExitBound, 816 leaves, max 5 pairs) and experimental `src/krk-central-sequence.js` (8 true-mate edge cases). Check latest exact-head CI before further changes.
+- The **precise blocker** is reproduced in `test/krk-central-sequence.test.js`: Kd5/Ra6 against Kd7, white to move, exact FEN `8/3k4/R7/3K4/8/8/8/8 w - - 0 1`. The actual fixture is `sk:[3,4],rs:[0,5],wk:[3,6]` in 0-based bottom-origin files/ranks. Current phase composition repeats a position because it recentres the strong king after an off-centre pursuit move, undoing strictly descending progress. Existing audit detects the repetition and **fails closed**.
+- The pre-existing individual Lean constructors remain correct. The problem is their **phase-indexed composition**, not the move legality, browser or engine.
+- All stacks are DRAFT and unreleased. Keep KQK/KPK main intact, no force merge, and no deployment claim without real verification.
 
-## Required execution
+## Primary execution task
 
-1. Inspect **exact newest heads and their CI**, reconcile stacked draft
-   branches without overwriting unrelated active proof work.
-2. Formalise and extract the **complete lower-band continuation**, not
-   one more isolated first pair. Connect `KRKCentral.positive_bound`,
-   `back_bound`, `wait_even_bound`, opposition check,
-   protected/guarded cuts, column/box pivots, `ExitBound` and
-   edge mating. Produce a concrete selector plus ONE well-founded
-   descending measure applying after **every** legal weak reply.
-3. Compose the full central-wall induction with the already completed
-   KRK07 upper rank advance. Finish the non-wall setup and root
-   classification for every legal arranged KRK board, both colours and
-   either turn; draw or captured-rook cases must never be falsely
-   presented as forceable wins.
-4. Translate ONLY exact, Lean-verified constructors into the separate
-   Playground local JS. Retain immutable source locks and the user's
-   arranged position/move history. No engine, tablebase, minimax,
-   search, heuristic or arbitrary first-legal fallback in Maths.
-5. Run Lean, print axioms, source-lock checks, full Node tests, phase
-   audits, browser suites, and **actual complete all-defender games to
-   checkmate**, checking 50/75-move and 3/5-repetition behaviour.
-6. Merge only coherent, tested and reviewed heads. Enable KRK only
-   when the complete policy and explicit owner approval exist.
-   Otherwise report the exact missing constructor/induction, preserve
-   draft and the KRK release lock. Install KRK09 only if there is a
-   genuinely distinct proof obligation; do not replace execution
-   with prompt churn.
+1. Inspect and correct the off-centre continuation **in the Lean source first**. Make the phase a tagged recursive state with an explicit distinction between (a) off-centre king chasing in lower band, (b) actual restoration after a rook lift, and (c) ready aligned/upper exit. Produce one decreasing induction over **every** legal weak reply, showing source move selection never undoes earlier progress.
+2. Translate that proof into `src/krk-central-sequence.js` without searching, minimax, engine, tablebase, heuristics, arbitrary move fallback or lookup. The existing penultimate-rank test must require a genuine strong-side checkmate again; do not weaken it by omitting branches.
+3. Compose with KRK07 rank-two/restoration and edge opposition to audit complete all-defender real games from multiple rank heights, colours, turns and board frames, including move histories and FIDE 50/75-move and 3/5-repetition constraints. The proof must provide the game-length bound, not just test enumeration.
+4. Expand from full central wall to **every legal KRK arranged root**, including off-wall setup, weak-to-move and drawn/captured rook cases. Prove/translate the global selector before any UI activation.
+5. Run exact-head Lean builds and `#print axioms`, source-lock verification, Node tests, phase domain, syntax, production build and both browser suites. Ensure all CI green at the latest heads.
+6. Keep `KRK_GAMEPLAY_RELEASED=false` and `MATERIAL.krk.playable=false` until a **complete** proof-sourced opponent exists, is verified, and receives explicit owner approval. Merge only coherent tested branches; keep research drafts separate otherwise.
 
-## Non-negotiable
-
-`KRK_GAMEPLAY_RELEASED=false` and `MATERIAL.krk.playable=false`
-remain required unless the **whole** win/draw/terminal/clock policy
-has been verified and its release approved.
+Do **not** install another successor prompt without a genuinely distinct demonstrated mathematical obligation. Prioritise fixing the actual central composition cycle over more unrelated first-step helpers.
