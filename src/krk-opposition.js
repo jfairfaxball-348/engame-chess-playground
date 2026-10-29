@@ -34,7 +34,7 @@ function framed(s,f){
 
 export function krkOppositionCheckChoice(state,frame='id'){
  const p=framed(state,frame);if(!p)return null;
- const {strong,sx,sy,rx,ry,wx,wy,rook}=p;
+ const {strong,sk,sx,sy,rx,ry,wx,wy,rook}=p;
  if(sx!==wx||wy!==sy+2||Math.abs(rx-wx)<2||ry===wy)return null;
  const target=krkTransformSquare(squareAt(rx,wy),frame);
  const move=legalMoves(state.board,strong).find(m=>m.from===rook&&m.to===target);
