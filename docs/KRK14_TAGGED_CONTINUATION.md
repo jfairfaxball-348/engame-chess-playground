@@ -30,6 +30,27 @@ The KRK14 **2,048-triple stratified window** on that tested head reported:
 
 These are executable port/falsification results, **not** a proof of total mating strategy from every legal root. The full-tree diagnostic and its CI are additional tests on the subsequent KRK14 head, not included in the earlier exact-head CI claim.
 
+
+## KRK14 complete-game detector correction
+
+The first all-defender full-tree run at `c5faa74c657fbbab5b3e84e120f1af63fbc79993` falsely labelled a **ply-28 cycle** starting from
+`8/8/8/8/5k2/R7/2K5/8 w - - 0 1`. That report is **RETRACTED**:
+the diagnostic key compared the outer PreparedWall tag (`stage=central`)
+but dropped its nested `CentralRun` stage (`centre` versus `lower`).
+The same board with *different source control stages* is not a cycle of
+the deterministic tagged state machine.
+
+The stage-sensitive fix at `d4175fe0347f4a50247a474b71805c800401658c`
+passed [Playground CI #40972942947](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40972942947).
+With the same starting root and `--nodes=1200`, the diagnostic saw **1,201 nodes,
+484 terminal checkmates and a maximum 37 plies**, then stopped on the explicit
+**node cap**, NOT on a cycle. This neither proves nor refutes all-reply
+termination. A dedicated regression checks the previously false positive.
+The diagnostic also gains `sourceTrace` on any failure so that nested
+Lean rule, stage and orientation can be inspected without turning the
+test traversal into a move selector. A larger 40,000-node check is being
+run separately; its result must be read before claims about that bound.
+
 ## Remaining mathematical work
 
 The central requirement is a **source-correspondent well-founded rank** for the entire deterministic tagged controller, proving that *all* legal defender choices reach mate, beginning at any legal strong-turn root. The upstream `KRKForcing.SafeSetup.krk_strong_force_of_not_check` is a `ForceMate` existence construction; it does not by itself certify that this particular JS selector faithfully composes all of its choices. Verify any newly required finite rank or phase lemma in a fresh upstream importing module and run Lean/axiom CI.
