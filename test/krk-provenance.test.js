@@ -8,7 +8,8 @@ test('pinned KRK proof lock has all required theorem records and named Lean cons
   assert.equal(validateLock(lock),true);
   assert.equal(lock.sourceRepository,'jfairfaxball-348/engame-chess');
   assert.equal(lock.sourceCommit,'e7de0930fc61caeb11795cf3c10fde11e4774a40');
-  assert.equal(lock.sources.length,11);
+  assert.equal(lock.sources.length,12);
+  assert.ok(lock.sources.some(s=>s.path.endsWith('KRKLastReply.lean')));
   assert.ok(lock.sources.some(s=>s.path.endsWith('KRKImmediate.lean')));
   assert.ok(lock.sources.some(s=>s.path.endsWith('KRKWinning/Policy.lean')));
   assert.ok(lock.sources.some(s=>s.path.endsWith('EC-T0048/v1.md')));
