@@ -1,5 +1,9 @@
 # Chess Playground — engineering roadmap
 
+## KRK02 execution follow-up — 29 October 2026
+
+[KRK02 exact proof-policy blocker](KRK02_EXACT_BLOCKER.md) identifies the remaining genuine READY/exit/pivot/global dispatcher deficiency and pins a legal reproduction FEN. [KQK03 readiness](KQK03_IMPORT_READINESS.md) records queen-specific import gates. On the isolated parent draft extraction branch, a narrow-band deterministic rook tempo and all-reply phase split has been added in `KRKExecutable/ReadyCutTempo.lean` (subject to its own CI). Its **unreleased** JS counterpart `src/krk-ready-cut-tempo.js` and both-colour/four-frame tests are on the KRK02 audit branch, without changing `MATERIAL.krk.playable=false`. This is incremental and not a production KRK release.
+
 ## Current owner priority — KRK02 full-game proof-derived release (29 October 2026)
 
 The old S006 and historic "KRK on hold" sections below describe earlier stages. **Authorised now:** continue KRK01's verified local proof-derived components and finish a *total, executable* KRK strategy. See [NEXT_SESSION.md](../NEXT_SESSION.md) for binding requirements. The KRK01 implementation and source-identity audit are documented in [KRK01_PROOF_POLICY_AUDIT.md](KRK01_PROOF_POLICY_AUDIT.md), and the parent executable extraction draft is [endgame-chess PR #3](https://github.com/jfairfaxball-348/engame-chess/pull/3).
