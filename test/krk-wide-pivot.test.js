@@ -4,7 +4,7 @@ import {makeBoard,squareAt,positionKey,opposite,validateSetup}
   from '../src/chess.js';
 import {KRK_FRAMES,krkTransformSquare,KRK_GAMEPLAY_RELEASED}
   from '../src/krk-local-witness.js';
-import {krkWidePivotChoice,auditKRKWidePivot,KRK_WIDE_PIVOT_LEMMA}
+import {krkWidePivotChoice,auditKRKWidePivot,KRK_WIDE_PIVOT_LEMMA,KRK_LEFT_PIVOT_LEMMA}
   from '../src/krk-wide-pivot.js';
 
 function pos(colour,sk,rs,wk){
@@ -61,9 +61,31 @@ test('all weak responses remain in right-side guarded region in four frames and 
   console.log('KRK02 wide pivot conditional theorem diagnostic:',{tried,replies});
 });
 
-test('left-oriented pivot and non-READY states are not pretended to have a proof-specific cut',()=>{
+test('certified left-wide pivot mirrors the right cut and covers all replies',()=>{
   const left=pos('w',[4,1],[7,2],[2,3]);
-  assert.equal(krkWidePivotChoice(left),null);
+  const c=krkWidePivotChoice(left);
+  assert.equal(c?.kind,'step');
+  assert.equal(c?.rule,KRK_LEFT_PIVOT_LEMMA);
+  assert.equal(c?.move.from,squareAt(7,2));
+  assert.equal(c?.move.to,squareAt(3,2));
+  assert.ok(auditKRKWidePivot(left).ok);
+  let tried=0;
+  for(const colour of ['w','b'])for(const frame of KRK_FRAMES)
+  for(const sx of [3,4])
+  for(let sy=0;sy<=4;sy++)
+  for(let wx=0;wx<=sx-2;wx++)
+  for(let rx=0;rx<8;rx++){
+    const s=framePosition(pos(colour,[sx,sy],[rx,sy+1],[wx,sy+2]),frame);
+    if(validateSetup(s.board,'krk',colour))continue;
+    const d=krkWidePivotChoice(s,frame);
+    assert.ok(d,JSON.stringify({colour,frame,sx,sy,rx,wx}));
+    const a=auditKRKWidePivot(s,frame);
+    assert.ok(a.ok,JSON.stringify({colour,frame,sx,sy,rx,wx,a}));
+    tried++;
+  }
+  assert.ok(tried>100);
+});
+test('noncentral wall and unproved material remain unavailable',()=>{
   const notReady=pos('w',[1,1],[0,3],[5,4]);
   assert.equal(krkWidePivotChoice(notReady),null);
   assert.equal(KRK_GAMEPLAY_RELEASED,false);
