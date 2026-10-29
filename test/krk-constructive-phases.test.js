@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {makeBoard,squareAt,positionKey,legalMoves,validateSetup,applyMove,findKing,coords,distance,opposite} from '../src/chess.js';
-import {KRK_FRAMES,krkTransformSquare,KRK_GAMEPLAY_RELEASED} from '../src/krk-local-witness.js';
+import {KRK_FRAMES,krkTransformSquare,KRK_GAMEPLAY_RELEASED,krkLocalWitness,auditKRKLocalWitness} from '../src/krk-local-witness.js';
 import {KRK_CONSTRUCTIVE_RULES,krkCentreDistance,krkPrepDistance,
   krkConstructiveStep,auditKRKConstructiveStep} from '../src/krk-constructive-phases.js';
 
@@ -88,6 +88,23 @@ test('constructive steps fail closed for unproved premises and forged evidence',
   assert.equal(KRK_GAMEPLAY_RELEASED,false);
   const near=state('w',[3,0],[0,2],[1,3]);
   assert.equal(krkConstructiveStep(near,'rankAdvance'),null);
+});
+
+test('Lean wall entry admits a threatened rook; next strong turn can rescue it',()=>{
+ const st=state('w',[0,0],[2,0],[0,3]);
+ const entry=witness(st,'entry');
+ assert.ok(entry);
+ const child=applyMove(st.board,entry.move);
+ const reply=legalMoves(child,'b').find(m=>m.to===square(1,2));
+ assert.ok(reply,'the adversary must be allowed to threaten the rook');
+ const b=applyMove(child,reply);
+ const next={...st,board:b,history:[positionKey(b,'w')],halfmove:2};
+ const rook=square(2,1),wk=square(1,2);
+ assert.equal(distance(rook,wk),1,'the new wall does not imply a safe rook');
+ const rescue=krkLocalWitness(next,'rescue');
+ assert.ok(rescue,'frozen rescue lemma applies at the next strong turn');
+ assert.ok(auditKRKLocalWitness(next,rescue).ok,'rescue preserves the wall for all replies');
+ assert.equal(rescue.move.to,square(7,1));
 });
 
 test('sampled quantified phase families preserve local postconditions against every weak reply',()=>{
