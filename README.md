@@ -1,5 +1,9 @@
 # Endgame Chess Playground
 
+## KRK02 continued verified extraction — 29 October 2026
+
+The current draft [KRK02 execution continuation](docs/KRK02_EXECUTION_CONTINUATION.md) includes two-sided protected rook cuts, guarded king entries, column centring, and a concrete two-file opposition check/king-up phase. The proof-sourced extraction compiled in [upstream Lean CI #40886544904](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40886544904). The non-released Playground translation passed [102 tests and browser CI #40886756069](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40886756069). **The class-wide executable selector and carried WDL50/97/98-ply budget are still missing: Maths KRK Start remains disabled.** All work is on the separate [draft PR #4](https://github.com/jfairfaxball-348/engame-chess-playground/pull/4) and parent [draft PR #3](https://github.com/jfairfaxball-348/engame-chess/pull/3), not released production.
+
 ## KRK02 proof-to-player execution update — 29 October 2026
 
 The KRK02 executable-policy audit confirmed a **genuine missing total selector**, including READY lower-band to protected pivot/exit and endgame finish, despite the upstream 97/98-ply forced-outcome theorem. The unreleased KRK02 audit branch adds a narrow READY rook-tempo proof extraction/JS diagnostic and all-reply tests, but **does not enable KRK gameplay**. See [exact blocker/repro](docs/KRK02_EXACT_BLOCKER.md), [next-session steps](NEXT_SESSION.md) and [KQK03 readiness](docs/KQK03_IMPORT_READINESS.md). Independent Engine Playground and currently released drawn classes remain unaffected.
