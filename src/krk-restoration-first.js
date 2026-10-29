@@ -2,7 +2,7 @@
  * KRK05 (UNRELEASED): a constructive restoration FIRST PAIR only.
  *
  * Source: EndgameChess.Rules.KRKExecutable.RestorationFirst,
- * upstream stacked review https://github.com/jfairfaxball-348/engame-chess/pull/6.
+ * upstream stacked review https://github.com/jfairfaxball-348/engame-chess/pull/7.
  * Its proofs extract the first two branches of the frozen
  * KRKCentral.restoration_bound argument. This is NOT a root-to-mate policy.
  *
@@ -18,7 +18,7 @@ export const KRK_RESTORATION_LEMMAS=Object.freeze({
   far:'EndgameChess.Rules.KRKExecutable.restorationFar_sound',
   king:'EndgameChess.Rules.KRKExecutable.restorationKing_sound'
 });
-export const KRK_RESTORATION_REVIEW='https://github.com/jfairfaxball-348/engame-chess/pull/6';
+export const KRK_RESTORATION_REVIEW='https://github.com/jfairfaxball-348/engame-chess/pull/7';
 
 function framed(s,f){
   if(!KRK_FRAMES.includes(f)||s?.material!=='krk'||

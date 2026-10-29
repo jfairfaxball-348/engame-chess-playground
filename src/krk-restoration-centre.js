@@ -1,7 +1,7 @@
 /**
  * KRK05 (unreleased): the second centre-alignment pair in the exact
  * KRKCentral.restoration_bound proof. Source review:
- * https://github.com/jfairfaxball-348/engame-chess/pull/6
+ * https://github.com/jfairfaxball-348/engame-chess/pull/7
  *
  * Restricted to king file 2 or 5, strict rank wall and rook file gap >=2.
  * Not a source-certified total winning policy.
@@ -37,7 +37,7 @@ export function krkRestorationCentreChoice(state,frame='id'){
   return Object.freeze({
     kind:'step',phase:'restoration-centre-align',frame,
     move,rule:KRK_RESTORATION_CENTRE_RULE,
-    proofReview:'https://github.com/jfairfaxball-348/engame-chess/pull/6',
+    proofReview:'https://github.com/jfairfaxball-348/engame-chess/pull/7',
     proofStatus:'upstream-draft-pending-merge',
     inputHalfmove:state.halfmove,inputHistoryLength:state.history.length,
     isCompleteWinningPolicy:false,maxMatePlies:null
