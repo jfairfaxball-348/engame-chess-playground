@@ -39,11 +39,11 @@ function exercise(st,rule,isometry='id') {
   return true;
 }
 
-test('release remains fail-closed; a local witness is not an autoplay selector',()=>{
-  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+test('practical release uses a separate player; local witness still requires an explicit rule',()=>{
+  assert.equal(KRK_GAMEPLAY_RELEASED,true);
   const st=state();
-  assert.throws(()=>newGame(st.board,st.turn,'krk'),/not released/);
-  assert.equal(chooseDecision(st,st.turn),null);
+  assert.equal(newGame(st.board,st.turn,'krk').material,'krk');
+  assert.ok(chooseDecision(st,st.turn)?.move);
   assert.equal(krkLocalWitness(st,'automatic'),null);
   assert.equal(krkLocalWitness(st,undefined),null);
   assert.equal(krkLocalWitness(st,'rescue','rotate-heuristic'),null);

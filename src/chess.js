@@ -1,14 +1,14 @@
 /** The playground's deliberately limited, independent chess rules implementation.
  * No engine, tablebase, remote lookup or dependency. Board indices: a1=0, h8=63.
  * Playable: K v K, K+B v K, K+N v K. KRK geometry remains for local rules tests only;
- * KRK play is explicitly blocked pending an owner-approved, completed upstream release.
+ * KRK is an owner-approved practical Maths demonstration, not an exact ply-bound certificate.
  * No pawns/castling/en-passant.
  */
 export const MATERIAL = Object.freeze({
   kk: { label: 'K vs K', extra: null, theorem: 'EC-T0003', outcome: 'Dead position', playable: true },
   kbk: { label: 'K+B vs K', extra: 'B', theorem: 'EC-T0004', outcome: 'Dead position', playable: true },
   knk: { label: 'K+N vs K', extra: 'N', theorem: 'EC-T0005', outcome: 'Dead position', playable: true },
-  krk: { label: 'K+R vs K', extra: 'R', theorem: 'EC-T0019', outcome: 'Awaiting complete parent-release approval', playable: false },
+  krk: { label: 'K+R vs K', extra: 'R', theorem: 'EC-T0048', outcome: 'Constructive geometric demonstration', playable: true },
 });
 const KNIGHT = [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
 const KING = [[1,1],[1,0],[1,-1],[0,1],[0,-1],[-1,1],[-1,0],[-1,-1]];
@@ -121,11 +121,14 @@ export function play(state,move){
   if(!allowed)throw new Error('Illegal move');
   const board=applyMove(state.board,allowed),turn=opposite(state.turn);
   const history=state.history.concat(positionKey(board,turn));
-  return {...state,board,turn,history,halfmove:allowed.capture?0:state.halfmove+1,
+  const rookTaken=state.material==='krk'&&allowed.capture?.[1]==='R';
+  return {...state,board,turn,material:rookTaken?'kk':state.material,
+    krkRookCaptured:rookTaken||Boolean(state.krkRookCaptured),
+    history,halfmove:allowed.capture?0:state.halfmove+1,
     log:state.log.concat(`${state.turn==='w'?'White':'Black'} ${moveNotation(state.board,allowed,board,turn)}`)};
 }
 export function newGame(board,turn,material){
-  if(!MATERIAL[material]?.playable) throw new Error('This material class is not released for playground play. Wait for completed, frozen upstream results and owner approval.');
+  if(!MATERIAL[material]?.playable) throw new Error('This material class is not currently playable.');
   const problem=validateSetup(board,material,turn);if(problem)throw new Error(problem);
   return {board:board.slice(),turn,material,halfmove:0,history:[positionKey(board,turn)],log:[]};
 }

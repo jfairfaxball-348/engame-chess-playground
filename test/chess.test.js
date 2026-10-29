@@ -8,10 +8,10 @@ import {
 import { chooseMove, chooseDecision, strategyLabel } from '../src/engine.js';
 const sq=squareAt;
 
-test('only upstream-released dead classes are playable; KRK stays gated',()=>{
+test('owner-approved practical KRK joins the dead-position classes',()=>{
   assert.deepEqual(Object.keys(MATERIAL),['kk','kbk','knk','krk']);
-  assert.deepEqual(Object.entries(MATERIAL).filter(([,m])=>m.playable).map(([id])=>id),['kk','kbk','knk']);
-  assert.equal(MATERIAL.krk.playable,false);
+  assert.deepEqual(Object.entries(MATERIAL).filter(([,m])=>m.playable).map(([id])=>id),['kk','kbk','knk','krk']);
+  assert.equal(MATERIAL.krk.playable,true);
 });
 
 test('default arrangements satisfy local geometry for colours and turns',()=>{
@@ -52,12 +52,12 @@ test('kings cannot be captured',()=>{
   const b=makeBoard();b[sq(4,0)]='wK';b[sq(4,7)]='bK';b[sq(4,6)]='wR';
   assert.ok(!legalMoves(b,'w').some(m=>m.to===sq(4,7)));
 });
-test('KRK cannot start a match, even through the game API',()=>{
+test('KRK can start and uses a legal non-arena geometric move',()=>{
   const board=initialSetup('krk');
-  assert.throws(()=>newGame(board,'w','krk'),/not released/);
-  assert.equal(chooseDecision({board,turn:'w',material:'krk'},'w'),null);
-  assert.equal(chooseMove({board,turn:'w',material:'krk'},'w'),null);
-  assert.match(strategyLabel('krk'),/Unavailable/);
+  assert.equal(newGame(board,'w','krk').material,'krk');
+  assert.ok(chooseDecision(newGame(board,'w','krk'),'w')?.move);
+  assert.ok(chooseMove(newGame(board,'w','krk'),'w'));
+  assert.match(strategyLabel('krk'),/geometry/);
 });
 test('engine always selects a legal move with correct frozen provenance',()=>{
   for(const mat of ['kk','kbk','knk'])for(const computer of ['w','b']){

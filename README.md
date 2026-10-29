@@ -1,30 +1,25 @@
 # Endgame Chess Playground
 
-## KRK02 continued verified extraction — 29 October 2026
+## Maths endgame — KRK practical play (29 October 2026)
 
-The current draft [KRK02 execution continuation](docs/KRK02_EXECUTION_CONTINUATION.md) includes two-sided protected rook cuts, guarded king entries, column centring, and a concrete two-file opposition check/king-up phase. The proof-sourced extraction compiled in [upstream Lean CI #40886544904](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40886544904). The non-released Playground translation passed [102 tests and browser CI #40886756069](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40886756069). **The class-wide executable selector and carried WDL50/97/98-ply budget are still missing: Maths KRK Start remains disabled.** All work is on the separate [draft PR #4](https://github.com/jfairfaxball-348/engame-chess-playground/pull/4) and parent [draft PR #3](https://github.com/jfairfaxball-348/engame-chess/pull/3), not released production.
+**K + R versus K is enabled in the Maths tab as a practical, proof-informed geometric demonstration.** Place a rook and the two kings on the empty board, choose the side to move, and press **Start game**. The human **always controls the lone king** (White or Black), and the local computer plays the strong K+R side. If the computer moves first, the existing explicit first-move button preserves the exact arranged position until pressed. All moves remain legally validated and Undo restores the game.
 
-## KRK02 proof-to-player execution update — 29 October 2026
+**Important exception:** when the lone king can legally take an unprotected rook, that capture is allowed. The material becomes **K vs K** and the Maths outcome immediately displays **Guaranteed draw · rook captured**. Undo restores the three-piece starting line. This is consistent with the parent EC-T0048 fresh-position theorem: not every **weak-to-move** root is winning for K+R.
 
-The KRK02 executable-policy audit confirmed a **genuine missing total selector**, including READY lower-band to protected pivot/exit and endgame finish, despite the upstream 97/98-ply forced-outcome theorem. The unreleased KRK02 audit branch adds a narrow READY rook-tempo proof extraction/JS diagnostic and all-reply tests, but **does not enable KRK gameplay**. See [exact blocker/repro](docs/KRK02_EXACT_BLOCKER.md), [next-session steps](NEXT_SESSION.md) and [KQK03 readiness](docs/KQK03_IMPORT_READINESS.md). Independent Engine Playground and currently released drawn classes remain unaffected.
+The opponent's implementation (`src/krk-play-policy.js`) selects explicit constructive moves translated from `engame-chess` Lean proofs: wall preparation, rook rescue, edge/central approach, protected pivot, guarded entry and opposition check, with an openly marked practical geometric setup phase where the exact proof's move dispatcher is not extracted. The direct frozen terminal mate-in-one formula is used first. **This is not a formally certified global JavaScript policy or a verified 97/98-ply/FIDE-clock-equivalent engine**. The demonstration uses real chess move legality and excludes Stockfish, tablebases, minimax and network chess engines from Maths mode. A correct upstream existence-of-win theorem is not evidence that any particular practical sequence wins at a fixed distance.
 
-## Current Maths KRK position — 29 October 2026
-
-KRK01 is incorporated as **proof-sourced infrastructure, not yet playable**: named constructive rook/king moves, board symmetries, geometric mate-in-one and two-ply terminal cases, local wall-preparation and wall-climb progress machinery, all-reply tests and pinned upstream Lean source verification (`proof-sources/krk.lock.json` / `npm run verify:krk-sources`). The entire implementation is JavaScript in the standalone Playground; **the site does not run Lean or access GitHub while playing**.
-
-The user has authorised KRK02 to finish the complete proof-derived adversarial policy and **conditionally** enable KRK only once proven all-phase, all-reply, history and 97/98-root-bound requirements are met. Read [NEXT_SESSION.md](NEXT_SESSION.md) and [the KRK01 proof audit](docs/KRK01_PROOF_POLICY_AUDIT.md). The independent S011 Engine workshop is preserved at [docs/ENGINE_S011_DEFERRED.md](docs/ENGINE_S011_DEFERRED.md), and KQK is the next planned material class when its own upstream proof/extraction gates are met.
-
+The source provenance and all-reply local test record remain documented in [KRK02 execution report](docs/KRK02_EXECUTION_CONTINUATION.md). Previous KRK01/KRK02 notes saying `KRK is disabled` are **historical**: the owner explicitly relaxed the exact bound/history release conditions for this practical Maths-only mode. No KQK, KPK or other material has been enabled. The independent Engine Playground remains separate.
 
 Two intentionally separate modes share a single Vercel website:
 
-- **Maths endgame** starts with an empty board and two full piece trays. The only currently arrangeable material is both kings plus at most one bishop, knight or rook; queen and pawn slots remain dark. Its outcome panel is backed by frozen theorems. K/K, K+B/K and K+N/K are playable against a legal-move draw adversary. Newly completed KRK is classified using the frozen fresh-clock theorem, but KRK *play* stays gated until a faithful executable winning policy is derived and verified. There is no engine, search or tablebase in this mode.
+- **Maths endgame** starts with an empty board and two full piece trays. The only currently arrangeable material is both kings plus at most one bishop, knight or rook; queen and pawn slots remain dark. Its outcome panel is backed by frozen theorems. K/K, K+B/K and K+N/K are playable against a legal-move draw adversary; KRK has its own geometric opponent. KRK is playable as the practical geometric demonstration described above; its mathematical outcome classification is independent of the particular exhibited move sequence. There is no engine, search or tablebase in this mode.
 - **Engine playground** is a standard, full-rules chess spectator arena. Choose a chess engine for White and Black, Play, Pause, advance one move, change the viewing pace, flip the board or Restart. It is NOT a proof-derived mathematical engine.
 
 ## Engine playground
 
 The initial pair is **Stockfish 19 Lite (single threaded WebAssembly)** and **Lozza (JavaScript UCI)**. The Stockfish Lite edition is significantly smaller and weaker than the full engine. Either can play either colour, including mirror matches. Both run locally in browser Web Workers, require no backend or API keys, and the display is deliberately delayed after each move so the games are watchable. The browser may download roughly 2 MB of engine assets on first use. For fair performance comparison, this arena is a spectator/demo interface, **not a calibrated engine-benchmark harness**.
 
-The separate arena uses the standard-chess \`chess.js\` library for legality, promotion, castling, en-passant, checkmate and draw detection. The maths-only \`src/chess.js\` remains untouched and does not gain new material classes.
+The separate arena uses the standard-chess \`chess.js\` library for legality, promotion, castling, en-passant, checkmate and draw detection. The maths-only \`src/chess.js\` is independent and supports only the original three dead classes plus the practical KRK release.
 
 ## Running and deploying
 

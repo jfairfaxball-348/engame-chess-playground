@@ -1,32 +1,28 @@
-/**
- * Chess Playground's ONLY currently released adversarial policy:
- * K vs K / K+B vs K / K+N vs K are upstream-proved dead positions.
- * Any legal move is sufficient in demonstration mode. NO heuristics,
- * external engines, minimax, precomputed positions, or upstream runtime access.
- *
- * IMPORTANT: KRK is intentionally NOT PLAYABLE. Do not restore a partial
- * proof-pattern policy until a completed upstream strategy has been formally
- * verified, frozen, reviewed, and expressly authorised for release by owner.
- */
+/** Maths-only opponent: frozen dead-position choices plus KRK geometric policy.
+ * The second Engine Playground tab has its own engines and is not imported. */
 import { MATERIAL, legalMoves } from './chess.js';
+import { chooseKRKDecision } from './krk-play-policy.js';
 
 export function chooseDecision(state, computerColor) {
   if (!MATERIAL[state.material]?.playable || state.turn !== computerColor) return null;
+  if(state.material==='krk'){
+    if(!state.board.includes(computerColor+'R'))return null;
+    return chooseKRKDecision(state,computerColor);
+  }
   const moves = legalMoves(state.board, state.turn);
   if (!moves.length) return null;
   return {
     move: moves[0],
     origin: 'dead-position-choice',
     rule: MATERIAL[state.material].theorem,
-    reason: 'The source theorem establishes a dead position. Any legal move has the same drawn outcome. Continued board movement is for exploration only.'
+    reason: 'The frozen dead-position result makes every legal move drawn.'
   };
 }
-
 export function chooseMove(state, computerColor) {
   return chooseDecision(state, computerColor)?.move ?? null;
 }
-
 export function strategyLabel(material) {
-  if (!MATERIAL[material]?.playable) return 'Unavailable — waiting for completed, approved proof in endgame-chess';
+  if(material==='krk')return 'Proof-sourced rook-and-king geometry (practical play, no ply certificate)';
+  if (!MATERIAL[material]?.playable) return 'Unavailable';
   return 'Any legal move (frozen dead-position theorem)';
 }

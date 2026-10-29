@@ -88,5 +88,5 @@ test('certified left-wide pivot mirrors the right cut and covers all replies',()
 test('noncentral wall and unproved material remain unavailable',()=>{
   const notReady=pos('w',[1,1],[0,3],[5,4]);
   assert.equal(krkWidePivotChoice(notReady),null);
-  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+  assert.equal(KRK_GAMEPLAY_RELEASED,true);
 });

@@ -48,7 +48,7 @@ test('exact frozen rank and file checkmate witnesses for both strong colours',()
     assert.equal(w.maxMatePlies,1);
     assert.equal(w.isCompleteWinningPolicy,false);
     assert.deepEqual(outcome(applyMove(st.board,w.move),colour==='w'?'b':'w'),{kind:'mate',winner:colour});
-    assert.throws(()=>newGame(st.board,colour,'krk'),/not released/);
+    assert.equal(newGame(st.board,colour,'krk').material,'krk');
   }
 });
 
@@ -62,7 +62,7 @@ test('the immediate witness respects the actual clock/history and fails closed',
   assert.equal(krkImmediateMateWitness({...st,history:null}),null);
   assert.equal(krkImmediateMateWitness({...st,turn:'b'}),null);
   assert.equal(krkImmediateMateWitness({...st,material:'kk'}),null);
-  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+  assert.equal(KRK_GAMEPLAY_RELEASED,true);
 });
 
 test('maths gameplay cannot import a terminal witness as an unproved total strategy',()=>{

@@ -105,7 +105,7 @@ test('complete all-adversary rook-climb/repair/centralisation trees reach a lowe
   walk(root,new Set(),krkWallClimbState(root).potential);
  }
  assert.ok(branches>leaves&&leaves>0);
- assert.equal(KRK_GAMEPLAY_RELEASED,false);
+ assert.equal(KRK_GAMEPLAY_RELEASED,true);
  console.log('KRK01 finite all-adversary wall-climb handoffs:',{branches,leaves});
 });
 

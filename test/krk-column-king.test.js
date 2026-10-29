@@ -50,5 +50,5 @@ test('exhaust all legal weak replies for both strong colours and every supported
 test('column witness is unavailable at central file or insufficient rook safety',()=>{
  assert.equal(krkColumnKingChoice(board('w',[3,1],[0,2],[5,4])),null);
  assert.equal(krkColumnKingChoice(board('w',[2,1],[0,2],[2,4])),null);
- assert.equal(KRK_GAMEPLAY_RELEASED,false);
+ assert.equal(KRK_GAMEPLAY_RELEASED,true);
 });

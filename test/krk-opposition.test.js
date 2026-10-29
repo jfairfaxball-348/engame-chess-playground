@@ -53,7 +53,7 @@ test('four-ply check then king-up: all first and second replies have the proved 
  }
  assert.ok(roots>15&&firstReplies>15&&secondReplies>15);
  console.log('KRK02 opposition certificate:',{roots,firstReplies,secondReplies});
- assert.equal(KRK_GAMEPLAY_RELEASED,false);
+ assert.equal(KRK_GAMEPLAY_RELEASED,true);
 });
 test('partial terminal proof refuses a forged high-margin follow-up context',()=>{
  const st=s('w',[4,2],[2,0],[4,4]);

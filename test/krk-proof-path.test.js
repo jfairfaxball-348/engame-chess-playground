@@ -53,6 +53,6 @@ test('both wide-protected cuts compose with guarded entry against every weak rep
  assert.ok(pivotDefences>10);
  assert.ok(guardDefences>40);
  assert.equal(wallHandoffs,guardDefences);
- assert.equal(KRK_GAMEPLAY_RELEASED,false);
+ assert.equal(KRK_GAMEPLAY_RELEASED,true);
  console.log('KRK02 protected-cut all-reply chain:',{pivotDefences,guardDefences,wallHandoffs});
 });

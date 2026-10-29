@@ -88,7 +88,7 @@ test('constructive steps fail closed for unproved premises and forged evidence',
   const w=krkConstructiveStep(a,'prep');
   assert.equal(auditKRKConstructiveStep(a,{...w,move:{...w.move,to:63}}).ok,false);
   assert.equal(auditKRKConstructiveStep(a,{...w,parent:'bad'}).ok,false);
-  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+  assert.equal(KRK_GAMEPLAY_RELEASED,true);
   const near=state('w',[3,0],[0,2],[1,3]);
   assert.equal(krkConstructiveStep(near,'rankAdvance'),null);
 });

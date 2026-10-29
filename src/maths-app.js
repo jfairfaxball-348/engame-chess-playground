@@ -8,7 +8,7 @@ import {proofFor} from './maths-proof.js';
 const root=document.getElementById('app');
 let board=blankBoard(),turn='w',human='w',game=null,phase='setup',picked=null,selected=-1;
 let facing='w',last=null,notice='',timer=null,busy=false,gesture=null,suppress=false,history=[],openingPending=false;
-const name=c=>c==='w'?'White':'Black',ongoing=()=>outcome(game.board,game.turn,game.history,game.halfmove).kind==='ongoing';
+const name=c=>c==='w'?'White':'Black',ongoing=()=>!game.krkRookCaptured&&outcome(game.board,game.turn,game.history,game.halfmove).kind==='ongoing';
 const announcement=document.createElement('div');
 announcement.className='sr-only';announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.after(announcement);
 function cancelGesture(){
@@ -57,7 +57,13 @@ function opponent(){
  busy=true;render();
  timer=setTimeout(()=>{
   timer=null;const decision=chooseDecision(game,opposite(human));busy=false;
-  if(decision?.move){last={from:decision.move.from,to:decision.move.to};game=play(game,decision.move);}
+  if(decision?.move){last={from:decision.move.from,to:decision.move.to};game=play(game,decision.move);
+    if(game.material==='krk'){
+      game.krkFrame=decision.frame||game.krkFrame||'id';
+      game.krkProofContext=decision.proofContext||null;
+      game.krkLastRule=decision.rule;
+    }
+  }else if(ongoing())notice='No safe geometric move available in this position.';
   selected=-1;render();
  },260);
 }
@@ -162,7 +168,8 @@ function render(){
  const value=attr?el.getAttribute(attr):null;
  const playing=phase==='playing',v=setupVerdict(current(),playing?game.turn:turn);
  const final=playing?outcome(game.board,game.turn,game.history,game.halfmove):null;
- const title=final?.kind==='mate'?name(final.winner)+' wins':
+ const title=playing&&game.krkRookCaptured?'Guaranteed draw · rook captured':
+  final?.kind==='mate'?name(final.winner)+' wins':
   final&&['stalemate','75-move','fivefold'].includes(final.kind)?'Draw':v.title;
  const formula=v.equation?proofMarkup(current(),playing?game.turn:turn):'';
  root.innerHTML='<section class="maths-shell"><h1 class="maths-heading">Chess <span>· Mathematics</span></h1>'+
@@ -172,7 +179,7 @@ function render(){
    (openingPending?'<button id="maths-first" class="maths-primary">Play opponent’s first move</button>':'')+
    '<button id="maths-undo" '+(history.length?'':'disabled')+'>Undo</button>'+
    '<button id="maths-edit">New position</button><span class="maths-turn">You play '+name(human)+
-   ' · '+(openingPending?'Starting position · Opponent to move':busy?'Opponent moving':name(game.turn)+' to move')+'</span>':
+   ' · '+(game.krkRookCaptured?'K vs K · guaranteed draw':openingPending?'Starting position · Opponent to move':busy?'Opponent moving':name(game.turn)+' to move')+'</span>':
    '<button id="maths-turn-w" class="'+(turn==='w'?'maths-active':'')+'">White to move</button>'+
    '<button id="maths-turn-b" class="'+(turn==='b'?'maths-active':'')+'">Black to move</button>'+
    '<button id="maths-start" class="maths-primary" '+(v.canStart?'':'disabled')+'>Start game</button>'+
@@ -180,7 +187,7 @@ function render(){
   '<div class="maths-notice" role="status">'+(notice||(!playing&&v.kind==='invalid'?v.reason:''))+'</div></div>'+
   '<aside class="maths-side maths-black">'+rack('b')+'</aside>'+
   '<section class="maths-verdict" aria-live="polite"><div class="maths-outcome">'+title+'</div>'+formula+
-  (v.strategyPending?'<div class="maths-policy">KRK proved · Move policy not yet ported</div>':'')+
+  (v.material==='krk'?'<div class="maths-policy">You control the lone king. The opponent uses constructive rook-and-king geometry; exact move-bound parity is not claimed.</div>':'')+
   '</section></div></section>';
  root.querySelector('#maths-turn-w')?.addEventListener('click',()=>{turn='w';notice='';render();});
  root.querySelector('#maths-turn-b')?.addEventListener('click',()=>{turn='b';notice='';render();});

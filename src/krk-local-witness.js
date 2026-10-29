@@ -2,7 +2,7 @@
  * KRK01: isolated, proof-derived ONE-STEP geometric witnesses.
  *
  * NOT A PLAYING POLICY. No composition, global forcing rank, history certificate
- * or 97/98-ply budget is provided. Maths gameplay remains locked. Callers must
+ * or 97/98-ply budget is provided. The practical Maths mode composes these\n * steps and distinguishes uncatalogued geometric setup from proved actions. Callers must
  * explicitly request a rule; this module intentionally has no auto-play entry.
  *
  * Read-only Lean source: engame-chess@e7de0930fc61caeb11795cf3c10fde11e4774a40
@@ -13,7 +13,8 @@ import {
 } from './chess.js';
 
 export const KRK_PARENT_SHA = 'e7de0930fc61caeb11795cf3c10fde11e4774a40';
-export const KRK_GAMEPLAY_RELEASED = false;
+export const KRK_GAMEPLAY_RELEASED = true;
+export const KRK_FORMAL_COMPLETE_POLICY = false;
 /**
  * Four involutive board isometries used in the frozen Lean setup proof.
  * `symId`, `symY`, `symSwap` and `symAnti` preserve king distance,

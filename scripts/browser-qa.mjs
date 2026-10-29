@@ -100,7 +100,7 @@ async function run(){
    assert.equal(await page.locator('#maths-start').isEnabled(),true);
    await drag(page,rack(page,'wR'),cell(page,0));
    assert.equal(await page.locator('.maths-outcome').innerText(),'Winning for White');
-   assert.equal(await page.locator('#maths-start').isDisabled(),true,'KRK policy remains gated');
+   assert.equal(await page.locator('#maths-start').isEnabled(),true,'Owner-approved practical KRK game must launch');
    for(const p of ['wB','bB','wN','bN','bR'])assert.equal(await rack(page,p).isDisabled(),true,p+' dim once rook is set');
    await drag(page,cell(page,0),rack(page,'wR'));
    assert.equal(await rack(page,'wB').isEnabled(),true,'tray reactivates after removal');
@@ -123,6 +123,33 @@ async function run(){
    assert.deepEqual(errors,[],'main browser console');
    console.log('PASS drag trays / KRK classification / weak-side ownership');
   }finally{await context.close();}
+
+  // Owner's critical practical-KRK scenario: user, as the lone black king,
+  // legally captures the exposed white rook and immediately draws K versus K.
+  const krkCaptureContext=await browser.newContext({viewport:{width:1000,height:850}});
+  try{
+   const page=await krkCaptureContext.newPage(),errors=[];
+   page.on('pageerror',e=>errors.push(e.message));
+   await fresh(page);
+   await add(page,'wK',0); // a1
+   await add(page,'wR',44); // e6, exposed to the lone black king
+   await add(page,'bK',52); // e7
+   await page.locator('#maths-turn-b').click();
+   assert.equal(await page.locator('.maths-outcome').innerText(),'Guaranteed draw');
+   assert.equal(await page.locator('#maths-start').isEnabled(),true);
+   await page.locator('#maths-start').click();
+   assert.match(await page.locator('.maths-turn').innerText(),/You play Black/);
+   await cell(page,52).click();await cell(page,44).click();
+   assert.equal(await page.locator('.maths-outcome').innerText(),'Guaranteed draw · rook captured');
+   assert.equal(await cell(page,44).locator('.piece-icon').count(),1);
+   assert.equal(await cell(page,52).locator('.piece-icon').count(),0);
+   assert.equal(await page.locator('.maths-proof-steps li').count(),4);
+   await page.locator('#maths-undo').click();
+   assert.equal(await cell(page,52).locator('.piece-icon').count(),1);
+   assert.equal(await cell(page,44).locator('.piece-icon').count(),1);
+   assert.deepEqual(errors,[]);
+   console.log('PASS KRK weak king takes rook → KK guaranteed draw; undo restores rook');
+  }finally{await krkCaptureContext.close();}
 
   // Reproduce the reported bug: White bishop a6, White king b6, Black king h6,
   // White to move. Previously Start flipped to Black orientation and played instantly.
