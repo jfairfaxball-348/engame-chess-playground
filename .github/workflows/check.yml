@@ -23,6 +23,9 @@ jobs:
       - run: npm run audit:krk-phase-domains
       - run: npm run check
       - run: npm run build
+      # Provider-independent Cloudflare Pages handoff: ensure the deployable
+      # static output includes both browser engines and the Maths entrypoint.
+      - run: node scripts/verify-pages-output.mjs
       # Playwright is CI-only; the new arena has pinned browser-only dependencies.
       - run: npm install --no-save --no-package-lock playwright
       - run: npx playwright install --with-deps chromium
