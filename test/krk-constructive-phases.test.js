@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {makeBoard,squareAt,positionKey,legalMoves,validateSetup} from '../src/chess.js';
+import {makeBoard,squareAt,positionKey,legalMoves,validateSetup,applyMove,findKing,coords,distance,opposite} from '../src/chess.js';
 import {KRK_FRAMES,krkTransformSquare,KRK_GAMEPLAY_RELEASED} from '../src/krk-local-witness.js';
 import {KRK_CONSTRUCTIVE_RULES,krkCentreDistance,krkPrepDistance,
   krkConstructiveStep,auditKRKConstructiveStep} from '../src/krk-constructive-phases.js';
@@ -37,7 +37,16 @@ function witness(st,rule,iso='id'){
   assert.equal(w.isometry,iso);
   assert.ok(legalMoves(st.board,st.turn).some(m=>m.from===w.move.from&&m.to===w.move.to));
   const a=auditKRKConstructiveStep(st,w);
-  assert.ok(a.ok,'All-reply postcondition failed '+rule+'/'+iso+'/'+JSON.stringify(st.board));
+  if(!a.ok){
+    const child=applyMove(st.board,w.move),weak=opposite(st.turn);
+    const dump=legalMoves(child,weak).map(reply=>{
+      const b=applyMove(child,reply);
+      return {move:reply.to,rook:coords(b.indexOf(st.turn+'R')),
+        sk:coords(findKing(b,st.turn)),wk:coords(findKing(b,weak)),
+        distance:distance(b.indexOf(st.turn+'R'),findKing(b,weak))};
+    });
+    assert.fail('All-reply postcondition failed '+rule+'/'+iso+'/'+JSON.stringify(st.board)+' replies='+JSON.stringify(dump));
+  }
   assert.ok(a.replies>0);
   return w;
 }
