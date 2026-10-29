@@ -24,6 +24,9 @@ jobs:
       # Exhaustively check every legal fresh strong-turn root. This checks actual
       # selector availability, never replaces Lean all-defender mate proof.
       - run: npm run audit:krk-root-selector -- --all --strict
+      # KRK14 falsification: test actual first/second weak replies and weak-to-move
+      # root partitions. Record failures, but do not claim global mate proof.
+      - run: npm run audit:krk14-continuations -- --limit=2048
       - run: npm run check
       - run: npm run build
       # Provider-independent Cloudflare Pages handoff: ensure the deployable
