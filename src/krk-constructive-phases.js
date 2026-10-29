@@ -65,7 +65,7 @@ export function krkConstructiveStep(state,rule,isometry='id'){
     if(sy+2>wy||diff(rx,wx)<2||!(rx!==sx||sy<ry)||ry===sy+1)return null;
     return emit(state,f,rule,rook,squareAt(rx,sy+1),
       'K.y+2<=k.y; |R.x-k.x|>=2; R.x!=K.x or K.y<R.y; R.y!=K.y+1',
-      'After every weak reply, K.y<R.y<k.y; rook cannot be captured.',
+      'After every weak reply, K.y<R.y<k.y; the rook may become threatened and require an immediate rescue.',
       {type:'wall-entry',targetRank:sy+1});
   }
   if(rule==='prep'){
@@ -97,7 +97,7 @@ export function krkConstructiveStep(state,rule,isometry='id'){
     if(!(sy===ry&&sy>0&&sy+2<=wy))return null;
     return emit(state,f,rule,king,squareAt(sx,sy-1),
       'K.y=R.y>0; K.y+2<=k.y; no incoming weak check',
-      'After every weak reply, K.y<R.y<k.y and rook remains safe.',
+      'After every weak reply, K.y<R.y<k.y; no guarantee of post-reply distant-rook safety.',
       {type:'same-rank-retreat',afterKingRank:sy-1});
   }
   if(rule==='backrank'){
@@ -132,8 +132,14 @@ export function auditKRKConstructiveStep(state,witness){
     const [rx,ry]=coords(krkTransformSquare(rs,f.iso));
     const [wx,wy]=coords(krkTransformSquare(wk,f.iso));
     if(!(sy<ry&&ry<wy)||diff(wx,oldWx)>1||diff(wy,oldWy)>1)return false;
-    if(witness.ruleKey==='entry'||witness.ruleKey==='retreat'||witness.ruleKey==='backrank'){
-      return distance(rs,wk)>=2||distance(sk,rs)===1;
+    if(witness.ruleKey==='entry'||witness.ruleKey==='retreat'){
+      // The Lean proof establishes an oriented WALL (and ForceMate from it),
+      // not a globally distant rook after EVERY defending move. A close rook
+      // must be rescued on the next strong turn before giving away the move.
+      return true;
+    }
+    if(witness.ruleKey==='backrank'){
+      return distance(sk,rs)===1;
     }
     if(witness.ruleKey==='prep'){
       return krkPrepDistance(ry,sx,sy)===expected.localRank.after &&
