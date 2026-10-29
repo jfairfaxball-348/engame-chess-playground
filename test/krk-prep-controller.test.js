@@ -117,6 +117,6 @@ test('broad independently verified preparation rank descends for every legal def
     steps++;
   }
  assert.ok(applicable>1000&&steps>1000&&ready>0);
- assert.equal(KRK_GAMEPLAY_RELEASED,false);
+ assert.equal(KRK_GAMEPLAY_RELEASED,true);
  console.log('KRK01 fully controlled prep branch fixtures:',{applicable,ready,steps});
 });
