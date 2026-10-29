@@ -62,5 +62,5 @@ test('no narrow tempo for wide pivot, non-ready wall, weak turn or stale clock',
   const old=root('w',[3,1],[0,2],[4,3]);
   old.halfmove=150;
   assert.equal(krkReadyCutTempoChoice(old),null);
-  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+  assert.equal(KRK_GAMEPLAY_RELEASED,true);
 });
