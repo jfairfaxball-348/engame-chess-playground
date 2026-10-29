@@ -22,11 +22,14 @@ const fixtures={
   rankTwo:state('w',[3,0],[0,2],[5,5]),
   rankAdvance:state('w',[3,0],[0,2],[5,5]),
   retreat:state('w',[3,2],[4,2],[6,5]),
-  backrank:state('w',[3,0],[4,0],[6,4])
+  backrank:state('w',[3,0],[4,0],[6,4]),
+  offrankRepair:state('w',[3,3],[4,1],[5,6]),
+  backrankSetup:state('w',[3,0],[5,0],[4,4])
 };
 const expected={
   entry:square(6,1),prep:square(2,1),rankTwo:square(0,3),
-  rankAdvance:square(0,3),retreat:square(3,1),backrank:square(4,1)
+  rankAdvance:square(0,3),retreat:square(3,1),backrank:square(4,1),
+  offrankRepair:square(0,1),backrankSetup:square(4,0)
 };
 function witness(st,rule,iso='id'){
   const w=krkConstructiveStep(st,rule,iso);
@@ -58,7 +61,7 @@ test('direct Lean centreDistance and prepDistance arithmetic matches named phase
   assert.equal(krkPrepDistance(2,3,1),0);
 });
 
-test('six constructive phase moves satisfy all legal weak replies in 4 frames and both colours',()=>{
+test('eight constructive phase moves satisfy all legal weak replies in 4 frames and both colours',()=>{
   for(const color of ['w','b'])for(const iso of KRK_FRAMES)for(const rule of Object.keys(fixtures)){
     const f=fixtures[rule];
     const st=transform({...f,board:f.board.map(p=>p?
@@ -110,7 +113,8 @@ test('Lean wall entry admits a threatened rook; next strong turn can rescue it',
 test('sampled quantified phase families preserve local postconditions against every weak reply',()=>{
   const shapes=[
     [0,0,3],[0,1,3],[0,2,4],[0,3,6],[1,1,4],[1,2,4],
-    [1,3,6],[2,2,5],[2,3,6],[2,4,7],[3,3,6],[3,4,7],[4,4,7]
+    [1,3,6],[2,0,6],[2,2,5],[2,3,6],[2,4,7],
+    [3,1,6],[3,3,6],[3,4,7],[4,4,7]
   ];
   const counts=Object.fromEntries(Object.keys(KRK_CONSTRUCTIVE_RULES).map(k=>[k,0]));
   for(const color of ['w','b'])for(const [sy,ry,wy] of shapes)
