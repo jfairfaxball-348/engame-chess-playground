@@ -9,7 +9,6 @@ import {applyMove,coords,findKing,legalMoves,opposite,squareAt}
 import {KRK_FRAMES,KRK_PARENT_SHA,krkTransformSquare}
   from './krk-local-witness.js';
 import {krkPrepState} from './krk-prep-controller.js';
-import {krkConstructiveStep} from './krk-constructive-phases.js';
 
 export const KRK_COLUMN_KING_LEMMA='EndgameChess.Rules.KRKExecutable.columnKingStep_sound';
 
@@ -24,12 +23,13 @@ export function krkColumnKingChoice(state,frame='id'){
   const [rx,ry]=coords(krkTransformSquare(rook,frame));
   const [wx,wy]=coords(krkTransformSquare(wk,frame));
   if(![1,2,5,6].includes(sx)||!(sy<ry&&ry<wy)||Math.abs(rx-wx)<3)return null;
-  const candidate=krkConstructiveStep(state,'prep',frame);
-  if(!candidate)return null;
+  // Column.lean prescribes a HORIZONTAL file step, unlike the diagonal
+  // centre+rank move of PrepPair. Preserve that exact distinction.
   const expect=sx<3?sx+1:sx-1;
-  if(candidate.move.from!==sk||
-     candidate.move.to!==krkTransformSquare(squareAt(expect,sy),frame))return null;
-  return Object.freeze({kind:'step',move:candidate.move,frame,witness:candidate,
+  const target=krkTransformSquare(squareAt(expect,sy),frame);
+  const move=legalMoves(state.board,strong).find(m=>m.from===sk&&m.to===target);
+  if(!move)return null;
+  return Object.freeze({kind:'step',move,frame,
     phase:'COLUMN interior centre-approach',
     rule:KRK_COLUMN_KING_LEMMA,parent:KRK_PARENT_SHA,
     premises:'K file in {1,2,5,6}; strict wall; rook/weak file gap >=3',
