@@ -13,12 +13,40 @@
       "gitBlob": "f255801dcb7fd78d6c1e824dc112e470f59404c5"
     },
     {
+      "path": "formal/EndgameChess/Rules/KRKCentral/KingBelow.lean",
+      "gitBlob": "cb9711689c81a058c9c65db9b618a72a091d2a4f"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/PrepDefinitions.lean",
+      "gitBlob": "594aeb4097d8e8d1154adc282bd753ed9243d060"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/PrepPair.lean",
+      "gitBlob": "2e5353fa0ef4b24f3c54097e23af0bd45fab36ce"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/RankTwo.lean",
+      "gitBlob": "4337b899759eee02482efc36907dc32960ddc825"
+    },
+    {
       "path": "formal/EndgameChess/Rules/KRKForcing/AxisWalls.lean",
       "gitBlob": "8fe21829b6966cb0c6b8d36d00526d13f42810c1"
     },
     {
+      "path": "formal/EndgameChess/Rules/KRKForcing/ClearEntry.lean",
+      "gitBlob": "ee398432ddda0a4cc9fb432d5e881f74e1a11dcd"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKForcing/RankAdvance.lean",
+      "gitBlob": "38ab080688f5d0ceb000a7bb3d824f061e457d2a"
+    },
+    {
       "path": "formal/EndgameChess/Rules/KRKForcing/RookRescue.lean",
       "gitBlob": "12cecd71180c989f076228b3cf5357a69cfa8281"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKForcing/SameRankSetup.lean",
+      "gitBlob": "2ee4dd334af378a59741515b61c46423f06fc403"
     },
     {
       "path": "formal/EndgameChess/Rules/KRKForcing/StrategyTransport.lean",
