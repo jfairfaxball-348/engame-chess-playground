@@ -3,3 +3,8 @@ dist/
 .vercel/
 .env*
 .DS_Store
+
+# Cloudflare Wrangler runtime/build artifacts
+.wrangler/
+.dev.vars*
+!.dev.vars.example

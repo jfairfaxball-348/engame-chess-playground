@@ -6,11 +6,14 @@ Owner goal remains a fully playable, theorem-derived KRK adversary. This
 follow-up is **execution**, not a documentation or release-flag exercise.
 Vercel hit its daily deployment quota on 29 October; develop and run CI
 independently, never claim production is updated without verifying a deploy.
-Cloudflare Pages is the preferred replacement: the source repository is prepared
-for static Pages Git deployments (see `docs/CLOUDFLARE_PAGES_DEPLOY.md`), but
-**Cloudflare account/GitHub authorisation and first live Pages build are still
-owner-side prerequisites**. Do not claim this migration is deployed until
-its exact URL and Maths/Engine browser smoke tests are verified.
+Cloudflare is the preferred replacement: the owner connected this repository
+to **Cloudflare Workers Builds** (not Pages Git), and the initial build passed
+but Wrangler's absent-config fallback scanned the entire repository and failed
+on a 137 MiB `node_modules/workerd` file. The subsequent repair adds an
+explicit `wrangler.jsonc` with static `assets.directory="./dist"` and checks
+that directory in CI. See `docs/CLOUDFLARE_WORKERS_DEPLOY.md`. Do not claim
+deployment success without the actual Cloudflare run's success and Maths/
+Engine browser smoke tests; Vercel stays as rollback.
 
 ## Verified boundary coming out of KRK04
 
