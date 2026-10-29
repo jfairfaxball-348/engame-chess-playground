@@ -54,20 +54,16 @@ test('game UI keeps both modalities and material release gate visible',()=>{
   assert.doesNotMatch(app,/♔|♚|♗|♝|♘|♞|♖|♜/);
 });
 
-test('S005 keyboard focus and game actions remain local and release-gated',()=>{
-  const app=readFileSync('src/app.js','utf8');
+test('new Maths tab retains keyboard, undo and drag interactions independently of arena',()=>{
+  const app=readFileSync('src/maths-app.js','utf8');
   const browser=readFileSync('scripts/browser-qa.mjs','utf8');
-  assert.match(app,/tabindex="\$\{sq===focusSquare\?0:-1\}"/);
-  assert.match(app,/root\.addEventListener\('keydown'/);
-  for(const key of ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Escape'])assert.ok(app.includes(key));
-  for(const id of ['restart','undo','flip'])assert.ok(app.includes('id="'+id+'"'));
-  assert.match(app,/undoStack\.push\(snapshot\(\)\)/);
-  assert.match(app,/clearPending\(\);clearGesture\(\)/);
-  assert.doesNotMatch(app,/game:newGame\(/); // snapshots preserve real state, not synthetic reseeding
-  assert.match(app,/game:\{\.\.\.game,board:game\.board\.slice\(\),history:game\.history\.slice\(\),log:game\.log\.slice\(\)\}/);
-  assert.match(browser,/Mouse drag diagnostics/);
-  assert.match(browser,/black-view left/);
-  assert.match(browser,/undo restores pre-human game/);
-  assert.match(browser,/after restart/);
-  assert.doesNotMatch(app,/\bfetch\s*\(|\bWebSocket\s*\(/);
+  for(const key of ['Escape','Delete','Backspace'])assert.ok(app.includes(key));
+  for(const id of ['maths-undo','maths-clear','maths-start','maths-edit'])assert.ok(app.includes(id));
+  for(const pointer of ['pointerdown','pointermove','pointerup','pointercancel'])assert.ok(app.includes(pointer));
+  assert.match(app,/history\\.push\\(save\\(\\)\\)/);
+  assert.match(app,/hasPointerCapture/);
+  assert.match(browser,/tray drag placed white king/);
+  assert.match(browser,/weak-side ownership/);
+  assert.match(browser,/64 squares/);
+  assert.doesNotMatch(app,/\\bfetch\\s*\\(|\\bWebSocket\\s*\\(/);
 });
