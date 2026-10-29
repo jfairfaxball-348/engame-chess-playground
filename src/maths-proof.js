@@ -78,7 +78,7 @@ export function proofFor(board,turn){
   const mate=terminal.kind==='mate'&&terminal.winner===strong;
   const on=turn===strong;
   // In setup the board is an explicitly fresh, zero-clock root; there is no
-  // implicit per-move refresh and no claim for a running KRK policy.
+  // implicit per-move refresh and the practical game policy does not inherit these exact ply bounds.
   const fresh={board,turn,material:'krk',halfmove:0,history:[positionKey(board,turn)]};
   const immediate=on?krkImmediateMateWitness(fresh):null;
   const lastReply=!on&&!mate?krkLastReplyWitness(fresh):null;
@@ -102,7 +102,7 @@ export function proofFor(board,turn){
     }
   }
   return {...general,
-   lead:immediate?'An exact frozen mate-in-one witness applies to this fresh setup. Full KRK gameplay remains gated.':
+   lead:immediate?'An exact frozen mate-in-one witness applies to this fresh setup. The interactive geometry demonstration is available.':
     lastReply?'The frozen LastReply theorem certifies mate in at most two plies after EVERY legal weak-king reply. Full KRK gameplay remains gated.':
     'The frozen theorem classifies each fresh-clock KRK outcome against every defence.',
    working:'d∞(R,k) = '+near+';  rook defended by K = '+(guard?'yes':'no')+
@@ -117,7 +117,7 @@ export function proofFor(board,turn){
       (w.move.piece[1]==='R'?'R':'K')+' '+squareName(w.move.from)+' → '+squareName(w.move.to)+
         (w.localRank.before!==undefined?'  ·  local rank '+w.localRank.before+' → '+w.localRank.after:''),
       'Exact applicable geometric case '+w.rule+' ('+w.isometry+'). '+w.postcondition+
-      ' This is a theorem-derived single move only; no global mate policy has been extracted.')),
+      ' This is a theorem-derived single move only; the full all-position move policy is not formally extracted.')),
     ...(lastReply?[step('LastReply(K,R,k) ⇒ ∀r ∈ LegalWeak(p), MateNow(K,R,kᵣ) ⇒ MateWithinσ(2)',
       'For this '+lastReply.axis+' terminal geometry, the frozen model_last_iff checks all '+
       lastReply.defenderReplyCount+' legal defender replies, each followed by an explicit rook mating move. '+
@@ -133,7 +133,7 @@ export function proofFor(board,turn){
       '; safe rook: '+(v.safeRook?'yes':'no')+'; legal reply exists: '+(legal>0?'yes':'no')+'.'),
     step('Strong to move ⇒ MateWithin(97)','For a legal nonterminal fresh-clock position, the proof gives mate in at most 97 plies against all responses.'),
     step('Weak to move ∧ SafeRook ∧ Reply ⇒ MateWithin(98)','For a winning weak-turn root, mate is forced within 98 plies; both bounds fit the 50-move rule.'),
-    step('¬Winσ(p) ⇒ Draw','An unsafe rook may be captured, leaving KK, or the position is stalemate. The class outcome is proved; a JavaScript move policy is not yet certified.')
+    step('¬Winσ(p) ⇒ Draw','An unsafe rook may be captured, leaving KK, or the position is stalemate. The class outcome is proved; the practical JS opponent is not a formal equivalent of the 97/98-ply selector.')
    ],
    formal:immediate?'KRKImmediate.immediate_iff; KRKCentral.fresh_outcome':
      lastReply?'KRKLastReply.model_last_iff; KRKCentral.fresh_outcome':'KRKCentral.fresh_outcome',
