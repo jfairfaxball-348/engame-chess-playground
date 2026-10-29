@@ -22,6 +22,9 @@ export const KRK_LOWER_WAIT_RULE =
   'EndgameChess.Rules.krk_wall_rook_move';
 export const KRK_LOWER_CENTRAL_BOUND =
   'EndgameChess.Rules.KRKCentral.central_bound';
+export const KRK_LOWER_ROUTING_RULE =
+  'EndgameChess.Rules.KRKExecutable.lowerRouting_terminates';
+export const KRK_ROUTING_SOURCE_SHA = 'e9d0ecb47ef9461c933522e8d609597cea89958f';
 
 const n=x=>Number.isInteger(x)&&x>=0;
 const claim=s=>s.halfmove>=100||
@@ -62,6 +65,15 @@ function resultStep(state,frame,kind,g){
     orientedStrong:g.orientedStrong,remainingFileDistance:7-g.orientedStrong,
     isCompleteWinningPolicy:false,maxMatePlies:null
   });
+}
+
+/** Lean lowerRoutingRank: file progress plus back-rook/parity debt. */
+export function krkLowerRoutingRank(state,frame='id'){
+  const g=geometry(state,frame);
+  if(!g||g.direction==='aligned')return null;
+  const backFile=g.direction==='positive-x'?g.rx:7-g.rx;
+  const debt=backFile<=1?g.gap%2:2;
+  return 6-g.orientedStrong+debt;
 }
 
 /** Exact orientation of the positive/back/wait Lean case split. */
@@ -123,12 +135,7 @@ export function auditKRKLowerBandToExit(root,frame='id'){
     const g=geometry(state,frame);
     const next=krkLowerBandChoice(state,frame);
     if(!g||!next)return 'unproved lower-band continuation';
-    if(previous&&
-       !(g.orientedStrong>previous.orientedStrong ||
-         (g.orientedStrong===previous.orientedStrong&&
-           next.phase==='king-pursuit'&&previous.phase==='back-rook-wait')||
-         (g.orientedStrong===previous.orientedStrong&&
-           next.phase==='back-rook-wait')))
+    if(previous&&!(krkLowerRoutingRank(state,frame)<previous.rank))
       return 'orientation or rank invariant failed';
     const key=positionKey(state.board,state.turn);
     if(path.has(key))return 'repeated lower-band position';
@@ -173,7 +180,7 @@ export function auditKRKLowerBandToExit(root,frame='id'){
         }
       }
       const error=visit(child,pairs+1,{
-        phase:next.phase,orientedStrong:g.orientedStrong
+        rank:krkLowerRoutingRank(state,frame)
       });
       if(error){path.delete(key);return error;}
     }

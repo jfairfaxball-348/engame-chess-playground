@@ -1,22 +1,66 @@
-# KRK09 — Fix off-centre central pursuit cycle; finish source-derived mate policy
+# KRK10 — Quantitative tagged central-to-mate policy, then all legal roots
 
 **NEXT EXECUTION SESSION — INSTALLED, NOT EXECUTED.**
 
-## Incoming verified evidence
+The owner still wants fully playable proof-derived KRK. KRK09 fixed the
+actual pursuit/recentring cycle; do not repeat KRK05 from main's stale
+handoff. Continue the latest isolated draft stack.
 
-- Lean constructive lower pursuit [PR #9](https://github.com/jfairfaxball-348/engame-chess/pull/9), source branch `krk08-lower-pursuit-pair`, exact Lean/axiom CI passed at `e920a7752665d025d30f81db7c0e7ec73ff77591`. Prints **no `sorryAx`**.
-- Playground [KRK08 PR #15](https://github.com/jfairfaxball-348/engame-chess-playground/pull/15), stacked on KRK07 PR #14, adds `src/krk-lower-band.js` (32 all-reply colour/frame cases to ExitBound, 816 leaves, max 5 pairs) and experimental `src/krk-central-sequence.js` (8 true-mate edge cases). Check latest exact-head CI before further changes.
-- The **precise blocker** is reproduced in `test/krk-central-sequence.test.js`: Kd5/Ra6 against Kd7, white to move, exact FEN `8/3k4/R7/3K4/8/8/8/8 w - - 0 1`. The actual fixture is `sk:[3,4],rs:[0,5],wk:[3,6]` in 0-based bottom-origin files/ranks. Current phase composition repeats a position because it recentres the strong king after an off-centre pursuit move, undoing strictly descending progress. Existing audit detects the repetition and **fails closed**.
-- The pre-existing individual Lean constructors remain correct. The problem is their **phase-indexed composition**, not the move legality, browser or engine.
-- All stacks are DRAFT and unreleased. Keep KQK/KPK main intact, no force merge, and no deployment claim without real verification.
+## Verified incoming work
 
-## Primary execution task
+- Source [PR #10](https://github.com/jfairfaxball-348/engame-chess/pull/10),
+  branch `krk09-phase-index`, stacked on PR #9. Exact source SHA/blob lock
+  is `proof-sources/krk09-routing.lock.json`; verify final-head full CI.
+- `LowerRouting.lean` proves `lowerRouting_terminates`,
+  `lowerCentralWithinFive`, chase/wait reply partition and
+  `offCentreUpper_sound`. Focused 90-target Lean build passed; all five
+  declarations have only standard axioms, no proof escapes.
+- Rank `6−orientedStrongFile+rookTempoDebt` decreases for every continuing
+  lower reply. Fixed orientation survives until Exit; the lower derivation
+  admits only coordinate chase/back-rook actions, no restoration.
+- JS `krk-central-sequence.js` has history-bound `central/lower/restore/centre`
+  tags. The old Kd5/Ra6 versus Kd7 regression now MUST mate on every reply.
+  Tests also complete Kd4/Ra5 versus Kd6 and rescue/tempo roots: 27 roots,
+  18,973 actual mate leaves, maximum 29 plies. See `docs/KRK09_PHASE_ROUTING.md`.
+- A board may occur during two different control phases. Cycle detection
+  includes the phase; FIDE threefold still counts actual board/turn keys.
+  Tests explicitly require different moves on the same board in these
+  phases. Never suppress the real history to pass a test.
 
-1. Inspect and correct the off-centre continuation **in the Lean source first**. Make the phase a tagged recursive state with an explicit distinction between (a) off-centre king chasing in lower band, (b) actual restoration after a rook lift, and (c) ready aligned/upper exit. Produce one decreasing induction over **every** legal weak reply, showing source move selection never undoes earlier progress.
-2. Translate that proof into `src/krk-central-sequence.js` without searching, minimax, engine, tablebase, heuristics, arbitrary move fallback or lookup. The existing penultimate-rank test must require a genuine strong-side checkmate again; do not weaken it by omitting branches.
-3. Compose with KRK07 rank-two/restoration and edge opposition to audit complete all-defender real games from multiple rank heights, colours, turns and board frames, including move histories and FIDE 50/75-move and 3/5-repetition constraints. The proof must provide the game-length bound, not just test enumeration.
-4. Expand from full central wall to **every legal KRK arranged root**, including off-wall setup, weak-to-move and drawn/captured rook cases. Prove/translate the global selector before any UI activation.
-5. Run exact-head Lean builds and `#print axioms`, source-lock verification, Node tests, phase domain, syntax, production build and both browser suites. Ensure all CI green at the latest heads.
-6. Keep `KRK_GAMEPLAY_RELEASED=false` and `MATERIAL.krk.playable=false` until a **complete** proof-sourced opponent exists, is verified, and receives explicit owner approval. Merge only coherent tested branches; keep research drafts separate otherwise.
+## Precisely distinct next obligation
 
-Do **not** install another successor prompt without a genuinely distinct demonstrated mathematical obligation. Prioritise fixing the actual central composition cycle over more unrelated first-step helpers.
+The new finite lower-to-Exit proof does **not** yet prove the whole tagged
+JS composition wins within the source's 50-move budget. Construct that
+proof in a NEW importing upstream module:
+
+1. Define source-indexed central, oriented lower, exit, two-rank restoration
+   and final centre-alignment states corresponding to the actual JS tags.
+   Compose `lowerCentralWithinFive`, upper/aligned lifts and the existing
+   restoration constructors. Prove a quantitative all-defender derivation
+   to genuine mate, decreasing wall height between full central epochs.
+   Budget actual chosen moves, not merely a separate `MateWithin` existence
+   witness or a sample-game maximum. Include aligned narrow-margin rescue.
+2. Preserve fixed lower orientation; restoration begins ONLY after lifting
+   the rook. Prove safe handling of a board visited under different tags,
+   then establish fresh-history repetition and 50-move bounds for THIS
+   selector. The automatic 75-move and claims semantics must remain honest.
+3. Extend to every legal arranged KRK root: off-wall setup, either colour,
+   either turn, all frames, capturable rook/drawn roots and terminal states.
+   No engine, tablebase, minimax, heuristic or first-legal substitute.
+4. Translate only verified source results; update immutable source locks.
+   Keep original board/history. Expand complete adversarial mate tests.
+   Lower ranks 1–3 currently exceed the 100,000-node diagnostic cap; do not
+   label capped trees successful or treat a cap as a mathematical refutation.
+5. Run exact-head Lean/axiom CI; `npm test`, `verify:krk-sources`,
+   `audit:krk-phase-domains`, syntax, build, static-output verification and
+   Maths/Engine Chromium suites. Local browser download was unavailable in
+   KRK09's environment; use actual final-head CI results as evidence.
+6. Keep the draft stack separate from main, preserve upstream KQK/KPK,
+   and keep KRK release flags false until the complete source policy,
+   semantics and integration gates pass. Owner already authorised the
+   conditional full release; do not ask again on an inferred skill rule.
+   Verify actual hosting before claiming deployment; prefer Cloudflare
+   Workers static assets and keep Vercel as rollback.
+
+Do not create another helper-only successor to avoid this composition.
+The target is the complete quantified source-derived playable opponent.
