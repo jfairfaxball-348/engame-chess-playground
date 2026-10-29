@@ -70,7 +70,10 @@ async function run(){
     assert.equal(await page.locator('.maths-outcome').innerText(),'Guaranteed draw');
     assert.equal(await page.locator('#maths-start').isEnabled(),true);
     const before=await geometry(page,width+' arranged');
+    const initial=await page.locator('.maths-board').evaluate(el=>Array.from(el.querySelectorAll('.maths-cell'),c=>[c.dataset.sq,Boolean(c.querySelector('.piece-icon'))]));
     await page.locator('#maths-start').click();
+    const begun=await page.locator('.maths-board').evaluate(el=>Array.from(el.querySelectorAll('.maths-cell'),c=>[c.dataset.sq,Boolean(c.querySelector('.piece-icon'))]));
+    assert.deepEqual(begun,initial,'Start game must preserve exact board occupancy and orientation');
     assert.match(await page.locator('.maths-turn').innerText(),/You play White/);
     await cell(page,4).click();
     assert.match(await cell(page,4).getAttribute('class'),/maths-selected/);
@@ -106,13 +109,48 @@ async function run(){
    await page.locator('#maths-turn-b').click();
    await page.locator('#maths-start').click();
    assert.match(await page.locator('.maths-turn').innerText(),/You play White/);
+   assert.equal(await page.locator('#maths-first').isVisible(),true,'Opponent first move is explicit');
+   assert.equal(await cell(page,56).locator('.piece-icon').count(),1,'Bishop unchanged before first move');
+   await page.locator('#maths-first').click();
    await page.waitForFunction(()=>document.querySelector('.maths-turn')?.textContent.includes('White to move'),null,{timeout:4000});
+   assert.equal(await page.locator('.maths-proof-steps li').count(),5,'working proof visible during game');
+   await page.locator('#maths-undo').click();
+   assert.equal(await cell(page,56).locator('.piece-icon').count(),1,'Opening undo restores exact placed bishop square');
+   assert.equal(await page.locator('#maths-first').isVisible(),true,'Opening move can be replayed');
    await page.locator('#maths-edit').click();
    await page.locator('#maths-clear').click();
    assert.equal(await page.locator('.maths-board .piece-icon').count(),0,'Clear resets the arrangement');
    assert.deepEqual(errors,[],'main browser console');
    console.log('PASS drag trays / KRK classification / weak-side ownership');
   }finally{await context.close();}
+
+  // Reproduce the reported bug: White bishop a6, White king b6, Black king h6,
+  // White to move. Previously Start flipped to Black orientation and played instantly.
+  const capturedContext=await browser.newContext({viewport:{width:1280,height:960}});
+  try{
+   const page=await capturedContext.newPage();
+   await fresh(page);
+   await add(page,'wK',41); // b6
+   await add(page,'bK',47); // h6
+   await add(page,'wB',40); // a6
+   assert.match(await page.locator('.maths-worked').innerText(),/a6/);
+   assert.equal(await page.locator('.maths-proof-steps li').count(),5);
+   assert.match(await page.locator('.maths-theorem').getAttribute('href'),/EC-T0004\/v1\.md$/);
+   const original=await page.locator('.maths-board').evaluate(el=>[...el.querySelectorAll('.maths-cell')].map(x=>[x.dataset.sq,x.querySelector('.piece-icon')?.getAttribute('class')||null]));
+   await page.locator('#maths-start').click();
+   const after=await page.locator('.maths-board').evaluate(el=>[...el.querySelectorAll('.maths-cell')].map(x=>[x.dataset.sq,x.querySelector('.piece-icon')?.getAttribute('class')||null]));
+   assert.deepEqual(after,original,'EXACT screenshot arrangement and orientation must survive launch');
+   assert.equal(await cell(page,40).locator('.piece-icon').count(),1,'bishop stays a6');
+   assert.equal(await cell(page,41).locator('.piece-icon').count(),1,'white king stays b6');
+   assert.equal(await cell(page,47).locator('.piece-icon').count(),1,'black king stays h6');
+   await page.waitForTimeout(500);
+   assert.deepEqual(await page.locator('.maths-board').evaluate(el=>[...el.querySelectorAll('.maths-cell')].map(x=>[x.dataset.sq,x.querySelector('.piece-icon')?.getAttribute('class')||null])),original,'No hidden automatic opponent move');
+   assert.equal(await page.locator('#maths-first').isVisible(),true);
+   await page.locator('#maths-first').click();
+   await page.waitForFunction(()=>document.querySelector('.maths-turn')?.textContent.includes('Black to move'),null,{timeout:4000});
+   assert.equal(await page.locator('#maths-first').count(),0);
+   console.log('PASS reported screenshot starting arrangement and explicit first move');
+  }finally{await capturedContext.close();}
  }finally{await browser.close();}
 }
 try{await run();console.log('Maths BROWSER QA PASS');}

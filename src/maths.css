@@ -62,3 +62,21 @@
  .maths-ghost{width:45px;height:45px}
 }
 @media(prefers-reduced-motion:reduce){.maths-shell *{scroll-behavior:auto!important}}
+
+/* S012: actual proof working beside the board, not just an outcome equation. */
+.maths-verdict{align-self:start}
+.maths-proof{margin-top:15px}
+.maths-proof h2{font-size:14px;letter-spacing:.015em;margin:0 0 8px;color:#edf4e7}
+.maths-proof-lead{font-size:12px;line-height:1.55;color:#c5d4c6;margin:0 0 14px}
+.maths-worked{border-top:1px solid #455449;border-bottom:1px solid #455449;padding:11px 0;margin-bottom:13px}
+.maths-worked span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#9cae9c;margin-bottom:6px}
+.maths-worked strong{display:block;font:normal 15px/1.4 ui-serif,Georgia,serif;color:#d1e7c0;overflow-wrap:anywhere}
+.maths-proof-steps{counter-reset:mathproof;list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.maths-proof-steps li{position:relative;padding:0 0 0 23px;line-height:1.4}
+.maths-proof-steps li:before{counter-increment:mathproof;content:counter(mathproof);position:absolute;top:1px;left:0;border:1px solid #5c715e;border-radius:50%;font-size:9px;line-height:15px;width:15px;height:15px;text-align:center;color:#c5dcc0}
+.maths-proof-math{display:block;font:normal 15px/1.45 ui-serif,Georgia,serif;color:#d7e9c8;overflow-wrap:anywhere;margin-bottom:3px}
+.maths-proof-reason{display:block;color:#b8c9ba;font-size:11px;line-height:1.5}
+.maths-theorem{display:inline-block;text-decoration:none;border-top:1px solid #405143;margin-top:16px;padding-top:13px;line-height:1.5;font-size:11px;color:#b5d4ac}
+.maths-theorem:hover{text-decoration:underline;color:#e3f6d3}
+@media(max-width:1050px){.maths-proof{max-width:650px}.maths-proof-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}}
+@media(max-width:580px){.maths-proof-steps{grid-template-columns:1fr;gap:13px}.maths-proof-math{font-size:14px}.maths-worked strong{font-size:14px}}
