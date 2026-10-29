@@ -36,3 +36,8 @@ Neither a passing normal Playground CI nor a green Lean build for these local fu
 ## Release decision
 
 Keep both PRs **draft and unmerged**, keep both playable flags false and all existing KK/KBK/KNK and Engine Playground behaviour unchanged. The next actual coding task is to extract the **total central/column exit and restoration dispatcher** with all-reply rank, then the general setup dispatcher, and finally connect the fresh WDL50/history budget. KQK03 readiness has its own document; it must not leapfrog a missing KRK selector.
+
+
+## Postscript — 29 October: owner-authorised staged integration
+
+The earlier **“keep both PRs draft and unmerged”** sentence records the conservative decision *before* the owner's new request to commit, merge, push and fast-forward the completed staging work. The latest direction allows **only the dormant Playground code and tests** to be integrated into `main` with all KRK gameplay/start gates still explicitly `false`. This does **not** authorise merging the incomplete upstream mathematical extraction or advertising KRK gameplay. See [KRK02_CLOSEOUT.md](KRK02_CLOSEOUT.md) for the exact verified status, and [KRK03](../NEXT_SESSION.md) for the next executable, proof-driven finalisation session.
