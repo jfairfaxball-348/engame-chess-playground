@@ -1,3 +1,11 @@
+# Owner update — KRK02 executable release work authorised, 29 October 2026
+
+**Current instruction supersedes the historic KRK work ban below.** The owner authorises finishing and testing the **fully playable proof-derived KRK opponent** in the Maths tab. The verified KRK01 local constructions and proof source lock may be merged into `main` and deployed **with KRK gameplay still gated**. The next priority is the executable complete KRK policy and release under `NEXT_SESSION.md` (KRK02). The mathematical release gate remains binding: do not enable KRK until total proof-corresponding move selection, all adversarial replies, correct rule/clock semantics, integration tests and release CI pass. Upstream KRK is outcome-complete but its noncomputable global `Classical.choose` policy does not itself supply executable play. The owner has explicitly authorised KRK02 engineering; this is **not** permission to substitute any unproved engine/heuristic/tablebase for the mathematical policy.
+
+The independent Engine S011 workshop is deferred to `docs/ENGINE_S011_DEFERRED.md`. KQK should be staged for the next material-class release once the frozen upstream constructive proof and game semantics permit it; its readiness work must not weaken the KRK release gate. Existing Maths dead-position classes and Engine Playground remain unchanged.
+
+---
+
 # Owner update — Maths tab, 29 October 2026
 
 KRK is now completed **for outcome classification** in the parent programme (EC-T0048; see parent's current KRK completion report). The owner authorises an empty-board Maths redesign with full piece trays, selectable KRK placements and theorem-backed outcome annotation. **This supersedes the previous blanket ban on showing/selecting KRK in the editor only.** It does NOT approve an uncertified KRK move selector: the earlier gate remains on KRK gameplay until a reviewed, faithful, locally executable constructive policy is available. Never describe a theorem of winning-policy *existence* as a verified JavaScript move algorithm. Neither the separate Engine Playground nor the upstream research repo may be changed by this Maths UI work.
@@ -28,7 +36,7 @@ Do not enable a class merely because the parent has some frozen theorem about it
 3. An auditable, independent **local implementation** reproducing the approved frozen results, with tests for legal moves, all replies, capture transitions, both colours and terminal cases.
 4. **Explicit owner approval after upstream completion** to release/import the class into Chess Playground. No automatic promotion or runtime sync.
 
-**KRK is explicitly ON HOLD.** Although EC-T0019 freezes some clock-free forcing mathematics, the owner has said to WAIT until the KRK work is properly finished upstream before importing/playing it here. Do not work on KRK strategy extraction, rule expansion, minimax, or proof-derived KRK move choice during ordinary playground sessions. Do not unlock KRK without the owner's further express approval. The earlier S002 partial KRK code has been withdrawn from the runtime; its audit remains historical. KRK chess geometry may remain for future tests, but the material class must stay unplayable.
+**Historical gate (superseded for KRK02 engineering):** The owner previously held KRK implementation until proof completion. On 29 October 2026 the owner explicitly authorised the KRK02 proof-derived implementation work and requested full playable release, **conditional on the same mathematical completeness, auditable strategy, semantics and CI gates above**. The old S002 heuristic remains rejected and may not be reinstated. KRK stays unplayable until the complete policy is certified; local geometric witness modules may ship without enabling gameplay.
 
 Currently released: K vs K (EC-T0003), K+B vs K (EC-T0004), K+N vs K (EC-T0005). The opponent may choose any legal move in those dead-position classes. Explain that the continuing board game is an exploration mode that suspends immediate FIDE dead-position termination, not a standard rated chess match.
 
