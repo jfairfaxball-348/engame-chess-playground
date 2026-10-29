@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "status": "draft-unreleased",
+  "sourceRepository": "jfairfaxball-348/engame-chess",
+  "sourceCommit": "2433df9ea1ccbba000740cb89f2f0f276ce65d37",
+  "gameplayReleased": false,
+  "sources": [
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/LowerRouting.lean",
+      "gitBlob": "2745df6bbe67bb007f00bfd99faecdda66150b57"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/LowerPursuitPair.lean",
+      "gitBlob": "9730133efc6d14ed6cc77631dd36976ebdfa2425"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/CentralBackRook.lean",
+      "gitBlob": "c0c111d25401a30d29c8436f9822986159224565"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/CentralAlignedRescue.lean",
+      "gitBlob": "61ff9a2fa0eee6b2e6195bde416a83ae4293cd74"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/RestorationFirst.lean",
+      "gitBlob": "9102c79d314850f8d247fb83f87c2ddf373efee0"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/RestorationCentre.lean",
+      "gitBlob": "0ca0783c75c5e8eba90f113d15ba347ff3ee27fa"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/AlignedExit.lean",
+      "gitBlob": "17a12cbd4b42e28c80e010dcf30ec37f33591335"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/OppositionActions.lean",
+      "gitBlob": "e7da2a8c3535c4e91ba8acbef7efd547d198bd9b"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/RankTwo.lean",
+      "gitBlob": "4337b899759eee02482efc36907dc32960ddc825"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/Restoration.lean",
+      "gitBlob": "70048e143c135d32b4945924472e8ca88d4e570a"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/Positive.lean",
+      "gitBlob": "d81fccac213e36f50b00533445d82ae53c5e74a5"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/Back.lean",
+      "gitBlob": "2be0bd0134a99f7d2aaae21b23ddb1cb49adc351"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/BackEven.lean",
+      "gitBlob": "25f7db7cbf732ec8194326fe1855ac6ee6e955a8"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKCentral/WaitEven.lean",
+      "gitBlob": "fcf44f0da16ea64511b3c08eeaa180764e11e89f"
+    },
+    {
+      "path": "formal/EndgameChess/Rules/KRKExecutable/CentralPolicy.lean",
+      "gitBlob": "e0f6d3f455c598a21aa4535edde64b6010d478b1"
+    }
+  ]
+}
