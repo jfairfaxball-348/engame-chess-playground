@@ -34,7 +34,8 @@ export function validateLock(lock){
       throw Error('Missing frozen theorem lock: '+theorem);
   }
   if(!paths.has('formal/EndgameChess/Rules/KRKWinning/Policy.lean') ||
-     !paths.has('formal/EndgameChess/Rules/KRKImmediate.lean'))
+     !paths.has('formal/EndgameChess/Rules/KRKImmediate.lean') ||
+     !paths.has('formal/EndgameChess/Rules/KRKLastReply.lean'))
     throw Error('Missing critical constructive/choice audit sources');
   return true;
 }
@@ -56,9 +57,12 @@ export async function verifyKRKProofSources(lock=readLock(),fetchSource=fetch){
   }
   const localSource=readFileSync('src/krk-local-witness.js','utf8');
   const terminalSource=readFileSync('src/krk-immediate-witness.js','utf8');
+  const lastReplySource=readFileSync('src/krk-last-reply.js','utf8');
   const proofPanel=readFileSync('src/maths-proof.js','utf8');
   if(!localSource.includes("KRK_PARENT_SHA = '"+lock.sourceCommit+"'") ||
      !terminalSource.includes('KRK_PARENT_SHA') ||
+     !lastReplySource.includes('KRK_LAST_REPLY_RULE') ||
+     !lastReplySource.includes(lock.sourceCommit) ||
      !proofPanel.includes("const krkRoot='https://github.com/"+lock.sourceRepository+"/blob/"+lock.sourceCommit+"/'"))
     throw Error('Playground KRK implementation or proof links do not match frozen Lean lock');
   return checked;
