@@ -6,8 +6,10 @@ import {
 import {KRK_FRAMES,KRK_GAMEPLAY_RELEASED,krkTransformSquare}
   from '../src/krk-local-witness.js';
 import {
-  KRK_CENTRAL_ALIGNED_RULE,krkCentralAlignedRescueChoice,
-  krkCentralBoundaryNext,auditKRKCentralAlignedRescue
+  KRK_CENTRAL_ALIGNED_RULE,KRK_CENTRAL_BACK_RULE,
+  krkCentralAlignedRescueChoice,krkCentralBackRookChoice,
+  krkCentralBoundaryNext,auditKRKCentralAlignedRescue,
+  auditKRKCentralBackRook
 } from '../src/krk-central-boundary.js';
 
 function root(strong,king,rook,weak){
@@ -66,12 +68,9 @@ test('central READY branch delegates to existing frozen local extraction',()=>{
   assert.equal(ready?.isCompleteWinningPolicy,false);
   assert.equal(krkCentralAlignedRescueChoice(s),null);
 });
-test('unextracted central geometry, false history and clock claims fail closed',()=>{
-  // Unaligned close rook: existing central theorem uses a distinct
-  // back-rook pursuit branch which is NOT yet translated.
-  const missing=root('w',[3,1],[4,2],[5,3]);
-  assert.equal(krkCentralBoundaryNext(missing)?.kind,'handoff');
-  assert.equal(krkCentralBoundaryNext(missing)?.move,null);
+test('invalid central geometry, false history and clock claims fail closed',()=>{
+  const missing=root('w',[3,1],[4,1],[5,3]);
+  assert.equal(krkCentralBoundaryNext(missing),null);
   const s=root('w',[3,1],[4,2],[3,3]);
   assert.equal(krkCentralBoundaryNext({...s,history:[]}),null);
   assert.equal(krkCentralBoundaryNext({...s,history:['forged']}),null);
@@ -79,5 +78,36 @@ test('unextracted central geometry, false history and clock claims fail closed',
   const k=positionKey(s.board,s.turn);
   assert.equal(krkCentralAlignedRescueChoice({...s,history:[k,k,k]}),null);
   assert.equal(krkCentralBoundaryNext({...s,material:'knk'}),null);
+  assert.equal(KRK_GAMEPLAY_RELEASED,false);
+});
+
+test('nonaligned narrow-rook margin follows exact oriented back-file source for every defender',()=>{
+  let checked=0;
+  for(const strong of ['w','b'])for(const frame of KRK_FRAMES){
+    for(const setup of [
+      {king:[3,1],rook:[4,2],weak:[5,3],target:0},
+      {king:[4,1],rook:[3,2],weak:[2,3],target:7},
+      {king:[3,1],rook:[3,2],weak:[4,3],target:0},
+      {king:[4,1],rook:[4,2],weak:[3,3],target:7}
+    ]){
+      const s=frameState(root(strong,setup.king,setup.rook,setup.weak),frame);
+      const choice=krkCentralBackRookChoice(s,frame);
+      assert.equal(choice?.rule,KRK_CENTRAL_BACK_RULE,
+        JSON.stringify({strong,frame,setup}));
+      assert.equal(krkTransformSquare(choice.move.to,frame)%8,setup.target);
+      assert.equal(krkCentralBoundaryNext(s,frame)?.phase,'central-oriented-back-rook');
+      const audit=auditKRKCentralBackRook(s,frame);
+      assert.equal(audit.ok,true,JSON.stringify({strong,frame,setup,audit}));
+      assert.ok(audit.replies>0);
+      const after=play(s,choice.move);
+      for(const reply of legalMoves(after.board,after.turn)){
+        const child=play(after,reply);
+        assert.equal(child.history.length,s.history.length+2);
+        assert.equal(child.halfmove,2);
+      }
+      checked++;
+    }
+  }
+  assert.equal(checked,32);
   assert.equal(KRK_GAMEPLAY_RELEASED,false);
 });
