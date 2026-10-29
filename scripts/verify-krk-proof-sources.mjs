@@ -73,11 +73,24 @@ export async function verifyKRKRoutingSources(
   lock=JSON.parse(readFileSync('proof-sources/krk09-routing.lock.json','utf8')),
   fetchSource=fetch
 ){
+  return verifyDraftSourceLock(lock,fetchSource,'src/krk-lower-band.js',
+    'KRK_ROUTING_SOURCE_SHA','LowerRouting',14);
+}
+
+export async function verifyKRKCentralPolicySources(
+  lock=JSON.parse(readFileSync('proof-sources/krk10-central-policy.lock.json','utf8')),
+  fetchSource=fetch
+){
+  return verifyDraftSourceLock(lock,fetchSource,'src/krk-central-sequence.js',
+    'KRK_CENTRAL_POLICY_SOURCE_SHA','CentralPolicy',15);
+}
+
+async function verifyDraftSourceLock(lock,fetchSource,localPath,anchor,required,count){
   if(lock?.schemaVersion!==1||lock.status!=='draft-unreleased'||
      lock.gameplayReleased!==false||
      lock.sourceRepository!=='jfairfaxball-348/engame-chess'||
      !/^[0-9a-f]{40}$/.test(lock.sourceCommit)||
-     !Array.isArray(lock.sources)||lock.sources.length<14)
+     !Array.isArray(lock.sources)||lock.sources.length<count)
     throw Error('Invalid unreleased KRK routing lock');
   const paths=new Set();
   for(const {path,gitBlob} of lock.sources){
@@ -91,9 +104,9 @@ export async function verifyKRKRoutingSources(
     if(gitBlobHash(Buffer.from(await response.arrayBuffer()))!==gitBlob)
       throw Error('Routing source mismatch: '+path);
   }
-  if(!paths.has('formal/EndgameChess/Rules/KRKExecutable/LowerRouting.lean')||
-     !readFileSync('src/krk-lower-band.js','utf8').includes(
-       "KRK_ROUTING_SOURCE_SHA = '"+lock.sourceCommit+"'"))
+  if(!paths.has('formal/EndgameChess/Rules/KRKExecutable/'+required+'.lean')||
+     !readFileSync(localPath,'utf8').includes(
+       anchor+" = '"+lock.sourceCommit+"'"))
     throw Error('Missing routing extraction or mismatched local source anchor');
   return paths.size;
 }
@@ -104,6 +117,8 @@ if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
     console.log('KRK proof provenance verified:',count,'frozen upstream files, no runtime Lean execution');
     const routing=await verifyKRKRoutingSources();
     console.log('KRK routing provenance verified:',routing,'draft source files; gameplay remains unreleased');
+    const policy=await verifyKRKCentralPolicySources();
+    console.log('KRK central policy provenance verified:',policy,'draft source files; no FIDE or global-root certificate');
   }catch(e){
     console.error(e);
     process.exitCode=1;

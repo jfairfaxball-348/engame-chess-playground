@@ -42,6 +42,23 @@ function geometry(state,frame){
 const claim=s=>s.halfmove>=100||
   s.history.filter(k=>k===positionKey(s.board,s.turn)).length>=3;
 
+export const KRK_CENTRAL_POLICY_SOURCE_SHA = '2433df9ea1ccbba000740cb89f2f0f276ce65d37';
+export const KRK_CENTRAL_POLICY_RULE =
+  'EndgameChess.Rules.KRKExecutable.policy_uncut_central_bound';
+
+/** Static source derivation, NOT a FIDE history/clock or full-root release. */
+export function krkCentralStaticBound(state,frame='id'){
+  const g=geometry(state,frame);
+  if(!g||![3,4].includes(g.sx)||g.sy+1!==g.ry||
+      g.ry<1||g.ry>6||g.ry>=g.wy)return null;
+  return Object.freeze({
+    plies:18*(6-g.ry)+11,wallRank:g.ry,
+    rule:KRK_CENTRAL_POLICY_RULE,sourceCommit:KRK_CENTRAL_POLICY_SOURCE_SHA,
+    scope:'static full central wall under the selected uncut policy',
+    coversFIDEClaims:false,isCompleteWinningPolicy:false,maxMatePlies:null
+  });
+}
+
 /**
  * A restricted dispatcher from a FULL central wall and tagged descendants.
  * Context is returned with each move, then supplied after the weak reply.
@@ -132,11 +149,13 @@ export function auditKRKCentralSequence(root,frame='id',maxNodes=40000){
   if(!g||![3,4].includes(g.sx)||g.sy+1!==g.ry||
     g.ry>=g.wy||g.ry>6||claim(root)||root.halfmove!==0||root.history.length!==1)
     return bad('outside fresh full central-wall scope');
+  const staticProofBound=krkCentralStaticBound(root,frame).plies;
   let nodes=0,terminalMates=0,maximumPlies=0;
   const path=new Set();
   function visit(s,plies,context=null){
     if(++nodes>maxNodes)return 'diagnostic node cap reached';
     maximumPlies=Math.max(maximumPlies,plies);
+    if(plies>staticProofBound)return 'selected trace exceeds static source bound';
     const o=outcome(s.board,s.turn,s.history,s.halfmove);
     if(o.kind==='mate'){
       if(o.winner!==root.turn)return 'wrong winner';
@@ -177,9 +196,10 @@ export function auditKRKCentralSequence(root,frame='id',maxNodes=40000){
     return null;
   }
   const error=visit(root,0);
-  if(error)return bad(error,{nodes,terminalMates,maximumPlies});
+  if(error)return bad(error,{nodes,terminalMates,maximumPlies,staticProofBound});
   return {
     ok:terminalMates>0,nodes,terminalMates,maximumPlies,
+    staticProofBound,coversFIDEClaims:false,
     terminal:'actual strong-side checkmate in tested central roots',
     isCompleteWinningPolicy:false,maxMatePlies:null
   };
