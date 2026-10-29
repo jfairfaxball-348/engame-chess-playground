@@ -18,7 +18,9 @@ export const KRK_CONSTRUCTIVE_RULES=Object.freeze({
   rankTwo:'EndgameChess.Rules.KRKCentral.rank_two_pair',
   rankAdvance:'EndgameChess.Rules.krk_rank_advance',
   retreat:'EndgameChess.Rules.krk_same_rank_retreat_force',
-  backrank:'EndgameChess.Rules.krk_backrank_protected_force'
+  backrank:'EndgameChess.Rules.krk_backrank_protected_force',
+  offrankRepair:'EndgameChess.Rules.krk_offrank_setup_force',
+  backrankSetup:'EndgameChess.Rules.krk_backrank_setup_force'
 });
 const diff=(a,b)=>Math.abs(a-b);
 export const krkCentreDistance=x=>x<3?3-x:x>4?x-4:0;
@@ -59,6 +61,28 @@ export function krkConstructiveStep(state,rule,isometry='id'){
   if(!f||!Object.hasOwn(KRK_CONSTRUCTIVE_RULES,rule))return null;
   const {sx,sy,rx,ry,wx,wy}=f;
   const rook=squareAt(rx,ry),king=squareAt(sx,sy);
+  if(rule==='offrankRepair'){
+    // OffRankSetup: if the rook is off the strong king's rank and outside
+    // the existing wall, the *close-file* case explicitly moves it to the
+    // far file before considering the next positive-wall phase.
+    const wall=sy<ry&&ry<wy;
+    if(!(sy+2<=wy&&ry!==sy&&!wall&&diff(rx,wx)<2))return null;
+    const far=wx>=4?0:7;
+    return emit(state,f,rule,rook,squareAt(far,ry),
+      'K.y+2<=k.y; R.y!=K.y; R outside strict rank wall; |R.x-k.x|<2',
+      'Strong rook moves to the far file; every weak reply retains file margin >=2, but not necessarily a rank wall.',
+      {type:'far-file-repair',targetFile:far});
+  }
+  if(rule==='backrankSetup'){
+    // SameRankSetup: unprotected near-file back-rank root first aligns its
+    // strong king with the weak king file, preparing the protected rook entry.
+    if(!(sy===0&&ry===0&&wy>=2&&diff(sx,wx)<=1&&diff(rx,wx)<=1&&diff(sx,rx)!==1))
+      return null;
+    return emit(state,f,rule,king,squareAt(wx,0),
+      'K.y=R.y=0; k.y>=2; |K.x-k.x|<=1; |R.x-k.x|<=1; |K.x-R.x|!=1',
+      'After every weak reply, K and R remain on back rank with rook protected by king (one-file difference).',
+      {type:'backrank-protection',targetKingFile:wx});
+  }
   if(rule==='entry'){
     // ClearEntry: strong king at least two ranks below weak; distinct rook file
     // or rook rank already above strong king. A distant rook enters wall rank.
@@ -131,7 +155,15 @@ export function auditKRKConstructiveStep(state,witness){
     const [sx,sy]=coords(krkTransformSquare(sk,f.iso));
     const [rx,ry]=coords(krkTransformSquare(rs,f.iso));
     const [wx,wy]=coords(krkTransformSquare(wk,f.iso));
-    if(!(sy<ry&&ry<wy)||diff(wx,oldWx)>1||diff(wy,oldWy)>1)return false;
+    if(diff(wx,oldWx)>1||diff(wy,oldWy)>1)return false;
+    if(witness.ruleKey==='offrankRepair'){
+      return rx===expected.localRank.targetFile &&
+        diff(rx,wx)>=2 && distance(sk,wk)>=2;
+    }
+    if(witness.ruleKey==='backrankSetup'){
+      return sy===0&&ry===0&&wy>=2&&diff(sx,rx)===1;
+    }
+    if(!(sy<ry&&ry<wy))return false;
     if(witness.ruleKey==='entry'||witness.ruleKey==='retreat'){
       // The Lean proof establishes an oriented WALL (and ForceMate from it),
       // not a globally distant rook after EVERY defending move. A close rook
