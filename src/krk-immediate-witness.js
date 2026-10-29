@@ -4,7 +4,7 @@
  * Frozen proof interface:
  *   KRKImmediate.rankTarget / fileTarget / MateNow / immediate_iff
  *   KRKMateGeometry.Horizontal and kernel_mate_iff
- * Read-only parent: engame-chess@6f64110b7db1fd57493a5478f0ae303798537fbc
+ * Read-only parent: engame-chess@e7de0930fc61caeb11795cf3c10fde11e4774a40
  * Frozen supporting bundle: EC-T0049@4275e227ce88f966c1d663117a3081b55179fc35
  *
  * The Lean equivalence is for a legal strong-turn, nonchecking KRK root with
