@@ -6,7 +6,8 @@
  * an already named local Lean extraction; no search, score, tablebase or
  * legal-move fallback chooses a square.
  *
- * Crucial missing pieces: aligned ExitBound, guarded/column continuation,
+ * Crucial missing pieces: aligned ExitBound's **post-check restoration**,
+ * guarded/column continuation,
  * global root dispatcher and all-phase well-founded rank. In particular a
  * successful local audit must not enable KRK gameplay or certify MateWithin.
  */
@@ -22,6 +23,8 @@ import {krkWidePivotChoice,auditKRKWidePivot}
   from './krk-wide-pivot.js';
 import {krkGuardedEntryChoice,auditKRKGuardedEntry}
   from './krk-guarded-entry.js';
+import {krkOppositionCheckChoice,auditKRKOppositionCheck}
+  from './krk-opposition.js';
 
 export const KRK_READY_DISPATCH_SCOPE='local READY and guarded-cut steps only';
 
@@ -47,7 +50,8 @@ function step(phase,witness,frame){
  * Under READY: strong king centrally positioned one rank below the rook;
  * weak king strictly above, and rook/weak file margin >=2. Partition:
  *  - upper band -> already-proved RankTwo move;
- *  - lower band, aligned files -> unextracted ExitBound HANDOFF;
+ *  - lower band, aligned files -> certified opposition check (one move only);
+ *    post-check global ExitBound restoration remains a HANDOFF;
  *  - lower band, wide separation -> protected pivot;
  *  - lower band, narrow unaligned -> certified rook tempo.
  *
@@ -80,8 +84,12 @@ export function krkReadyDispatch(state,frame='id'){
       blocked('ready-upper',frame,'Certified upper-wall action not constructible');
   }
   if(sx===wx){
-    return blocked('aligned-exit',frame,
-      'Frozen ReadyCut invokes an existential ExitBound; no executable aligned exit is extracted');
+    // The exact opposition-check destination and ALL immediate weak replies
+    // are already certified by KRKExecutable.oppositionCheck_sound. This does
+    // NOT discharge the subsequent restoration or full-game exit proof.
+    const check=krkOppositionCheckChoice(state,frame);
+    return step('ready-aligned-check',check,frame) ||
+      blocked('aligned-check',frame,'Certified opposition-check action cannot be constructed');
   }
   if(Math.abs(sx-wx)>=2){
     const pivot=krkWidePivotChoice(state,frame);
@@ -113,7 +121,8 @@ export function auditKRKReadyDispatch(state,frame='id'){
     'guarded-cut':auditKRKGuardedEntry,
     'ready-upper':auditKRKWallClimbChoice,
     'ready-wide-pivot':auditKRKWidePivot,
-    'ready-narrow-tempo':auditKRKReadyCutTempo
+    'ready-narrow-tempo':auditKRKReadyCutTempo,
+    'ready-aligned-check':auditKRKOppositionCheck
   };
   const local=audits[result.phase]?.(state,frame);
   return {ok:!!local?.ok&&!local?.handoff,phase:result.phase,
