@@ -22,7 +22,7 @@ export const KRK_GUARDED_HANDOFF =
 
 export function krkWidePivotChoice(state,frame='id'){
   const info=krkPrepState(state,frame);
-  if(!info||info.rank!==0)return null;
+  if(!info||info.prepDistance!==0)return null;
   const strong=state.turn,weak=opposite(strong);
   const sk=findKing(state.board,strong),rook=state.board.indexOf(strong+'R'),
     wk=findKing(state.board,weak);
@@ -30,7 +30,7 @@ export function krkWidePivotChoice(state,frame='id'){
   const [sx,sy]=coords(krkTransformSquare(sk,frame));
   const [rx,ry]=coords(krkTransformSquare(rook,frame));
   const [wx,wy]=coords(krkTransformSquare(wk,frame));
-  // The EXACT right-oriented wide premises from pivotRightCut_sound.
+  // The right-oriented wide proof requires central height, not a rook-file\n  // margin: a rook already on the guarded file remains a valid handoff.
   if(sy+1!==ry||wy!==ry+1||!(sx===3||sx===4)||wx<sx+2)return null;
   const target=krkTransformSquare(squareAt(sx+1,ry),frame);
   const original={phase:'READY wide right protected pivot',frame,
