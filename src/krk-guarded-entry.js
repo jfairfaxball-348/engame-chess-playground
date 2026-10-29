@@ -12,6 +12,7 @@ import {KRK_FRAMES,KRK_PARENT_SHA,krkTransformSquare}
   from './krk-local-witness.js';
 
 export const KRK_GUARDED_LEMMA='EndgameChess.Rules.KRKExecutable.guardedEntry_sound';
+export const KRK_GUARDED_LEFT_LEMMA='EndgameChess.Rules.KRKExecutable.guardedEntryLeft_sound';
 
 export function krkGuardedEntryChoice(state,frame='id'){
   if(!KRK_FRAMES.includes(frame)||state?.material!=='krk'||
@@ -24,15 +25,17 @@ export function krkGuardedEntryChoice(state,frame='id'){
   const [sx,sy]=coords(krkTransformSquare(sk,frame));
   const [rx,ry]=coords(krkTransformSquare(rook,frame));
   const [wx,wy]=coords(krkTransformSquare(wk,frame));
-  if(sx+1!==rx||sy+1!==ry||wx<=rx||wy<=ry||rx<3||rx>5)return null;
+  const right=sx+1===rx&&wx>rx&&rx>=3&&rx<=5;
+  const left=rx+1===sx&&wx<rx&&rx>=2&&rx<=4;
+  if(sy+1!==ry||wy<=ry||(!right&&!left))return null;
   const dest=krkTransformSquare(squareAt(sx,ry),frame);
   const m=legalMoves(state.board,strong).find(m=>m.from===sk&&m.to===dest);
   if(!m)return null;
   return Object.freeze({kind:'step',move:m,frame,
     phase:'GUARDED entry → axis-swapped column-wall handoff',
-    rule:KRK_GUARDED_LEMMA,parent:KRK_PARENT_SHA,
-    premises:'K diagonal below-left of rook; weak king strictly above-right; rook file 3–5',
-    continuation:'Every legal defender reply stays strictly above and to the right of rook.',
+    rule:right?KRK_GUARDED_LEMMA:KRK_GUARDED_LEFT_LEMMA,parent:KRK_PARENT_SHA,
+    premises:'K diagonal below the rook; weak king strictly above and on the opposite side of rook',
+    continuation:'Every legal defender reply stays strictly above the rook and beyond the protected rook file.',
     isCompleteWinningPolicy:false,maxMatePlies:null,
     inputHalfmove:state.halfmove,inputHistoryLength:state.history.length});
 }
@@ -45,12 +48,14 @@ export function auditKRKGuardedEntry(state,frame='id'){
   if(replies.length===0)return {ok:false,replies:0};
   const rook=after.indexOf(state.turn+'R');
   const [rx,ry]=coords(krkTransformSquare(rook,frame));
+  const [sx]=coords(krkTransformSquare(findKing(after,state.turn),frame));
+  const right=sx<rx;
   for(const reply of replies){
     if(reply.capture||reply.piece!==weak+'K')
       return {ok:false,replies:replies.length,failedReply:reply};
     const nxt=applyMove(after,reply),wk=findKing(nxt,weak);
     const [wx,wy]=coords(krkTransformSquare(wk,frame));
-    if(wx<=rx||wy<=ry)
+    if((right?wx<=rx:wx>=rx)||wy<=ry)
       return {ok:false,replies:replies.length,failedReply:reply};
   }
   return {ok:true,replies:replies.length,continuation:'column-wall',
