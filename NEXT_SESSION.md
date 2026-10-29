@@ -1,65 +1,77 @@
-# KRK05 — Constructive post-check restoration and total KRK source-derived mate policy
+# KRK06 — Execute central-wall to exit, then global source-derived KRK policy
 
 **NEXT SESSION — INSTALLED, NOT EXECUTED.**
 
-Owner goal remains a fully playable, theorem-derived KRK adversary. This
-follow-up is **execution**, not a documentation or release-flag exercise.
-Vercel hit its daily deployment quota on 29 October; develop and run CI
-independently, never claim production is updated without verifying a deploy.
-Cloudflare Pages is the preferred replacement: the source repository is prepared
-for static Pages Git deployments (see `docs/CLOUDFLARE_PAGES_DEPLOY.md`), but
-**Cloudflare account/GitHub authorisation and first live Pages build are still
-owner-side prerequisites**. Do not claim this migration is deployed until
-its exact URL and Maths/Engine browser smoke tests are verified.
+## Mission
 
-## Verified boundary coming out of KRK04
+Finish the *actual* theorem-derived King + Rook versus King opponent for the
+Maths tab. Work in the parent proof repo on isolated importing proof branches
+when additional mathematics is needed; translate only exact successful
+proven Lean declarations into the independent Playground. No more standalone
+diagnostics in lieu of a total policy. Do not invent a heuristic or turn on
+release flags before the complete proof and FIDE semantics.
 
-- Parent research `main` was `e163515e875d6fe25157246b345f0566a3ffba8c`;
-  active KQK/KPK must remain intact. Upstream extraction [PR #4]
-  (https://github.com/jfairfaxball-348/engame-chess/pull/4) remains
-  a separate prerequisite.
-- Proof branch [KRK04 parent PR #5]
-  (https://github.com/jfairfaxball-348/engame-chess/pull/5)
-  specialises `oppositionCheck_sound` into a concrete aligned READY
-  check plus its all-reply postcondition. Verify Lean / axioms and
-  reconcile the stacked branch before treating it as a new frozen source.
-- Playground `src/krk-ready-dispatch.js` translates that **already
-  source-proven local** check, keeping `isCompleteWinningPolicy=false`
-  and `maxMatePlies=null`. Both colours, all four frames, and initial
-  rook gaps 2/3/4 are covered by `test/krk-ready-dispatch.test.js`.
-- `docs/KRK04_ALIGNED_CHECK.md` explains the exact remaining obstacle
-  and release status; neither repo's current changes have enabled
-  any KRK Maths gameplay.
+## Verified incoming state (29 October 2026)
 
-## Required next work
+- Playground draft [KRK05 PR #12](https://github.com/jfairfaxball-348/engame-chess-playground/pull/12),
+  branch `krk05-restoration-first-pair`, now includes
+  `src/krk-restoration-first.js`,
+  `src/krk-restoration-centre.js` and
+  `src/krk-restoration-chain.js`.
+- Commit `c3a456febfb9743b3f6612138135d92f1418bda9`
+  connects the exact far-rook rescue, king catch-up and central alignment
+  constructors and verifies every defending reply through a maximum of three
+  pairs (six plies) to the **central-wall premise**, not to checkmate.
+  [Exact-head CI #40915307300](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40915307300)
+  passed Node, provenance, coverage, syntax, build and both Chromium suites.
+- Source [upstream draft PR #7](https://github.com/jfairfaxball-348/engame-chess/pull/7)
+  head `b4690afeb85f315c94164cfd1d43b9435948eb2b`
+  has green Lean and axiom CI
+  [#40908371875](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40908371875).
+  The stacked parent PRs #4/#5 and #7 are not merged to proof main.
+  Frozen main source lock remains immutable.
+- `KRK_GAMEPLAY_RELEASED=false`, `MATERIAL.krk.playable=false`.
+  Maths KRK Start is **not** enabled. Existing K/K, KBK, KNK and separate Engine
+  Playground still function. The Vercel deployment quota is not a code blocker;
+  Cloudflare Workers config is present, but production must be independently
+  confirmed at a live URL before any deployment claim.
 
-1. Start with White Kd2 Ra3 vs Black Kd4, white to move,
-   FEN `8/8/8/8/3k4/R7/3K4/8 w - - 0 1`. The checked
-   rook move is Ra4+, and all weak king replies retreat upward.
-   Gap is 3 files: existing `oppositionFollow_sound` explicitly
-   **cannot** justify a generic next `Kd3` move.
-2. In a fresh upstream importing Lean module, extract the
-   `KRKCentral.Restoration` rescue/catch-up cases into coordinate
-   functions and prove each reply total and decreasing over its *exact*
-   input type. Preserve KQK/KPK and immutable source theorems; build
-   `lake` and print axioms for the exact new head. Reconcile PRs #4/#5,
-   do not force-merge conflicting main.
-3. Compose `ReadyCut` narrow/wide/aligned and guarded/column/box phases
-   into all-defender, well-founded and clock/history-aware *global* source
-   policy. Finish non-wall setup and both colours/turns/frames. No heuristic,
-   engine, tablebase, minimax, arbitrary first-legal or known-FEN lookup.
-4. Translate ONLY verified new Lean steps into the independent local
-   Playground JS, maintain immutable source/blob locks, add legal complete
-   adversarial games to checkmate and verify all replay/claim/75-move
-   semantics. Preserve exact arranged board and Engine tab behaviour.
-5. Run `npm test`, `npm run verify:krk-sources`,
-   `npm run audit:krk-phase-domains`, `npm run check`, `npm run build`,
-   browser suites and Lean+axiom CI. Merge only exact tested heads.
-   **Only after** fully certified global selection and owner-approved
-   release, enable `KRK_GAMEPLAY_RELEASED` and KRK Maths Start.
-   Otherwise preserve a separate proof-progress branch and clear blocker
-   record, with KRK still **not fully playable**.
+## Immediate next proof obligation
 
-Install KRK06 only when a genuinely distinct, precisely verified
-next proof obligation remains; do not turn successor prompts into a
-substitute for actually constructing the policy.
+The exact endpoint from the new bounded restoration chain is a strong-to-move
+**central close wall**: in a Lean frame, `K.y+1=R.y<k.y`,
+`K.x ∈ {3,4}`. This is the input to
+`formal/EndgameChess/Rules/KRKCentral/Central.lean`'s `central_bound`.
+That theorem constructs a result using `positive_bound`, `wait_even_bound`
+and `ExitBound`, but it does not provide a global coordinate-level playing
+algorithm.
+
+1. Inspect `Central.lean`, `Positive.lean`, `WaitEven.lean`, aligned
+   repair, `ExitBound`, column/guarded/box phases and all upstream extraction
+   PRs. Identify the exact missing first action and the all-defender recursive
+   successor for **every** central case (strong king left, right, aligned,
+   margin-deficient).
+2. Add importing Lean code on an isolated parent proof branch: explicit
+   destinations, legality, quantified defender replies, next-phase partition
+   and a strictly decreasing global measure toward actual mate. Include
+   remaining non-wall setup and all starting legal KRK states, both colours,
+   both turns and all symmetry frames. Run `lake build` and exact-head axiom
+   reports; preserve KQK/KPK and frozen source files.
+3. Port *only* verified new constructors into local JS with immutable source
+   SHA/blob links. Extend chain coverage all the way to actual mate, not a
+   handoff; use original arranged board/history, no reset. Audit adversarial
+   moves exhaustively across the stated domains.
+4. Establish a complete legal KRK opponent, explicit checkmate terminal
+   and draw/clock/repetition handling (claims, automatic rules, rook capture,
+   stalemate); demonstrate the bound from **every** supported legal root.
+   No tablebase, existing chess engine, minimax, search surrogate,
+   model, or arbitrary legal move may select a Maths move.
+5. Run Node and browser suites, upstream Lean+axiom CI, source-lock and
+   regression tests. Merge only exact tested heads with coherent ancestry.
+   Do not merge the existing draft KRK05 PR into a gameplay release while
+   unfinished. Obtain explicit owner approval before enabling KRK Maths
+   gameplay; otherwise keep the proof-progress draft and report the next
+   mathematically precise obstruction, without calling it playable.
+
+The next session should perform implementation and formal verification, not
+merely update this prompt or rewrite a status report.
