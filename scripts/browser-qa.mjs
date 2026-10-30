@@ -49,7 +49,7 @@ async function fresh(page){
  assert.equal(await page.locator('.maths-cell').count(),64);
  assert.equal(await page.locator('.maths-tray-piece').count(),32);
  assert.equal(await page.locator('.maths-board .piece-icon').count(),0);
- assert.equal(await rack(page,'wQ').isDisabled(),true);
+ assert.equal(await rack(page,'wQ').isEnabled(),true);
  assert.equal(await rack(page,'wP').isDisabled(),true);
  assert.equal(await rack(page,'bR').isEnabled(),true);
  assert.equal(await page.locator('#maths-start').isDisabled(),true);
@@ -123,7 +123,7 @@ async function run(){
    assert.equal(await page.locator('#maths-first').isVisible(),true,
      'Undo restores initial KRK turn and source token');
    await page.locator('#maths-edit').click();
-   for(const p of ['wB','bB','wN','bN','bR'])assert.equal(await rack(page,p).isDisabled(),true,p+' dim once rook is set');
+   for(const p of ['wB','bB','wN','bN','bR','wQ','bQ'])assert.equal(await rack(page,p).isDisabled(),true,p+' dim once rook is set');
    await drag(page,cell(page,0),rack(page,'wR'));
    assert.equal(await rack(page,'wB').isEnabled(),true,'tray reactivates after removal');
    await add(page,'bB',56);
