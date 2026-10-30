@@ -193,6 +193,38 @@ async function run(){
       'full KNK derivation is still present during play');
    console.log('PASS full KNK worked proof and dynamic square parity');
   }finally{await knightContext.close();}
+
+  // S018: KQK is arranged from an empty board, retains its exact squares,
+  // plays only an explicit source-derived first move, and ends in real mate.
+  const queenContext=await browser.newContext({viewport:{width:1100,height:900}});
+  try{
+   const page=await queenContext.newPage(),errors=[];
+   page.on('pageerror',e=>errors.push(e.message));
+   await fresh(page);
+   await add(page,'wK',46); // g6
+   await add(page,'wQ',52); // e7
+   await add(page,'bK',63); // h8
+   assert.equal(await page.locator('.maths-outcome').innerText(),'K+Q vs K');
+   assert.equal(await page.locator('.maths-proof').count(),0,'KQK play-first panel stays compact');
+   assert.match(await page.locator('.maths-policy').innerText(),/Experimental KQK/);
+   assert.equal(await page.locator('#maths-start').isEnabled(),true);
+   const arranged=await page.locator('.maths-board').evaluate(el=>
+     [...el.querySelectorAll('.maths-cell')].map(c=>[c.dataset.sq,c.querySelector('.piece-icon')?.getAttribute('class')||null]));
+   await page.locator('#maths-start').click();
+   const started=await page.locator('.maths-board').evaluate(el=>
+     [...el.querySelectorAll('.maths-cell')].map(c=>[c.dataset.sq,c.querySelector('.piece-icon')?.getAttribute('class')||null]));
+   assert.deepEqual(started,arranged,'KQK must preserve exact arranged starting squares');
+   assert.equal(await page.locator('#maths-first').isVisible(),true);
+   await page.locator('#maths-first').click();
+   await page.waitForFunction(()=>document.querySelector('.maths-outcome')?.textContent.includes('White wins'),null,{timeout:5000});
+   assert.equal(await cell(page,55).locator('.piece-icon').count(),1,'queen delivers source edge mate on h7');
+   assert.equal(await page.locator('.maths-notice').innerText(),'');
+   await page.locator('#maths-undo').click();
+   assert.equal(await page.locator('#maths-first').isVisible(),true);
+   assert.equal(await cell(page,52).locator('.piece-icon').count(),1,'Undo returns queen to original e7');
+   assert.deepEqual(errors,[],'KQK browser console');
+   console.log('PASS experimental KQK exact setup / source mate / undo');
+  }finally{await queenContext.close();}
  }finally{await browser.close();}
 }
 try{await run();console.log('Maths BROWSER QA PASS');}
