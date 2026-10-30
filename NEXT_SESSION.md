@@ -1,93 +1,79 @@
-# S028 — close verified KRK/KQK strategy gaps, not merely audit more
+# S029 — genuine KRK/KQK continuation closure, then mathematical parity
 
-**Execute** in `jfairfaxball-348/engame-chess-playground`.
-Read AGENTS.md and `docs/KQK27_PREPARED_SOURCE.md`.
-Do not edit read-only `engame-chess`; KQK frozen source
+**Execution session.** Work in
+`jfairfaxball-348/engame-chess-playground`; inspect
+`AGENTS.md`, `docs/KQK27_PREPARED_SOURCE.md`,
+`docs/KQK28_HORIZONTAL_SOURCE.md` and current `main`.
+Immutable parent `engame-chess` is READ-ONLY; KQK Lean lock
 `c72365a8ba46f59114a2a77d9d38993f6a52df80`.
 
-## Non-negotiable owner order
+## Owner priority — binding
 
-1. Make **both** KRK and KQK complete simplified/play-first
-   source-derived mating strategies from **every legal arrangement**
-   against **every legal weak reply**, preserving legal play,
-   capture-to-KK, start-from-exact-arranged-board and both colours.
-   Do not use Stockfish, Lozza, tablebases, minimax, chess AI,
-   arbitrary first-legal moves or manufactured mathematical proof
-   in Maths. A missing source phase fails closed and is visible.
-2. **Immediately once both are actually closed**, return to
-   full board-specific mathematical equations, source derivations,
-   clock/history/terminal parity for KRK **and** KQK as already
-   present for KK, KNK, KBK. Preserve those prior Maths panels
-   at all times. Do not divert to KPK or Engines. The 50/75-move
-   parity is secondary until constructive strategy closure,
-   but it is not silently called complete.
+1. Complete **both KRK and KQK** simplified, actual all-defender,
+source-derived mating strategies for every legal arranged root.
+No external engines, tablebases, minimax, arbitrary first-legal
+selection or invented proof translation in Maths; missing Lean
+constructive action fails closed. Keep both colours, exact arranged
+board, legal replies, captures to KK, checkmates and all old
+KK/KNK/KBK detailed mathematical panels.
+2. **Immediately when both strategies really close**, add full
+board-specific derivations/equations/source links, legal outcome
+semantics and FIDE clock/history parity to KRK **and** KQK as in
+KK/KNK/KBK. Do not spend this session on KPK/Engine experiments.
+Continue to mark uncertified controllers as experimental.
 
-## Exact latest handoff
+## Exact S028 handoff
 
-- S026 merged-main was `f3bac9ab2ae76649d59a4ae9d924c9e05d854736`;
-  post-merge Actions **41099570173 passed**. It confirmed
-  deterministic monotone-clock-free KQK 105/120 mate-closed,
-  15 capped, **0 hard failures** at 12,000 attempts, four per
-  family, 2,500 nodes, 64 rounds. KRK 24/24 capped,
-  0 hard failures at 2,500 nodes. Both are finite/inconclusive.
-- S027 PR #36 adds one-reply **band-prepared** tokens for
-  frozen `BandProgress.prepared_king_step` and
-  `prepared_queen_step`, preserving the *original source frame*
-  through every legal defender reply. Test coverage for both
-  colours/eight frames, token forgery and exact capped position.
-  See `docs/KQK27_PREPARED_SOURCE.md`.
-- **S027 measured post-change PR head** `607038d9a6cff854704d01de273ecc3b16a9df0c`
-  passed Actions **41126489134**: monotone KQK **98/120 mate-closed,
-  22 capped, 0 falsified**; exact **87/120 mate-closed, 33 capped,
-  0 falsified**. This is **seven more bounded caps** than S026's
-  monotone 105/120 on identical roots. No proven strategy failure;
-  the new continuation token may increase search state. See S027
-  report. Do not present it as improved finite coverage. Verify the
-  final merged-main CI before claiming release.
-- A **real KQK source cycle**, far-file oscillation, was fixed in
-  S025; do not regress it. Backrank protected reply was fixed
-  in S026; do not regress it.
-- The initial S025 capped WeakToMove path:
-  strong White K48 Q32, weak Black K35, Black to move;
-  first cap K44 Q32 weak K12, White to move, token null.
-  This state **does** have an explicit source action Q32–35
-  (BandProgress.prepared_queen_step) and now a guarded one-reply
-  continuation. It is **not** evidence of a missing first move.
-  Trace full siblings or a genuine cycle/unsupported action
-  before claiming a root-level fix.
-- Latest largest KQK capped cohorts before S027:
-  WeakToMove 4/8, FarFilePreparation 4/8,
-  SameRankEntry 3/8. Use new S027 exact CI results to
-  narrow this further.
+- S027 main at `12164ae6d2f7a8d2fa8bcc4c98e99159bafcf425`,
+  passed Actions `41127487084`.
+- S028 PR [#37](https://github.com/jfairfaxball-348/engame-chess-playground/pull/37)
+  squash merged `fd9f0e899ede84e2629cefb0fee46dd8193c1497`;
+  Actions [41130916414](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41130916414)
+  passed **all Node, source locks, KRK/KQK adversarial, build and two
+  Chromium suites**. Verify latest merged-main CI as well.
+- New named source branch `OrientedEntry.horizontal_far_wall_entry`
+  now uses **`wk.rank>=sk.rank+1`** rather than equality in the
+  high-file narrow Q-to-six construction. Broader source-valid
+  continuation exercised across colours, frames, legal weak replies.
+  It did **not** improve bounded mate closure.
+- **Identical S027/S028 bounded result:** KQK monotone 98/120
+  mate-closed, 22 capped, 0 hard failures; exact 87/120
+  mate-closed, 33 capped, 0 hard failures. KRK 24/24
+  capped, 0 observed hard failures. These are finite inconclusive
+  audits, neither universal proofs nor real counterexamples.
 
-## Execute next, prioritising controller closure
+## Execute, not just instrument
 
-1. Inspect exact S027 merged-main CI and source-choice changes.
-   Keep the fresh Prepared proof-frame token; replay at least one
-   remaining KQK deep cap to identify an actual unsupported
-   source branch or wrong branch/frame commitment. Distinguish
-   wide all-reply resource explosion from a true error.
-2. Where Lean actually specifies a missing all-reply action,
-   port its precise geometric coordinate premise and its
-   continuation token. Prioritise FarFileEntry continuation and
-   SameRankEntry, then BandRaise/RankFive; include both colours,
-   eight frames and all immediate legal replies. No guessed
-   controller policy.
-3. Investigate KRK's 24/24 capped *constructive phase trees*,
-   using exact `krk14` nested tokens, immutable Lean source,
-   and structural revisits vs distinct history contexts.
-   Focus on a source-defined all-reply continuation/rank that
-   closes an actual phase, not merely increasing maxNodes.
-4. Re-run Node tests, frozen source-lock checks, syntax/build,
-   adversarial KQK exact and monotone modes, bounded KRK trees,
-   and Chromium Maths/Engines QA. Preserve start position, turn,
-   legal replies, capture-to-KK, checkmate/stalemate,
-   Undo/Restart and KK/KBK/KNK detailed proof workings.
-5. If BOTH Stage A controllers truly close, begin Stage B
-   **in the same execution session**. Otherwise be candid:
-   sampled caps do NOT prove or refute global mating.
-   Commit, PR, test final exact head, merge, confirm main CI,
-   independently inspect Cloudflare and install S029.
+1. **KRK first**: inspect `src/krk-tagged-strategy.js`,
+   `src/krk-prepared-wall.js`, the immutable `krk14` nested
+   continuation tokens and `scripts/krk14-mate-tree.mjs`.
+   From an existing 24-root capped source tree identify the first
+   *actual* repeated structural controller state, inconsistent
+   history token or absent named proof continuation. Distinguish
+   a large distinct-tree node cap from a true cycle. Only implement
+   a concrete Lean-authorised step or ranking-decreasing phase.
+2. **KQK next**: pick a remaining same-seed deep capped
+   WeakToMove, FarFilePreparation or SameRankEntry path, not
+   its already-solved first action. Follow actual sibling replies
+   and frame/token commitment until an unsupported step or
+   cycle is reproducible. Compare the frozen
+   `FarFileEntry.far_file_stage_bound` case split with
+   `farFileReply`, then implement a *named* source-specific
+   continuation only if the missing branch is demonstrated.
+3. For each change write a two-colour, eight-frame, all-immediate-
+   reply regression with the exact first failing source position.
+   Measure against the fixed S028 roots and both KQK cache modes.
+   Reject mere extra token state or cap increases as progress
+   without a demonstrated closure improvement.
+4. Run full Node, source locks, KRK root/mate trees,
+   KQK exact/monotone, syntax/build and both Chromium suites.
+   Check all existing Maths panels and Engine isolation.
+   Keep live Cloudflare verification separate from green CI.
+5. Commit on an isolated branch, PR, verify exact-head CI,
+   merge, confirm merged-main CI and install **S030**.
+   If Stage A remains open, say so precisely, including
+   which roots remain capped and whether genuine failures exist.
 
-Owner wants a **working mathematical strategy showcase**, not
-endless new audit frameworks or an uncertified claim of perfection.
+**Do not claim KRK/KQK universal strategy completion merely because
+all sampled first moves are source-tagged or 0 hard failures were
+observed.**
