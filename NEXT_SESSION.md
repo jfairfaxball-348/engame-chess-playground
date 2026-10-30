@@ -34,7 +34,13 @@ failures or mark experimental controllers certified.
   continuations, instead of opposite-file re-preparation.
   Regression `test/kqk25-far-file-cycle.test.js`. The **pre-fix**
   monotone audit found 103/120 closed, 1 real cycle, 16 capped;
-  check the final PR-head **post-fix** audit before reuse.
+  post-fix PR-head CI **41094156645** passed and reported
+  **105/120 bounded KQK mate-closed**, **15 capped**, **0
+  confirmed hard failures**, **7,810 cross-depth closure reuses**.
+  Largest remaining caps: WeakToMove 4/8,
+  FarFilePreparation 4/8, SameRankEntry 3/8.
+  KRK stays 24/24 capped (0 demonstrated failures). Verify final
+  merged main-head CI before quoting newer metrics.
 - `scripts/kqk21-adversarial.mjs` now reports each first cap's
   exact board/turn/source token and `crossDepthClosedReuses`.
   `--cache=exact` provides comparison against old depth-specific
