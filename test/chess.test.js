@@ -9,9 +9,10 @@ import { chooseMove, chooseDecision, strategyLabel } from '../src/engine.js';
 const sq=squareAt;
 
 test('only upstream-released dead classes are playable; KRK stays gated',()=>{
-  assert.deepEqual(Object.keys(MATERIAL),['kk','kbk','knk','krk']);
+  assert.deepEqual(Object.keys(MATERIAL),['kk','kbk','knk','krk','kqk']);
   assert.deepEqual(Object.entries(MATERIAL).filter(([,m])=>m.playable).map(([id])=>id),['kk','kbk','knk']);
   assert.equal(MATERIAL.krk.playable,false);
+  assert.equal(MATERIAL.kqk.playable,false);
 });
 
 test('default arrangements satisfy local geometry for colours and turns',()=>{
