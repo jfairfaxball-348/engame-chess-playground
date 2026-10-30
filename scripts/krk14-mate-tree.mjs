@@ -86,8 +86,15 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
   const data={ok:false,scope:'one root, ALL legal defender replies',
     rootFEN:fen(root.board,root.turn),
     nodes:0,terminalMates:0,maximumPlies:0,
+    structuralRevisits:0,distinctStructuralStates:0,
+    distinctHistoryRevisits:0,defenderRepliesExamined:0,
+    sourceChoicesExamined:0,maximumDefenderBranching:0,
     completeGlobalMateProof:false,fideClockHistoryCertified:false};
   const stack=new Set(),moves=[];
+  // Diagnostic-only: detect transpositions without merging branches.
+  // Repeated geometries with distinct incoming clocks/histories MUST NOT
+  // be treated as interchangeable for FIDE/continuation semantics.
+  const seenStructural=new Map();
   const fail=(reason,s,rule)=>({
     reason,atFEN:fen(s.board,s.turn),plies:moves.length,
     sourceRule:rule??null,variation:moves.slice()
@@ -100,10 +107,22 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
     // further conflation of distinct nested phases or setup parameters.
     const key=positionKey(s.board,s.turn)+'|'+krk14ControlStateKey(token);
     if(stack.has(key))return fail('phase-position cycle',s);
+    const historySignature=s.halfmove+'|'+s.history.join(';');
+    const previouslySeen=seenStructural.get(key);
+    if(previouslySeen){
+      data.structuralRevisits++;
+      if(!previouslySeen.has(historySignature))
+        data.distinctHistoryRevisits++;
+      previouslySeen.add(historySignature);
+    }else{
+      seenStructural.set(key,new Set([historySignature]));
+      data.distinctStructuralStates++;
+    }
     const o=outcome(s.board,s.turn,s.history,s.halfmove);
     if(o.kind!=='ongoing')return fail('terminal before strong action: '+o.kind,s);
     const choice=krkTaggedStrongChoice(s,token);
     if(!choice)return fail('missing source-derived continuation',s);
+    data.sourceChoicesExamined++;
     const after=play(s,choice.move),a=outcome(after.board,after.turn,after.history,after.halfmove);
     moves.push(uci(choice.move));
     if(a.kind==='mate'){
@@ -118,7 +137,11 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
       moves.pop();return err;
     }
     stack.add(key);
-    for(const reply of legalMoves(after.board,after.turn)){
+    const replies=legalMoves(after.board,after.turn);
+    data.defenderRepliesExamined+=replies.length;
+    data.maximumDefenderBranching=Math.max(
+      data.maximumDefenderBranching,replies.length);
+    for(const reply of replies){
       moves.push(uci(reply));
       if(reply.capture){
         const err=fail('defender rook capture',after,choice.rule);
