@@ -1,10 +1,16 @@
+## S018 experimental KQK gameplay — 30 October 2026
+
+**KQK is now selectable as an experimental Maths beta**: place either colour queen and the two kings at exact squares, choose the side to move, and play as the lone king against named frozen-proof geometric rules. The current source-derived controller implements edge-wall / corner-prison and queen-shadow / edge-exit phases, including 8 board symmetries, queen capture to KK and Undo. It explicitly stops rather than substitute an engine on unsupported positions. **Not every legal KQK position has a runnable strategy yet**; the Lean EC-T0050 class theorem proves the outcome, not that this particular JavaScript selector is complete.
+
+The previous full worked equations, positional calculations, derivations and Lean links **remain intact** for KK, KBK, KNK. KRK stays experimental. Strict 50-move history parity remains deferred. See [S018 scope and source provenance](docs/KQK18_PLAYABLE_BETA.md), [next KQK expansion session](NEXT_SESSION.md).
+
 # Endgame Chess Playground
 
 ## Maths presentation preserved by material (30 October 2026)
 
 For the existing **K vs K, K+B vs K and K+N vs K** draw demonstrations, the Maths tab again shows the **complete mathematical workings** from `src/maths-proof.js`: theorem equation, piece-position-dependent calculation, all reasoning steps and linked frozen Lean proof. This remains available while setting up positions and during play. The Maths explanations are not a disposable feature.
 
-The experimental **KRK** strategy remains playable with a compact, board-first presentation; its specific JavaScript winning controller is not globally certified. The next installed session [S018](NEXT_SESSION.md) builds **experimental KQK** in that same playable style, *preserving all three existing worked draw explanations*.
+The experimental **KRK** strategy remains playable with a compact, board-first presentation; its specific JavaScript winning controller is not globally certified. The successor [S019](NEXT_SESSION.md) expands the **partially playable experimental KQK** controller while preserving all three worked draw explanations.
 
 
 ## KRK16 playable experimental Maths mode — 30 October 2026
@@ -13,7 +19,7 @@ The KRK Maths board now allows **Start game** from an exactly arranged legal Kin
 
 **Experimental means experimental.** The upstream KRK **outcome** theorem is complete, and this opponent's individual actions come from translated constructive source rules, but the precise JavaScript all-defender, complete-game selector has **not** been formally certified. A missing source phase stops play with a visible explanation; the Maths mode never substitutes Stockfish, a tablebase or an arbitrary legal move. FIDE 50/75-move and repetition-history parity is not a beta release requirement and remains **uncertified**. Certified flags `KRK_GAMEPLAY_RELEASED=false` and `MATERIAL.krk.playable=false` remain locked. The separate Engine Playground is unchanged.
 
-KQK **outcome** is independently frozen upstream as `EC-T0050` (29 October 2026) and is the next playable-beta engineering priority. KPK is still incomplete upstream, not yet released or advertised as solved here.
+KQK **outcome** is frozen upstream as `EC-T0050` (29 October 2026); an experimental partial KQK beta is available. KPK is still incomplete upstream, not yet released or advertised as solved here.
 
 See [KRK beta work](docs/KRK16_PLAYABLE_BETA.md) and [next session](NEXT_SESSION.md).
 
@@ -35,7 +41,7 @@ The user has authorised KRK02 to finish the complete proof-derived adversarial p
 
 Two intentionally separate modes share one static website. Cloudflare is the preferred destination; the owner connected the repository through Cloudflare **Workers Builds** (rather than the earlier Pages Git workflow). The initial Workers build succeeded but the first deployment failed due to Wrangler auto-selecting the repository root. The explicit `wrangler.jsonc` now restricts assets to `./dist`; the existing Vercel website remains available until the new Cloudflare production deployment is verified:
 
-- **Maths endgame** starts with an empty board and two full piece trays. The only currently arrangeable material is both kings plus at most one bishop, knight or rook; queen and pawn slots remain dark. Its outcome panel is backed by frozen theorems. K/K, K+B/K and K+N/K are playable against a legal-move draw adversary. Newly completed KRK is classified using the frozen fresh-clock theorem, and experimental source-derived KRK play is available; the complete JavaScript controller remains uncertified. There is no engine, search or tablebase in this mode.
+- **Maths endgame** starts with an empty board and two full piece trays. The only currently arrangeable material is both kings plus at most one bishop, knight or rook; pawn slots remain dark; the queen slot is active for KQK beta. Its outcome panel is backed by frozen theorems. K/K, K+B/K and K+N/K are playable against a legal-move draw adversary. Newly completed KRK is classified using the frozen fresh-clock theorem, and experimental source-derived KRK play is available; the complete JavaScript controller remains uncertified. There is no engine, search or tablebase in this mode.
 - **Engine playground** is a standard, full-rules chess spectator arena. Choose a chess engine for White and Black, Play, Pause, advance one move, change the viewing pace, flip the board or Restart. It is NOT a proof-derived mathematical engine.
 
 ## Engine playground
