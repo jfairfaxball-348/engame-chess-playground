@@ -47,7 +47,8 @@ test('S027 BandProgress keeps each proved Prepared continuation for all weak rep
       const chosen=chooseMathsOpponent(next,strong,first.continuationToken);
       assert.ok(chosen?.move,
         'Lean Prepared invariant must license a fixed-frame source action after '+reply.from+'-'+reply.to);
-      assert.match(chosen.sourcePhase,/^KQK\\.(BandProgress|BandRaise|RankFive|BandEntry)\\./);
+      assert.ok(['BandProgress','BandRaise','RankFive','BandEntry'].some(p=>
+        chosen.sourcePhase.startsWith('KQK.'+p+'.')),chosen.sourcePhase);
       assert.ok(legalMoves(next.board,strong).some(m=>
         m.from===chosen.move.from&&m.to===chosen.move.to));
       assert.equal(chooseMathsOpponent(next,strong,{
