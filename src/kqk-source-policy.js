@@ -217,9 +217,9 @@ function bandChoice(state,strong,frame,g) {
   if(qy===5&&wx===7&&wy===7&&qx!==5)
     return choice(g.queen,5,5,'KQK.RankFive.rank_five_corner_bound');
   if(kx+2<=wx)
-    return choice(g.sk,kx+1,ky,'KQK.BandProgress.prepared_king_step');
+    return choice(g.sk,kx+1,ky,'KQK.BandProgress.prepared_king_step','band-prepared');
   if(qx+2<=wx)
-    return choice(g.queen,wx-1,qy,'KQK.BandProgress.prepared_queen_step');
+    return choice(g.queen,wx-1,qy,'KQK.BandProgress.prepared_queen_step','band-prepared');
   if(qx+1!==wx)return null;
   if(qy===5&&wy===7) {
     if(wx>=2&&wx<=6)
@@ -323,6 +323,24 @@ function knightSideReply(state,strong,token) {
     'KQK.KnightPrison.knight_prison_bound.top_reply');
 }
 
+
+/**
+ * S027: the frozen BandProgress.prepared_{king,queen}_step theorems
+ * preserve Prepared under EVERY legal weak reply, in the SAME source
+ * orientation. Do not discard that all-reply continuation and reselect
+ * an unrelated frame. Recheck the exact Prepared coordinates before
+ * taking another source-defined band action; otherwise fail closed.
+ */
+function bandPreparedReply(state,strong,token) {
+  const g=geometric(state,strong,token.frame);
+  if(!g)return null;
+  const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+  // Prepared: Wall (king below queen below weak, queen left of weak),
+  // queen rank <=5, king one rank below queen, queen <= king <= weak.
+  if(qy>5||ky+1!==qy||qy>=wy||qx>=wx||qx>kx||kx>wx)
+    return null;
+  return bandChoice(state,strong,token.frame,g);
+}
 
 /**
  * S020: explicit strong-entry branches from frozen SameRankEntry,
@@ -520,7 +538,7 @@ function farFileReply(state,strong,token) {
 }
 
 function validToken(state,strong,token) {
-  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','knight-low-five','tight-file','far-file','backrank-protected'].includes(token.kind)||
+  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','band-prepared','knight-side','knight-low-five','tight-file','far-file','backrank-protected'].includes(token.kind)||
      !Object.hasOwn(FRAMES,token.frame)||token.strong!==strong||
      state.log.length!==token.moveCount+1)return false;
   const weak=findKing(state.board,opposite(strong));
@@ -538,6 +556,7 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='shadow-reply')return shadowReply(state,strong,token);
     if(token.kind==='shadow-bottom-reply')return bottomReply(state,strong,token);
     if(token.kind==='band-raise')return bandRaiseReply(state,strong,token);
+    if(token.kind==='band-prepared')return bandPreparedReply(state,strong,token);
     if(token.kind==='tight-file')return tightFileReply(state,strong,token);
     if(token.kind==='backrank-protected')
       return protectedBackrankReply(state,strong,token);
