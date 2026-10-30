@@ -43,7 +43,7 @@ test('queen inventory activates only when no extra material is already present; 
 });
 test('queen moves and rays obey both rook and bishop geometry, blockers and king safety',()=>{
  const b=makeBoard();b[sq(0,0)]='wK';b[sq(7,7)]='bK';b[sq(3,3)]='wQ';
- assert.equal(validateSetup(b,'kqk','w'),null);
+ assert.equal(validateSetup(b,'kqk','b'),null);
  for(const [x,y] of [[3,6],[6,3],[5,5],[1,1],[1,5],[5,1]])
    assert.equal(attacks(b,'w',sq(x,y)),true);
  assert.equal(attacks(b,'w',sq(5,6)),false);
