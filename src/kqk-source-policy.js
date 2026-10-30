@@ -194,7 +194,9 @@ function bandChoice(state,strong,frame,g) {
     return kx===5&&ky===5
       ? choice(g.queen,7,5,'KQK.SetupCorners.king_blocks_target_bound')
       : choice(g.queen,5,5,'KQK.KnightPrison.corner_knight_rescue');
-  if(qx>5)return null;
+  // Files six and seven remain legal below rank five (OpenBand). Only the
+  // rank-five corner exception is excluded by the top-band premise.
+  if(qy===5&&qx>5)return null;
   // BandEntry.wall_prepare_bound: approach the queen rank, then file.
   if(ky+1<qy)
     return choice(g.sk,kx,ky+1,'KQK.BandEntry.wall_prepare_bound.vertical');
