@@ -82,10 +82,11 @@ test('rank-five knight prison steps work from either player colour',()=>{
     assert.notEqual(outcome(mathsPlayMove(s,c.move).board,opposite(strong)).kind,'stalemate');
   }
 });
-test('uncovered fresh positions still refuse; all eight proof frames remain present',()=>{
+test('S020 adds a frozen backrank entry to the former gap; all eight source frames remain',()=>{
   assert.equal(KQK_FRAMES.length,8);
   const s=start('w',[4,0],[0,0],[4,7]);
-  assert.equal(kqkSourceChoice(s,'w'),null);
+  assert.equal(kqkSourceChoice(s,'w')?.sourcePhase,'KQK.SameRankEntry.backrank_entry.clear_low_wall');
+  assert.equal(kqkSourceChoice(s,'w',{kind:'invalid'}),null);
 });
 
 test('the first-reply continuation from a newly covered knight-prison root reaches mate',()=>{
