@@ -263,13 +263,16 @@ function knightChoice(state,strong,frame,g) {
   }
   if(qx===5) {
     if(wx===6&&wy===7)
-      return step(g.queen,4,6,'KQK.KnightPrison.knight_top_bound');
+      return ky===5
+        ? step(g.sk,kx,4,
+          'KQK.KnightPrison.knight_prison_low_five_bound.king_down','knight-low-five')
+        : step(g.queen,4,6,'KQK.KnightPrison.knight_top_bound');
     if(wx===7&&wy===6)
       return ky<=4
         ? step(g.sk,kx===7?6:kx+1,ky,
           'KQK.KnightPrison.knight_prison_bound.king_tempo','knight-side')
-        : step(g.sk,kx,4,'KQK.KnightPrison.knight_prison_low_five_bound',
-          'knight-side');
+        : step(g.sk,kx,4,
+          'KQK.KnightPrison.knight_prison_low_five_bound.king_down','knight-low-five');
     return null;
   }
   if(qx===1&&wx===0&&wy===7)
@@ -298,6 +301,17 @@ function bandRaiseReply(state,strong,token) {
   return targetMove(state,strong,g.queen,preimage(token.frame,qx,qy+1),
     'KQK.BandRaise.prepared_raise_bound.queen_rise');
 }
+// KnightPrison.knight_prison_low_five_bound must lower a rank-five
+// strong king BEFORE using the low-king knight-prison constructions.
+// The weak king may enter either knight square after that legal step;
+// dispatch only those two proved branches in the original frame.
+function knightLowFiveReply(state,strong,token) {
+  const g=geometric(state,strong,token.frame);
+  if(!g||g.k[1]!==4||g.q[0]!==5||g.q[1]!==5||
+     !((g.w[0]===6&&g.w[1]===7)||(g.w[0]===7&&g.w[1]===6)))return null;
+  return knightChoice(state,strong,token.frame,g);
+}
+
 function knightSideReply(state,strong,token) {
   const g=geometric(state,strong,token.frame);
   if(!g||g.q[0]!==5||g.q[1]!==5||g.w[0]!==6||g.w[1]!==7||
@@ -413,7 +427,7 @@ function entryChoice(state,strong,frame,g) {
 }
 
 function validToken(state,strong,token) {
-  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','tight-file'].includes(token.kind)||
+  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','knight-low-five','tight-file'].includes(token.kind)||
      !Object.hasOwn(FRAMES,token.frame)||token.strong!==strong||
      state.log.length!==token.moveCount+1)return false;
   const weak=findKing(state.board,opposite(strong));
@@ -432,6 +446,7 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='shadow-bottom-reply')return bottomReply(state,strong,token);
     if(token.kind==='band-raise')return bandRaiseReply(state,strong,token);
     if(token.kind==='tight-file')return tightFileReply(state,strong,token);
+    if(token.kind==='knight-low-five')return knightLowFiveReply(state,strong,token);
     return knightSideReply(state,strong,token);
   }
   // Exact OrientedEntry.high_file_corner_entry (frozen Lean source):
