@@ -17,14 +17,21 @@
     "formal/EndgameChess/Rules/KQK/BandRaise.lean",
     "formal/EndgameChess/Rules/KQK/RankFive.lean",
     "formal/EndgameChess/Rules/KQK/KnightPrison.lean",
-    "formal/EndgameChess/Rules/KQK/EntryFrames.lean"
+    "formal/EndgameChess/Rules/KQK/EntryFrames.lean",
+    "formal/EndgameChess/Rules/KQK/SameRankEntry.lean",
+    "formal/EndgameChess/Rules/KQK/FarFilePreparation.lean",
+    "formal/EndgameChess/Rules/KQK/OrientedEntry.lean",
+    "formal/EndgameChess/Rules/KQK/TightEntry.lean",
+    "formal/EndgameChess/Rules/KQK/EntryGeometry.lean",
+    "formal/EndgameChess/Rules/KQK/FarFileEntry.lean",
+    "formal/EndgameChess/Rules/KQK/StrongEntry.lean"
   ],
   "policy": "experimental-subset",
   "certifiedJavascriptPolicy": false,
   "explicitGaps": [
-    "universal positive_entry and complete off-rank selection",
-    "SameRankEntry, FarFilePreparation and TightEntry for all legal roots",
-    "remaining oriented endgames and arbitrary rooted all-reply coverage",
+    "universal executable strong-turn source dispatch and complete terminal move tree",
+    "far-file preparation plus same-rank/tight/oriented combinations not yet all covered end to end",
+    "adversarial full-game KQK coverage from all legal roots, including weak-turn roots",
     "FIDE incoming history and clock parity"
   ]
 }
