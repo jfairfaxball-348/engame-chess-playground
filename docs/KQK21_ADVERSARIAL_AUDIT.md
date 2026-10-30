@@ -66,6 +66,18 @@ S021 adds exactly that source-derived `KQK.SameRankEntry.backrank_entry.king_to_
 move under the three exact file-distance premises to
 `src/kqk-source-policy.js`. No generic move selection was added.
 The original counterexample corresponds to **...Ka7** from a8.
+
+The first post-fix exact-head CI run 41050376840 passed. With identical
+seed and budgets, the source-stratified audit now selected **55 roots**:
+**26 bounded all-replies-mate, 0 falsified, 29 inconclusive**.
+The previously isolated `UnsupportedAtRoot` bucket vanished; because
+sampling quotas are keyed to selected source family, the denominator
+changed from 56 to 55. This is **not** a paired improvement in the
+mate percentage and not a universal completion claim. The concrete
+previously failing placement has its own eight-symmetry, two-colour
+test with exhaustive *immediate* weak replies.
+
+
 Tests exercise the repaired placement, the legal move and every
 immediate defender response across eight symmetries and both
 colours. Do **not** describe this repair as closing the global policy:
