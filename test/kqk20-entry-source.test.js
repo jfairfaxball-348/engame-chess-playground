@@ -31,9 +31,9 @@ test('SameRankEntry: positive king descent is source-derived for both sides',()=
 });
 test('SameRankEntry: protected backrank raises queen without stalemate',()=>{
   for(const strong of ['w','b']){
-    const s=start(strong,[2,0],[3,0],[6,7]),c=step(s,strong);
+    const s=start(strong,[2,0],[1,0],[6,7]),c=step(s,strong);
     assert.match(c.sourcePhase,/^KQK.SameRankEntry\./);
-    assert.equal(c.move.to,squareAt(3,1));
+    assert.equal(c.move.to,squareAt(1,1));
     assert.equal(outcome(mathsPlayMove(s,c.move).board,opposite(strong)).kind,'ongoing');
   }
 });
