@@ -1,5 +1,16 @@
 # Endgame Chess Playground
 
+## KRK16 playable experimental Maths mode — 30 October 2026
+
+The KRK Maths board now allows **Start game** from an exactly arranged legal King + Rook versus King position, playing as the lone king against the local **source-tagged constructive KRK attacker**. Choose the side to move before starting. When the rook's side is to move first, click **Play opponent's first move** to preserve the exact arranged board until explicitly released. Undo retains the actual continuation phase. Capturing the rook transitions to the already proved KK draw demonstration.
+
+**Experimental means experimental.** The upstream KRK **outcome** theorem is complete, and this opponent's individual actions come from translated constructive source rules, but the precise JavaScript all-defender, complete-game selector has **not** been formally certified. A missing source phase stops play with a visible explanation; the Maths mode never substitutes Stockfish, a tablebase or an arbitrary legal move. FIDE 50/75-move and repetition-history parity is not a beta release requirement and remains **uncertified**. Certified flags `KRK_GAMEPLAY_RELEASED=false` and `MATERIAL.krk.playable=false` remain locked. The separate Engine Playground is unchanged.
+
+KQK **outcome** is independently frozen upstream as `EC-T0050` (29 October 2026) and is the next playable-beta engineering priority. KPK is still incomplete upstream, not yet released or advertised as solved here.
+
+See [KRK beta work](docs/KRK16_PLAYABLE_BETA.md) and [next session](NEXT_SESSION.md).
+
+
 ## KRK02 continued verified extraction — 29 October 2026
 
 The current draft [KRK02 execution continuation](docs/KRK02_EXECUTION_CONTINUATION.md) includes two-sided protected rook cuts, guarded king entries, column centring, and a concrete two-file opposition check/king-up phase. The proof-sourced extraction compiled in [upstream Lean CI #40886544904](https://github.com/jfairfaxball-348/engame-chess/actions/runs/40886544904). The non-released Playground translation passed [102 tests and browser CI #40886756069](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/40886756069). **The class-wide executable selector and carried WDL50/97/98-ply budget are still missing: Maths KRK Start remains disabled.** All work is on the separate [draft PR #4](https://github.com/jfairfaxball-348/engame-chess-playground/pull/4) and parent [draft PR #3](https://github.com/jfairfaxball-348/engame-chess/pull/3), not released production.
