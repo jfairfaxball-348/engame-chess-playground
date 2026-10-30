@@ -1,83 +1,78 @@
-# S025 — close remaining KRK/KQK adversarial continuation gates
+# S026 — source-driven KRK/KQK continuation closure, not endless audits
 
-**Execution session following S024.** Binding owner order is unchanged:
-(1) complete genuinely playable source-derived KRK **and** KQK strategies
-against lawful adversarial defender replies in temporary simplified mode;
-(2) **immediately afterward** upgrade both to the mathematics/proof
-working and FIDE rule/clock/history parity of KK/KBK/KNK. Do not expand
-to KPK or engine research in lieu of this. Preserve the three existing
-rich draw-class theorem panels and all working gameplay.
+**Execution after S025.** Binding order from AGENTS.md: finish BOTH
+KRK/KQK genuinely winning simplified/play-first source-derived move
+policies from every legal setup against every legal weak reply.
+Only then **immediately** restore dynamic, position-specific maths
+equations and full theorem working, clock/repetition/terminal parity
+for BOTH classes. Preserve KK/KBK/KNK rich panels. No KPK or
+engine distraction. Do not conflate audit cost caps with controller
+failures or mark experimental controllers certified.
 
-## Exact handoff and immutable source
+## Frozen handoff
 
-- S024 playground PR **#33**; document:
-  `docs/KQK24_CORNER_AND_RANK_FIVE.md`. Verify it is merged and
-  inspect the **exact final-head** CI run, not an earlier run.
-- Frozen upstream KQK EC-T0050 SHA
-  `c72365a8ba46f59114a2a77d9d38993f6a52df80`
-  (read-only).
-- S024 translates `SetupCorners.corner_knight_low_five_rescue`:
-  rank-five Q(6,5), weak K(7,7) -> Q(5,5), or Q(7,5)
-  if K(5,5) blocks. The blocked continuation after K(6,7)
-  is Q(6,6) mate.
-- S024 fixes `KnightPrison.knight_prison_low_five_bound`:
-  rank-five strong K -> K(kx,4), then one-reply tagged knight-prison
-  continuation; the low-rank `RankFive.left_corner_bound` and
-  `left_fork_weak_bound` JS branches now check sk.rank <= 4.
-  `test/kqk24-corner-low-five.test.js` checks both colours,
-  eight frames and actual defender replies.
-- Reference S023 expanded CI 41057464801: KQK **81/112** bounded
-  mate-closed, **31 capped**, **0 hard failures**, strongest cap
-  families `FarFilePreparation` 7/8, `WeakToMove` 6/8,
-  `SameRankEntry` 5/8, `EntryGeometry` 4/8.
-  KRK **24/24 capped**, 0 hard failures, 54,948 structural
-  revisits (all distinct incoming histories). Compare S024 numbers
-  from its **own** CI, not these S023 numbers.
+- S024 PR #33 merged as main commit
+  `1035b2c065139c43616fb9c9a689de97f927a93e`,
+  exact main CI `41092116183` green.
+- S025 PR #34, `docs/KQK25_ADVERSARIAL_GATE.md`:
+  fixed-seed exact S024 baseline KQK **88/120** finite mate-closed,
+  **32 capped**, **0 falsified**. Most capped root families:
+  FarFilePreparation 7/8, WeakToMove 6/8, SameRankEntry 5/8,
+  EntryGeometry 4/8, BandEntry 4/8. KRK **24/24 capped**,
+  0 failures, 54,948 structural revisits with different histories.
+  Inspect **S025 exact final-head CI** before quoting results
+  under the new monotone diagnostic. These two samples are NOT
+  mathematical all-root certificates.
+- KQK frozen EC-T0050 upstream source SHA
+  `c72365a8ba46f59114a2a77d9d38993f6a52df80` read-only.
+- `scripts/kqk21-adversarial.mjs` now reports each first cap's
+  exact board/turn/source token and `crossDepthClosedReuses`.
+  `--cache=exact` provides comparison against old depth-specific
+  closure; `--cache=monotone` is clock-free diagnostic acceleration,
+  NOT a proof of selector correctness or FIDE parity.
+- `test/kqk25-audit-replay.test.js` replays actual first-cap
+  paths and verifies the last position/token. Prefer that
+  reproducible starting point over untargeted trial-and-error.
 
 ## Execute
 
-1. Re-run exact enhanced bounded audits from main:
-   `node scripts/krk15-stratified-mate-audit.mjs --nodes=2500
-   --plies=160 --examples=6` and
-   `npm run audit:kqk-adversarial -- --attempts=12000
-   --per-family=4 --nodes=2500 --rounds=64`. Record same-seed
-   per-family mate-closed / falsified / capped, total branches,
-   first cap trajectory and actual late board+token.
-2. Prioritise **FarFilePreparation**, **WeakToMove**, and
-   **SameRankEntry** after the rank-five repair; use the literal
-   `firstCap.path` and `test/kqk23-cap-replay.test.js` pattern
-   to reproduce deep late-phase continuations. Inspect the exact
-   premises and actual chosen moves in frozen `Rules/KQK/
-   {FarFileEntry,SameRankEntry,OrientedEntry,TightEntry,
-   KnightPrison,SetupCorners}.lean`. New steps must come from
-   source-defined coordinates with all actual weak replies covered.
-   Add 2-colour/eight-frame regressions and negative-premise tests.
-3. For KRK, the distinct-history revisit explosion is a
-   **test cost**, not automatically a controller fault. Explore
-   safe diagnostic simplifications or history-complete
-   coinductive/measure checks without silently reusing a win
-   across different clocks/history/token. Locate first actual
-   missing source continuation, if any; test exact nested token
-   and all defender continuations. Do not conflate bounded
-   evidence with universal mate proof.
-4. Check arranged setup preservation, strong/weak turn, colours,
-   8 KQK and 4 KRK frames, legal defender replies, piece-capture
-   to KK, mate/stalemate, Undo/Restart, existing KK/KBK/KNK
-   full mathematical calculations, and isolated Engines tab.
-   Run Node tests, source locks, audits, syntax, build, Chromium
-   UI QA, exact GitHub CI and deploy verification.
-5. Only when both simplified strategies really finish all
-   legal branches, **immediately** start Stage B: dynamic,
-   position-specific KRK/KQK equations and derivation steps,
-   theorem provenance, correct terminal semantics, complete
-   50/75-move and repetition history, verified controller
-   extraction. Otherwise keep flags **experimental/
-   uncertified**, give precise remaining failures or caps,
-   and install S026 to close the measured gaps.
-6. Commit playground-only code, PR, inspect exact head, merge,
-   fast-forward/verify main and independently check production.
+1. Verify S025 merged/main and all final-head checks. Run the same
+   expanded KQK audit in both `--cache=exact` and
+   `--cache=monotone`, compare same-cohort root verdicts and family
+   metrics. Run KRK stratified 24-root 2500-node audit. Record
+   counters and `firstCap.at` state for target family.
+2. **Prioritise real continuation code**, not more audit infrastructure.
+   For KQK pick the first *repeatably* inconclusive far-file /
+   weak-to-move / same-rank root. Replay the real late state/token,
+   identify a missing or over-generalised premise if and only if
+   observed, then translate the literal frozen source continuation
+   from `Rules/KQK/{FarFileEntry,SameRankEntry,OrientedEntry,
+   EntryFrames,TightEntry,BandEntry,BandProgress}.lean`. Examine
+   each actual legal weak reply, negative premises, both colours
+   and all eight frames. Do not invent arbitrary move ranking,
+   tablebase/minimax/engine fallback or a theorem not in the source.
+   If the branch is only resource-capped with all source moves
+   present, say so: cost alone does not justify altering the policy.
+3. For KRK inspect the exact nested source continuation on the
+   first capped 2500-node path, and seek a **sound** all-defender
+   closure argument or measurable phase ranking without treating
+   clock/history-distinct states as FIDE equivalent. Source-derived
+   actions only. Use all four frames and both colours as supported.
+4. Run Node tests, source locks, syntax, build, Chromium browser QA
+   for legal setup, turn selection, arranged-position fidelity,
+   legal defender replies, captures-to-KK, checkmate/stalemate,
+   Undo/Restart, and the three existing deep Maths proof panels.
+   Keep Engines independent.
+5. If both controllers genuinely finish *all legal branches*,
+   begin Stage B **in this same session** with board-specific proof
+   working/Lean provenance and actual clock/history rules (only
+   claim certification if independently demonstrated). Otherwise
+   keep `experimental/uncertified`, record concrete unresolved
+   cases and install S027 for targeted closure.
+6. Commit playground-only changes, PR, exact-head CI, merge,
+   verify main fast-forward and production Cloudflare deployment
+   independently. Do not edit `engame-chess`.
 
-Do not edit `engame-chess` upstream. No Stockfish, Lozza,
-Syzygy, minimax, search atlas, arbitrary first-legal fallbacks
-or hand-ranked pseudostrategies in Maths. Retain all existing
-KK/KBK/KNK source links and live proof working.
+Owner's priority is a working Maths playground, with strict FIDE
+50/75-move bookkeeping deliberately deferred until BOTH simplified
+KRK and KQK policies are complete.
