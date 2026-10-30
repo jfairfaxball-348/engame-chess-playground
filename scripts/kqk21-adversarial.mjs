@@ -28,6 +28,15 @@ const attempts=positiveArg('attempts',4000);
 const perFamily=positiveArg('per-family',2,10);
 const maxNodes=positiveArg('nodes',1200);
 const maxRounds=positiveArg('rounds',48);
+// This is an audit-only optimisation, not a gameplay move selector.
+// A subtree closed within a SHORTER remaining budget stays closed with
+// MORE remaining rounds, provided the exact board/turn/source token match.
+// The live KQK controller is board/token-based and this diagnostic ignores
+// FIDE clock/history; an active cycle is always checked before cache reuse.
+const cacheArg=process.argv.find(arg=>arg.startsWith('--cache='));
+const cacheMode=cacheArg?cacheArg.slice('--cache='.length):'monotone';
+if(!['exact','monotone'].includes(cacheMode))
+  throw Error('Invalid --cache (exact|monotone)');
 let seed=0x21c72365;
 function random() {seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return seed>>>0;}
 function fresh(strong,turn) {
@@ -40,6 +49,21 @@ function fresh(strong,turn) {
 const terminalKinds=['mate','opponent-mate','stalemate','queen-captured-draw',
   'unsupported','cycle','round-cap','node-cap','other-terminal'];
 function terminal(kind,path) {return {kind,path};}
+// Include the ACTUAL board and source continuation token at the first cap,
+// so deep source-geometry analysis does not have to infer a state from labels.
+function capWitness(kind,path,state,strong,token) {
+  return {...terminal(kind,path),at:{
+    strong,turn:state.turn,material:state.material,
+    king:state.board.indexOf(strong+'K'),
+    queen:state.board.indexOf(strong+'Q'),
+    weak:state.board.indexOf(opposite(strong)+'K'),
+    positionKey:positionKey(state.board,state.turn),
+    moveCount:state.log.length,
+    token:token?{kind:token.kind,frame:token.frame,
+      queen:token.queen,king:token.king,weak:token.weak,
+      moveCount:token.moveCount}:null
+  }};
+}
 function shape(state,strong,token) {
   return positionKey(state.board,state.turn)+'|'+strong+'|'+
     (token?token.kind+':'+token.frame+':'+token.queen+':'+token.king+':'+token.weak:'none');
@@ -52,12 +76,16 @@ function visit(root,strong) {
   // Include the depth budget in this key: finishing the same board with
   // fewer available rounds is NOT automatically a valid bounded result.
   const closed=new Set();
-  let closedReuses=0;
+  // A successful depth-specific subtree is always sound for the same
+  // position with greater remaining depth (smaller incoming round).
+  // Keep the original exact-depth set for audit reproducibility.
+  const greatestClosedRound=new Map();
+  let closedReuses=0,crossDepthClosedReuses=0;
   const phases={};
   function walk(state,token,rounds,active,path) {
     if(rounds>=maxRounds) {
       tally['round-cap']++;
-      if(!firstCap)firstCap=terminal('round-cap',path);
+      if(!firstCap)firstCap=capWitness('round-cap',path,state,strong,token);
       return false;
     }
     const key=shape(state,strong,token);
@@ -69,13 +97,17 @@ function visit(root,strong) {
       return false;
     }
     const closedKey=key+'|rounds='+rounds;
-    if(closed.has(closedKey)) {
+    const priorRound=greatestClosedRound.get(key);
+    if(closed.has(closedKey) ||
+        (cacheMode==='monotone' && priorRound!==undefined &&
+         rounds<=priorRound)) {
       closedReuses++;
+      if(!closed.has(closedKey))crossDepthClosedReuses++;
       return true;
     }
     if(visited>=maxNodes) {
       tally['node-cap']++;
-      if(!firstCap)firstCap=terminal('node-cap',path);
+      if(!firstCap)firstCap=capWitness('node-cap',path,state,strong,token);
       return false;
     }
     visited++;
@@ -124,7 +156,11 @@ function visit(root,strong) {
       }
     }
     active.delete(key);
-    if(allWin)closed.add(closedKey);
+    if(allWin) {
+      closed.add(closedKey);
+      greatestClosedRound.set(key,Math.max(rounds,
+        greatestClosedRound.get(key)??-1));
+    }
     return allWin;
   }
   const guaranteed=walk(root,null,0,new Set(),[]);
@@ -134,6 +170,7 @@ function visit(root,strong) {
   return {classification:hardFailure?'falsified':capped?'inconclusive':guaranteed?'all-replies-mate':'inconclusive',
     nodes:visited,defenderReplies,sourceChoices,
     fullyClosedSubtrees:closed.size,closedSubtreesReused:closedReuses,
+    crossDepthClosedReuses,
     tally,firstFailure,firstCap,phases};
 }
 
@@ -166,6 +203,7 @@ for(let i=0;i<attempts;i++) {
 }
 const overall={diagnosticOnly:true,clockHistoryCertified:false,sourceSha:'c72365a8ba46f59114a2a77d9d38993f6a52df80',
   seed:'0x21c72365',attempts,perFamily,maxNodes,maxRounds,
+  cacheMode,
   legalCandidates,roots:samples.length,
   allRepliesMate:samples.filter(s=>s.classification==='all-replies-mate').length,
   falsified:samples.filter(s=>s.classification==='falsified').length,
@@ -174,6 +212,7 @@ const overall={diagnosticOnly:true,clockHistoryCertified:false,sourceSha:'c72365
   legalDefenderRepliesVisited:samples.reduce((n,s)=>n+s.defenderReplies,0),
   fullyClosedSubtrees:samples.reduce((n,s)=>n+s.fullyClosedSubtrees,0),
   closedSubtreesReused:samples.reduce((n,s)=>n+s.closedSubtreesReused,0),
+  crossDepthClosedReuses:samples.reduce((n,s)=>n+s.crossDepthClosedReuses,0),
   families,
   firstCounterexamples:samples.filter(s=>s.classification==='falsified').slice(0,12).map(
     ({strong,turn,family,king,queen,weak,firstFailure})=>
