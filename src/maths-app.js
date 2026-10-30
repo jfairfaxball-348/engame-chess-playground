@@ -1,6 +1,6 @@
 /** The Maths tab is completely separate from the Engine Playground. */
 import {MATERIAL,legalMoves,newGame,outcome,opposite,inCheck,squareName} from './chess.js';
-import {chooseMathsOpponent,mathsPlayMove,KRK_EXPERIMENTAL_DESCRIPTION} from './maths-play-policy.js';
+import {chooseMathsOpponent,mathsPlayMove,KRK_EXPERIMENTAL_DESCRIPTION,KQK_EXPERIMENTAL_DESCRIPTION} from './maths-play-policy.js';
 import {pieceSVG,pieceLabel} from './pieces.js';
 import {squareForCell,squareAtPoint} from './board-ui.js';
 import {INVENTORY,blankBoard,available,put,relocate,setupVerdict} from './maths-model.js';
@@ -35,7 +35,7 @@ function launch(){
  if(!v.canStart)return;
  cancel();human=v.human;
  // Keep the original board orientation and ALL placed squares at the game start.
- try{game=newGame(board,turn,v.material,{experimentalKRK:v.experimental===true});}catch(e){notice=e.message;render();return;}
+ try{game=newGame(board,turn,v.material,{experimentalKRK:v.experimental===true&&v.material==='krk',experimentalKQK:v.experimental===true&&v.material==='kqk'});}catch(e){notice=e.message;render();return;}
  phase='playing';selected=-1;picked=null;last=null;history=[];policyToken=null;notice='';
  openingPending=game.turn!==human&&outcome(game.board,game.turn,game.history,game.halfmove).kind==='ongoing';
  render();
@@ -46,7 +46,7 @@ function humanMove(from,to){
  if(phase!=='playing'||busy||game.turn!==human||!ongoing())return false;
  const m=legalMoves(game.board,human).find(m=>m.from===from&&m.to===to);
  if(!m)return false;
- history.push(save());game=mathsPlayMove(game,m);if(game.material!=='krk')policyToken=null;
+ history.push(save());game=mathsPlayMove(game,m);if(game.material!=='krk'&&game.material!=='kqk')policyToken=null;
  last={from,to};selected=-1;notice='';render();opponent();return true;
 }
 function playOpeningMove(){
@@ -64,7 +64,7 @@ function opponent(){
    policyToken=decision.continuationToken??null;
    notice='';
   }else{
-   notice=game.material==='krk'? 'Experimental KRK cannot continue from this position using the current proof-derived controller. Undo or choose New position. No substitute engine move was played.': 'No legal opponent decision.';
+   notice=['krk','kqk'].includes(game.material)? 'Experimental '+game.material.toUpperCase()+' cannot continue from this position using the current source-derived controller. Undo or choose New position. No substitute engine move was played.': 'No legal opponent decision.';
   }
   selected=-1;render();
  },260);
@@ -195,7 +195,7 @@ function render(){
   '<div class="maths-notice" role="status">'+(notice||(!playing&&v.kind==='invalid'?v.reason:''))+'</div></div>'+
   '<aside class="maths-side maths-black">'+rack('b')+'</aside>'+
   '<section class="maths-verdict" aria-live="polite"><div class="maths-outcome">'+title+'</div>'+drawProof+
-  (playing&&game.material==='krk'||!playing&&v.experimental?'<div class="maths-policy">'+escapeText(KRK_EXPERIMENTAL_DESCRIPTION)+'</div>':'')+
+  ((playing&&['krk','kqk'].includes(game.material)||!playing&&v.experimental)?'<div class="maths-policy">'+escapeText((playing?game.material:v.material)==='kqk'?KQK_EXPERIMENTAL_DESCRIPTION:KRK_EXPERIMENTAL_DESCRIPTION)+'</div>':'')+
   '</section></div></section>';
  root.querySelector('#maths-turn-w')?.addEventListener('click',()=>{turn='w';notice='';render();});
  root.querySelector('#maths-turn-b')?.addEventListener('click',()=>{turn='b';notice='';render();});
