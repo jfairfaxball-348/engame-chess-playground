@@ -69,10 +69,35 @@ The most persistently capped families in that baseline were:
 errors. The new narrow horizontal phase is an additional covered
 witness, not a claimed fix for the baseline 18 caps.
 
-An additional expanded CI tier now runs KRK 24 roots at 2,500
-nodes each, and KQK seed 12,000 attempts / 4 per source-colour
-family / 2,500 nodes / 64 rounds. Treat its real exact-head
-numbers (not estimated results) as the successor session's input.
+Expanded-tier CI run **41057464801** (green; on S023 branch
+before its final replay/handoff documentation) ran KRK 24 roots at
+2,500 nodes each and KQK 12,000 attempts / 4 per source-colour
+family / 2,500 nodes / 64 rounds. Results:
+
+| Expanded diagnostic | Observed |
+|---|---:|
+| KQK sampled roots | 112 |
+| KQK all-replies-mate roots (bounded) | 81 |
+| KQK hard failures | 0 |
+| KQK capped / inconclusive roots | 31 |
+| KQK visited nodes | 97,007 |
+| KQK closed-subtree reuses | 48,372 |
+| KRK all-defender roots | 24 |
+| KRK capped / genuine failures | 24 / 0 |
+| KRK visited nodes | 60,024 |
+| KRK structural revisits | 54,948 |
+| KRK distinct-history revisits | 54,948 |
+| KRK mating leaves observed | 24,544 |
+
+Most KQK caps by root family (eight samples each):
+`FarFilePreparation` 7, `WeakToMove` 6,
+`SameRankEntry` 5, `EntryGeometry` 4, `BandEntry` 3;
+`BandProgress`, `BandRaise`, `TightEntry` each 2.
+There are **no** sampled proven hard failures here, but the 31 caps
+are not wins. Increasing KRK nodes from 1,000 to 2,500 per root still
+closed none of the 24 full defence trees, despite many mating leaves;
+this is a demonstrated testing-size/duplicate-history obstacle, not
+a demonstrated proof of termination.
 
 ## Remaining
 
