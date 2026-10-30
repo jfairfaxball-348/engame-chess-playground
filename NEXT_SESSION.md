@@ -1,71 +1,77 @@
-# S023 — close remaining KRK/KQK adversarial strategy gaps (Stage A)
+# S024 — resolve real KRK/KQK late-game strategy gaps
 
-**Next execution session after S022.** Binding sequence: finish the
-**source-derived checkmating strategies** for *both* KRK and KQK
-in temporary simplified-mode gameplay, THEN immediately return to
-the **full mathematical derivation, proof-panel and FIDE history/clock
-parity** for those same classes. Do not divert to KPK or engine research,
-and never regress the already-complete KK/KBK/KNK worked Maths.
+**Execution session after S023.** Binding owner order:
+complete *both* KRK and KQK adversarial, source-derived
+simplified playable controllers first; then **immediately** restore
+full board-specific mathematical proof working and FIDE history /
+clock / rule parity for both. The existing KK/KBK/KNK Maths
+theorem panels are already complete and must stay intact.
+KPK and Engine experimentation do not displace this work.
 
-## S022 source and test handoff
+## Exact source handoff
 
-- S022 PR #31 added `KQK.OrientedEntry.high_file_corner_entry`
-  exact Q(7,5)# from frozen parent EC-T0050
-  `c72365a8ba46f59114a2a77d9d38993f6a52df80`, with
-  legal setup/colour/eight-symmetry mate regression.
-- KQK all-defender audit now memoizes ONLY fully closed, depth-matched
-  all-mate subtrees, checks structural cycles first and keeps caps
-  explicitly inconclusive. Run `npm run audit:kqk-adversarial`.
-- Initial S022 green PR-head CI run 41052834416 (before corner addition),
-  same 55 sampled roots as S021, closed 37 vs previous 26,
-  falsified 0, capped 18. 13,146 reuses of fully closed subtrees.
-  **Recheck final-head metrics**; never interpret 18 caps as wins.
-- S022 added CI KRK source-stratified all-defender audit
-  `node scripts/krk15-stratified-mate-audit.mjs --nodes=1000 --plies=160 --examples=6`.
-  Initial run: 24/24 capped, 0 genuine failures,
-  0 root family mismatches, 9,724 mating leaves.
-  Existing KRK one-root 40k-node test also caps.
-- Complete S022 notes in `docs/KQK22_CLOSURE_AND_CORNER.md`.
-  KRK/KQK certified-selector flags remain false.
-  The remaining proof-related ambiguity must remain visible.
+- Playground S023: PR #32; detailed record:
+  `docs/KQK23_FAR_WALL_AND_KRK_DIAGNOSTICS.md`.
+- Frozen KQK EC-T0050 source SHA:
+  `c72365a8ba46f59114a2a77d9d38993f6a52df80`.
+  S023 added the exact narrow `OrientedEntry.horizontal_far_wall_entry`
+  Q(6,qy) construction. Do not rewrite as an unsourced heuristic.
+- Initial S023 head: Node/source/build/Chromium green on
+  CI run 41057127613; unchanged-seed KQK 37/55 all-defender
+  mate-closed, 18 capped, 0 confirmed hard failures;
+  KRK 24/24 1,000-node capped, 0 genuine failures.
+- KRK diagnostic: 20,010 structural revisits in the stratified
+  24-root sample, **all with distinct incoming histories**.
+  A naive board+token closure cache would not be legitimate
+  FIDE-parity evidence. Larger KRK/KQK budget tier now in CI;
+  READ ITS EXACT OUTPUT, distinguish resource caps from failures.
 
-## Execute S023 (do not stop at research)
+## Execute, don't stop at a diagnosis
 
-1. Inspect latest merged `main`, PR head and exact CI JSON.
-   Run KQK `--attempts=12000 --per-family=4 --nodes=2500 --rounds=64`
-   where CI resources allow. Record family-level all-mate,
-   hard failures, capped roots separately. Use each new
-   `firstCap.path` to replay a representative late-stage
-   state, not merely the first attacker action.
-2. Add targeted regression(s) for an actual missing or cyclic
-   continuation, both colours and every applicable board symmetry.
-   Match the *exact* cited frozen Lean theorem and hypotheses
-   before adding a source-tagged move. Consider
-   `FarFileEntry.far_file_stage_bound` and
-   `OrientedEntry.horizontal_far_wall_entry`
-   (especially high-file/low-margin exceptions).
-   No unsourced fallback.
-3. Improve KRK all-defender termination analysis without hiding
-   cycles under clock/history, and make capped leaves transparent.
-   Distinguish combinatorial reconvergence from genuine strategy
-   incompleteness. Keep the complete state/token when checking
-   cycles; do not reuse different FIDE histories as equivalent.
-4. Test both from **exact user-arranged legal placements**,
-   strong/weak turn, both colours, all frames, every lawful
-   weak reply, mate/draw/capture/undo/restart, Maths proof
-   regression and Engines isolation.
-5. If BOTH are truly complete for the temporary simplified
-   chess-rule scope, immediately install Stage B:
-   position-specific KQK/KRK math equations and derivation steps,
-   live theorem provenance, correct repetition/50/75 move and
-   terminal semantics, and complete certified selector work
-   genuinely supported upstream. Do not invent Lean proofs.
-   Otherwise install S024 with precise measured remaining gaps.
-6. Run Node, syntax, source lock, build, broad KQK/KRK audit,
-   Chromium Maths + Engines QA, exact-head CI. Commit, PR, merge,
-   verify main and any deployed production site separately.
+1. Verify merged `main`, exact latest PR/main CI and the **expanded**
+   CI tier: `node scripts/krk15-stratified-mate-audit.mjs
+   --nodes=2500 --plies=160 --examples=6`;
+   `npm run audit:kqk-adversarial --
+   --attempts=12000 --per-family=4 --nodes=2500 --rounds=64`.
+   Record closed/falsified/capped separately for every source family;
+   do not silently upgrade caps to wins.
+2. Triage KQK **FarFilePreparation**, **SameRankEntry**,
+   **WeakToMove** first, since the S023 baseline had 0/4,
+   0/4 and 1/4 closed respectively (with caps, not failures).
+   Use `firstCap.path`, and the exact adversarial replay in
+   `test/kqk23-cap-replay.test.js`, to inspect late-phase
+   board+token, not just a root first move. Locate the matching
+   named source lemma in frozen
+   `Rules/KQK/{FarFileEntry,SameRankEntry,OrientedEntry,TightEntry}.lean`.
+   Translate only a move with literal verified premises and
+   all-reply continuation, add both colours/all applicable frames
+   and legal-player-root regressions. No unsourced fallback.
+3. For KRK, use new per-root `structuralRevisits`,
+   `distinctHistoryRevisits`, defender branching and first
+   cap path to distinguish repeated-work blowup from missing
+   source continuation. Do NOT memoize a win across different
+   histories/clocks without a justified history-equivalence proof.
+   Re-run strict actual source selection against *every*
+   tested defender move, retaining complete nested token.
+4. Test exact editor setup placement, strong/weak turn,
+   both colours, eight KQK/four KRK frames, lawful weak
+   replies, queen/rook capture-to-KK, checkmate, stalemate,
+   undo/restart, all existing KK/KBK/KNK proof calculations
+   and Engines-tab isolation. Run Node, syntax, source locks,
+   build and Chromium QA; check exact head CI.
+5. **Only if both** simplified strategies are genuinely
+   complete against adversarial defender replies, switch
+   immediately to Stage B: position-specific KRK/KQK maths
+   equations, step-by-step theorem provenance, complete
+   50/75-move and repetition history, actual terminal
+   semantics, and genuinely certified selector extraction.
+   If not, clearly mark unresolved cases and install S025
+   targeting the measured blockers.
+6. Commit playground-only changes, open PR, inspect exact
+   commit CI, merge and verify `main` and production
+   independently. Update this handoff with measured evidence.
 
-**Strict limits:** Maths runtime uses named frozen constructive source
-rules only. No Stockfish/Lozza, tablebases, minimax, arbitrary move,
-first-legal fallback or false certification. Caps remain inconclusive.
-Do not delete or simplify KK/KBK/KNK mathematical working.
+Never change the parent research repo. Maths must not use
+Stockfish, Lozza, Syzygy, minimax, hand-selected best moves,
+or arbitrary first-legal fallbacks. Keep both JS selectors
+explicitly **experimental and uncertified** until proved.
