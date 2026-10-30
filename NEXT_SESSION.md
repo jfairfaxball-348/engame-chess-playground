@@ -1,60 +1,67 @@
-# S020 — Complete source-derived KQK entry and full-game adversarial coverage
+# S021 — KQK whole-game source continuation closure and honest release audit
 
-**Next execution session, installed following S019.**
+**Next execution session, installed after S020.**
 
-## Binding direction
+## Binding purpose
 
-Chess Maths Playground demonstrates the *separate engame-chess Lean
-project's constructed strategies* as a playable opponent. Do not invent
-new mathematics in the Playground, call Stockfish/Lozza/tablebases/minimax,
-add arbitrary first-legal moves, or use a move atlas as a substitute.
-The 50/75-move full history parity is deliberately deferred.
+Deliver a substantially more playable **Maths** KQK opponent from exact
+user-arranged legal positions by translating the existing frozen
+`jfairfaxball-348/engame-chess` theorem (EC-T0050 v1,
+SHA `c72365a8ba46f59114a2a77d9d38993f6a52df80`), not by
+inventing a new policy. KRK remains experimental. **Never remove the
+full board-specific KK, KBK, KNK mathematical equations, workings,
+proof steps and Lean links in setup or play.** Preserve independent
+Engines tab. Do not start KPK until KQK is substantially usable.
 
-**Permanent regression constraint:** KK, KBK, KNK retain their original
-board-dependent mathematical proof panels, equations, working and Lean
-links in setup and play. KRK/KQK may remain compact, play-first, and
-explicitly experimental. Do not modify the independent Engines tab.
+Owner deliberately defers strict 50/75-move and history parity. Do not
+let clock/history questions dominate this session. Be transparent that
+the KQK and KRK JavaScript selectors are not Lean-certified or global.
 
-## Incoming S019
+## Baseline from S020
 
-- S018 edge/shadow KQK working, two colours, user-chosen exact start, Undo,
-  captured-queen-to-KK and original mathematical proof restoration are
-  preserved.
-- `src/kqk-source-policy.js` now supports extra separating-rank king
-  preparation, prepared king/file progression, guarded cross/rise,
-  rank-five corner repair and knight-box cases from source SHA
-  `c72365a8ba46f59114a2a77d9d38993f6a52df80`.
-- Source proof references: BandEntry, BandProgress, BandForce, BandRaise,
-  RankFive, KnightPrison, EntryFrames, StrongEntry.
-- Crucial pitfall: `BandRaise.prepared_raise_bound` has a special
-  queen-to-(5,5) corner branch when its queen is on rank four and the
-  weak king at file seven. Never generalise the ordinary queen rise to
-  that case; that led to a reproducible stalemate.
-- Tests: `test/kqk19-band-source.test.js`; details:
-  `docs/KQK19_BAND_EXTENSION.md`. The certified flag stays false.
+- S019 source-tagged EdgeForce, ShadowForce, BandEntry/BandProgress,
+  BandRaise, RankFive and KnightPrison remain.
+- S020 adds source-conditional SameRankEntry positive/backrank, escaped
+  FarFilePreparation (file 0/1), direct EntryGeometry and OrientedEntry
+  first walls, and TightEntry king-approach with bound `tight-file`
+  protected-queen continuation.
+- `test/kqk20-entry-source.test.js` exercises both colours, frame
+  invariance, legal source steps and immediate replies.
+- `npm run audit:kqk-roots` (fixed seed, bounded) reports **separately**
+  sampled legal root selection, immediate defender continuation and
+  full first-reply game completion. It is an audit, never a live policy.
+  See `docs/KQK20_ENTRY_AND_AUDIT.md` for exact scope and gaps.
 
-## Execution mission
+## Execute
 
-1. Verify exact current `main` / S019 CI and the *actual* production
-   Cloudflare deployment independently; do not infer deployment from Git.
-2. Quantify supported legal fresh KQK roots and complete defender-branch
-   games under a reproducible, bounded, **diagnostic-only** corpus. Keep
-   availability, legal-move correctness and game termination separate.
-3. Implement the next missing *explicit, source-constructed* KQK phases,
-   prioritising `SameRankEntry`, `FarFilePreparation`,
-   `OrientedEntry` and `TightEntry`. Follow exact Lean premises and
-   defender reply cases, including diagonal/check and stalemate exclusions.
-   Build source-tagged continuations with tokens when needed.
-4. Test both colours, eight symmetries, adversarial all-reply children
-   and complete lines ending in actual checkmate. Fix failures instead
-   of softening release flags or deleting counterexamples.
-5. Run `npm test`, `npm run check`, `npm run build`,
-   `npm run verify:krk-sources`, and both Chromium suites. Commit and
-   PR/fast-forward merge only after exact-head CI success.
-6. Preserve `wrangler.jsonc` and the Engines tab unchanged. Do not
-   start KPK until the Playground's KQK is substantially playable.
+1. Confirm latest `main` / CI and determine the actual production
+   Cloudflare Workers URL from reliable deployment evidence. Vercel
+   daily rate limiting is not a code failure; do not manufacture a URL.
+2. Run the reproducible S020 KQK coverage audit, recording counts and
+   examples by source family. **Measure end-to-end checkmate and
+   defender branch coverage**, not only first-move availability.
+3. Falsify source-continuation completeness with bounded,
+   root-stratified, **all legal weak-reply** game trees and strict
+   terminal-kind checks. Distinguish `unsupported`, `stalemate`,
+   `capture-to-KK`, `mate`, `cycle`, and cap.
+4. Implement actual missing `FarFileEntry` /
+   `OrientedEntry` / `SameRankEntry` /
+   `TightEntry` source cases and exact chained continuations,
+   respecting all proof premises, weak escape witnesses and corner
+   exceptions. Never substitute an unsourced move, scoring heuristic,
+   precomputed tablebase, minimax, imported engine, or "first legal" fallback
+   in the **live Maths opponent**.
+5. Test exact user placements, weak-to-move starts, captured-queen-to-KK,
+   all eight isometries, both colours, Undo and every immediate defender
+   reply, including checked weak kings and stalemate threats.
+6. Run `npm test`, `npm run check`, `npm run build`,
+   `npm run verify:krk-sources`, `npm run audit:kqk-roots`,
+   and both Chromium browser QA suites. Use exact-head CI,
+   commit to a branch, PR and **fast-forward merge** only on success.
+   Install the subsequent specific prompt with measured remaining gaps.
 
-**Primary metric:** greater fraction of **user-arranged legal KQK roots**
-that actually complete lawful checkmates versus every legal defender
-reply, rather than more documentation or JavaScript outcome assertions.
-Be explicit about any still-incomplete root families.
+**Success criterion:** a demonstrably greater fraction of legal,
+user-arranged fresh KQK roots can complete actual lawful checkmates
+across *all* defender replies. Report exact empirical denominator,
+depth/caps, and counterexamples. Never call this fully certified merely
+because tests pass.
