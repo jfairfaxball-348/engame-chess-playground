@@ -1,3 +1,13 @@
+# Current roadmap override — 30 October 2026 (S021)
+
+1. **KRK + KQK strategy closure, play-first simplified mode.** This stage is NOT done merely because an initial selector exists, 32 scripted KQK lines mate, or every immediate weak reply has a follow-up. Complete source-derived actual wins from supported legal roots against adversarial continuation without engine/heuristic/tablebase fallback. Instrument via `npm run audit:kqk-adversarial` and existing KRK full-game audits. Explicitly disclose any still-unsupported roots.
+2. **Immediately after BOTH KRK and KQK strategies are complete**, make those two material classes fully maths/rule aware — show actual board-specific proof working, equation, justified move steps and Lean provenance like the existing KK, KBK and KNK implementations, and restore formal chess clock/history/repetition/capture/terminal semantics. Do not misrepresent a Lean existential strategy theorem as a certified JS controller.
+3. Only thereafter contemplate KPK or elective engine work. Do not regress the existing KK/KBK/KNK proof panels.
+
+Historical earlier roadmap items below are archival; use this order and `AGENTS.md`/ `NEXT_SESSION.md` for current priorities. S021 diagnostic and audit scope: [KQK21 adversarial audit](KQK21_ADVERSARIAL_AUDIT.md).
+
+---
+
 # Chess Playground — engineering roadmap
 
 ## KRK02 continued constructive implementation
