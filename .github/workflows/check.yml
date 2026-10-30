@@ -29,6 +29,8 @@ jobs:
       - run: npm run audit:krk14-continuations -- --limit=2048
       # Bounded all-defender game tree on one source-wall root; no fallback.
       - run: npm run audit:krk14-mate-tree -- --nodes=40000
+      # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
+      - run: npm run audit:kqk-roots
       - run: npm run check
       - run: npm run build
       # Provider-independent Cloudflare Pages handoff: ensure the deployable
