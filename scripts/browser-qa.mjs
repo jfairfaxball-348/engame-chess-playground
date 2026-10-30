@@ -100,7 +100,24 @@ async function run(){
    assert.equal(await page.locator('#maths-start').isEnabled(),true);
    await drag(page,rack(page,'wR'),cell(page,0));
    assert.equal(await page.locator('.maths-outcome').innerText(),'Winning for White');
-   assert.equal(await page.locator('#maths-start').isDisabled(),true,'KRK policy remains gated');
+   assert.equal(await page.locator('#maths-start').isEnabled(),true,'Experimental KRK can start');
+   assert.match(await page.locator('.maths-policy').innerText(),/Experimental KRK/);
+   const krkPlaced=await page.locator('.maths-board').evaluate(el=>
+     [...el.querySelectorAll('.maths-cell')].map(c=>[c.dataset.sq,c.querySelector('.piece-icon')?.getAttribute('class')||null]));
+   await page.locator('#maths-start').click();
+   const krkStarted=await page.locator('.maths-board').evaluate(el=>
+     [...el.querySelectorAll('.maths-cell')].map(c=>[c.dataset.sq,c.querySelector('.piece-icon')?.getAttribute('class')||null]));
+   assert.deepEqual(krkStarted,krkPlaced,'Experimental KRK preserves exact user arrangement');
+   assert.match(await page.locator('.maths-turn').innerText(),/You play Black/);
+   assert.equal(await page.locator('#maths-first').isVisible(),true);
+   await page.locator('#maths-first').click();
+   await page.waitForFunction(()=>document.querySelector('.maths-turn')?.textContent.includes('Black to move'),
+     null,{timeout:5000});
+   assert.equal(await page.locator('.maths-notice').innerText(),'');
+   await page.locator('#maths-undo').click();
+   assert.equal(await page.locator('#maths-first').isVisible(),true,
+     'Undo restores initial KRK turn and source token');
+   await page.locator('#maths-edit').click();
    for(const p of ['wB','bB','wN','bN','bR'])assert.equal(await rack(page,p).isDisabled(),true,p+' dim once rook is set');
    await drag(page,cell(page,0),rack(page,'wR'));
    assert.equal(await rack(page,'wB').isEnabled(),true,'tray reactivates after removal');
