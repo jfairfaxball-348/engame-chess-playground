@@ -7,7 +7,7 @@ import {chooseMathsOpponent, mathsPlayMove} from '../src/maths-play-policy.js';
 
 // OrientedEntry.lean high_file_corner_entry: exact K(5,6), weak K(7,7),
 // Q(*,5) with the weak king not initially in check, followed by Q(7,5)#.
-// Test every lawful queen file, both strong colours and all eight
+// Test every legal queen file (file 5 would check the weak king already), both strong colours and all eight
 // source isometries. This checks an exact proof action, NOT a tablebase.
 const transforms=[
   ([x,y])=>[x,y],([x,y])=>[7-x,y],([x,y])=>[x,7-y],
@@ -18,7 +18,7 @@ const transforms=[
 test('S022 high-file corner source move is mate for both colours and eight frames',()=>{
   let checked=0;
   for(const strong of ['w','b'])for(const transform of transforms)
-    for(let queenFile=0;queenFile<=6;queenFile++){
+    for(const queenFile of [0,1,2,3,4,6]){
       const board=makeBoard(),at=point=>squareAt(...transform(point));
       board[at([5,6])]=strong+'K';
       board[at([queenFile,5])]=strong+'Q';
@@ -38,5 +38,5 @@ test('S022 high-file corner source move is mate for both colours and eight frame
       assert.equal(result.winner,strong);
       checked++;
     }
-  assert.equal(checked,112);
+  assert.equal(checked,96);
 });
