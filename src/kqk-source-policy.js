@@ -280,8 +280,90 @@ function knightSideReply(state,strong,token) {
     'KQK.KnightPrison.knight_prison_bound.top_reply');
 }
 
+
+/**
+ * S020: explicit strong-entry branches from frozen SameRankEntry,
+ * FarFilePreparation, OrientedEntry and TightEntry (EC-T0050).
+ *
+ * Each candidate retains the source's coordinate premises. A legal move
+ * alone does not license a branch; if its geometric premises fail, this
+ * partial policy deliberately refuses that branch. No move search.
+ */
+function protectedFileChoice(state,strong,frame,g) {
+  const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+  if(qx>1||qx===kx+1||wx<2||qy!==ky+1||qy<2||
+     wy>ky||ky>wy+1||Math.abs(kx-wx)<2)return null;
+  if(kx===5&&ky===1&&wx===7&&wy===0)
+    return targetMove(state,strong,g.queen,preimage(frame,7,2),
+      'KQK.TightEntry.protected_file_entry.corner_mate');
+  if(kx+2<=wx)
+    return targetMove(state,strong,g.queen,preimage(frame,kx+1,qy),
+      'KQK.TightEntry.protected_file_entry.forward_wall');
+  if(wx+2<=kx)
+    return targetMove(state,strong,g.queen,preimage(frame,kx-1,qy),
+      'KQK.TightEntry.protected_file_entry.backward_wall');
+  return null;
+}
+function tightFileReply(state,strong,token) {
+  const g=geometric(state,strong,token.frame);
+  return g?protectedFileChoice(state,strong,token.frame,g):null;
+}
+function entryChoice(state,strong,frame,g) {
+  const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+  const choose=(from,x,y,phase,kind=null)=>{
+    const move=targetMove(state,strong,from,preimage(frame,x,y),phase);
+    if(!move||!kind)return move;
+    const post={...state,board:state.board.slice(),log:state.log.concat('entry-step')};
+    post.board[move.move.to]=post.board[move.move.from];
+    post.board[move.move.from]=null;
+    return tagged(move,makeToken(post,strong,frame,kind));
+  };
+  // SameRankEntry.positive_right_entry: lower the king one rank to enter
+  // Wall, except for the separate closed (6,5) corner theorem.
+  if(qy===ky&&wy>=ky+2&&qx<wx&&ky>0 &&
+     (qy<=4||(qy===5&&qx<=5)))
+    return choose(g.sk,kx,ky-1,
+      'KQK.SameRankEntry.positive_right_entry.king_down');
+  // SameRankEntry.backrank_entry: when a clear file wall is already
+  // present, begin with the source's low-rank wall. The adjacent-king
+  // case is the protected_backrank_entry constructed queen step.
+  if(qy===0&&ky===0&&wy>=2&&qx!==wx &&
+     (Math.abs(qx-wx)>=2||Math.abs(kx-qx)===1))
+    return choose(g.queen,qx,1,
+      Math.abs(qx-wx)>=2
+        ? 'KQK.SameRankEntry.backrank_entry.clear_low_wall'
+        : 'KQK.SameRankEntry.protected_backrank_entry.queen_up');
+  // FarFilePreparation: choose file 0 or 1 from the explicit escape
+  // witness, rather than always picking zero (which can stalemate).
+  if(wy>=ky+2&&wx>=4&&qy!==ky&&qy!==wy&&qx>=2) {
+    const escapeX=wx===7?6:wx+1;
+    const f=escapeX===Math.abs(qy-wy)?1:0;
+    return choose(g.queen,f,qy,
+      'KQK.FarFilePreparation.far_file_preparation.escape_preserving');
+  }
+  // EntryGeometry.low_right_entry: raise a cleared queen to the rank
+  // directly above the king, then the existing Band controller applies.
+  if(wy>=ky+2&&ky<=4&&qx+2<=wx&&
+     (qx!==kx||ky<qy)&&qy!==ky+1)
+    return choose(g.queen,qx,ky+1,
+      'KQK.EntryGeometry.clear_low_wall_entry.queen_wall');
+  // OrientedEntry.small_file_wall_entry: the exceptional fifth-rank
+  // first action enters the already implemented EdgeWall family.
+  if(ky===5&&wy===7&&qx<=4&&qx+2<=wx&&
+     (qx!==kx||ky<qy)&&qy!==6)
+    return choose(g.queen,qx,6,
+      'KQK.OrientedEntry.small_file_wall_entry.edge_wall');
+  // TightEntry.tight_above_entry / tight_king_step: a one-rank king
+  // approach, followed by the source-mandated protected queen file.
+  if(qx<=1&&wx>=3&&qy===ky+2&&wy===ky+1&&
+     Math.abs(kx-wx)>=2&&qx!==kx+1)
+    return choose(g.sk,kx,wy,
+      'KQK.TightEntry.tight_king_step.king_approach','tight-file');
+  return null;
+}
+
 function validToken(state,strong,token) {
-  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side'].includes(token.kind)||
+  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','tight-file'].includes(token.kind)||
      !Object.hasOwn(FRAMES,token.frame)||token.strong!==strong||
      state.log.length!==token.moveCount+1)return false;
   const weak=findKing(state.board,opposite(strong));
@@ -299,6 +381,7 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='shadow-reply')return shadowReply(state,strong,token);
     if(token.kind==='shadow-bottom-reply')return bottomReply(state,strong,token);
     if(token.kind==='band-raise')return bandRaiseReply(state,strong,token);
+    if(token.kind==='tight-file')return tightFileReply(state,strong,token);
     return knightSideReply(state,strong,token);
   }
   // Frame priority is a deterministic choice of PROVEN symmetry, not a
@@ -327,6 +410,11 @@ export function kqkSourceChoice(state,strong,token=null) {
   for(const frame of KQK_FRAMES){
     const g=geometric(state,strong,frame);
     const choice=bandChoice(state,strong,frame,g);
+    if(choice)return {...choice,frame};
+  }
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    const choice=entryChoice(state,strong,frame,g);
     if(choice)return {...choice,frame};
   }
   return null;
