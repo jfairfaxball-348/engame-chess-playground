@@ -11,16 +11,21 @@
 import {play,opposite} from './chess.js';
 import {chooseDecision} from './engine.js';
 import {krkTaggedStrongChoice} from './krk-tagged-strategy.js';
+import {kqkSourceChoice} from './kqk-source-policy.js';
 
 export const KRK_EXPERIMENTAL_PLAYABLE=true;
+export const KQK_EXPERIMENTAL_PLAYABLE=true;
+export const KQK_EXPERIMENTAL_DESCRIPTION=
+  'Experimental KQK · frozen EC-T0050 outcome; partial source-derived edge/shadow move policy (some positions unavailable); full-game selector not certified';
 export const KRK_EXPERIMENTAL_DESCRIPTION=
   'Experimental KRK · source-derived opponent; complete-game proof and FIDE clock/history certification pending';
 
 /** Capture of the only rook yields the existing proved KK draw class. */
 export function mathsPlayMove(state,move){
   const next=play(state,move);
-  if(state.material==='krk'&&
-      !next.board.includes('wR')&&!next.board.includes('bR'))
+  if((state.material==='krk'||state.material==='kqk')&&
+      !next.board.includes(state.material==='krk'?'wR':'wQ')&&
+      !next.board.includes(state.material==='krk'?'bR':'bQ'))
     return {...next,material:'kk'};
   return next;
 }
@@ -30,9 +35,20 @@ export function mathsPlayMove(state,move){
  */
 export function chooseMathsOpponent(state,computerColor,token=null){
   if(!state||state.turn!==computerColor)return null;
-  if(state.material!=='krk'){
+  if(state.material!=='krk'&&state.material!=='kqk'){
     const decision=chooseDecision(state,computerColor);
     return decision?{...decision,continuationToken:null}:null;
+  }
+  if(state.material==='kqk'){
+    if(!KQK_EXPERIMENTAL_PLAYABLE)return null;
+    const choice=kqkSourceChoice(state,computerColor,token);
+    return choice?.move?{
+      move:choice.move,rule:choice.rule,sourcePhase:choice.sourcePhase,
+      origin:'experimental-proof-derived-kqk',
+      reason:'KQK frozen constructive edge/shadow geometry; global JavaScript controller incomplete',
+      continuationToken:choice.continuationPhase??null,
+      mathematicallyCertifiedSelector:false,fideClockHistoryCertified:false
+    }:null;
   }
   if(!KRK_EXPERIMENTAL_PLAYABLE||
       !state.board.includes(computerColor+'R')||
