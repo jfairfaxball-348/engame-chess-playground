@@ -59,8 +59,8 @@ history/clock contexts as formally equivalent.
   replay up to four capped real histories with the actual chosen
   source moves/defender replies and token/board identity.
 
-No changes to `src/kqk-source-policy.js`, KRK controller,
-KK/KBK/KNK source calculations, Engines tab or upstream Lean sources.
+No changes to the KRK controller, KK/KBK/KNK source calculations,
+Engines tab or upstream Lean sources.
 Stage B (board-specific maths panels and 50/75-move/repetition parity)
 begins **immediately after both** simplified strategies are complete,
 not before and not replaced by KPK or engine research.
@@ -74,3 +74,36 @@ closeout. If resource caps persist, **do not** upgrade the controller
 to certified, do not claim total playability, and install S026 with
 specific source gaps to close. Independently confirm the production
 Cloudflare Workers deployment rather than assuming GitHub CI deploys it.
+
+## A real, previously hidden KQK failure and source-derived repair
+
+The first S025 PR-head expanded audit with depth-monotone closure
+(GitHub Actions run 41093303852) inspected **120 identical fixed-seed
+roots**: **103 bounded mate-closed**, **16 capped**, and **one genuine
+source-controller cycle**. Unlike the old 32 caps, the cycle is a
+demonstrated failure, NOT a node-budget artefact.
+
+Exact root: strong Black K index 32 / Q index 54, weak White K
+index 12, White to move. The first counterexample follows
+`W 12-20; Q 54-48; W 20-19; Q 48-55; W 19-20; Q 55-48`.
+Repeated `FarFilePreparation.escape_preserving` in *different frames*
+oscillated between far files. The frozen
+`Rules/KQK/FarFilePreparation.lean` explicitly proves a **single**
+preparation step, and after every actual weak reply invokes
+`FarFileEntry.far_file_stage_bound` with queen file <=1, weak file >=3
+and off-rank, distant-king premises. The controller had discarded that
+continuation and rerun its initial root dispatcher, selecting another
+preparation. This is the first verified source-policy liveness error
+after S024; do not describe S024's zero *observed* failures as universal
+correctness.
+
+S025 adds a `far-file` one-reply source token, checks those exact
+post-reply source premises in the original frame, and dispatches only
+existing named constructive source actions, disallowing a *second*
+`far_file_preparation` inside that discharge. Missing translations
+continue to fail closed. `test/kqk25-far-file-cycle.test.js` replays
+the original weakness, source move, real weak reply, and required
+non-bouncing continuation for both colours/eight symmetry frames.
+This is an actual live KQK strategy fix, **not** mathematical
+certification of complete KQK play. Full final-head PR and merged-head
+expanded CI metrics still must be checked.
