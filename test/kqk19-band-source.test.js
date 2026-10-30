@@ -109,15 +109,18 @@ test('the first-reply continuation from a newly covered knight-prison root reach
 test('the first-reply continuation from a newly covered separating-wall root reaches mate',()=>{
   for(const strong of ['w','b']) {
     let s=start(strong,[1,0],[2,2],[6,7]),token=null,finished=false;
+    const trail=[];
     for(let i=0;i<115;i++) {
       const c=step(s,strong,token);
+      trail.push({ply:i*2,phase:c.sourcePhase,from:c.move.from,to:c.move.to});
       s=mathsPlayMove(s,c.move);
       token=c.continuationToken;
       const result=outcome(s.board,s.turn);
       if(result.kind==='mate'){assert.equal(result.winner,strong);finished=true;break;}
-      assert.equal(result.kind,'ongoing','constructive move must not stalemate');
+      assert.equal(result.kind,'ongoing','constructive move must not stalemate '+JSON.stringify({trail,board:s.board}));
       const replies=legalMoves(s.board,opposite(strong));
       assert.ok(replies.length,'proof requires nonempty reply');
+      trail.push({ply:i*2+1,from:replies[0].from,to:replies[0].to});
       s=mathsPlayMove(s,replies[0]);
     }
     assert.ok(finished,'unbroken source continuation must reach checkmate');
