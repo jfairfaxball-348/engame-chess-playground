@@ -351,7 +351,7 @@ function tightFileReply(state,strong,token) {
   const g=geometric(state,strong,token.frame);
   return g?protectedFileChoice(state,strong,token.frame,g):null;
 }
-function entryChoice(state,strong,frame,g) {
+function entryChoice(state,strong,frame,g,allowFarFile=true) {
   const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
   const choose=(from,x,y,phase,kind=null)=>{
     const move=targetMove(state,strong,from,preimage(frame,x,y),phase);
@@ -388,11 +388,11 @@ function entryChoice(state,strong,frame,g) {
   }
   // FarFilePreparation: choose file 0 or 1 from the explicit escape
   // witness, rather than always picking zero (which can stalemate).
-  if(wy>=ky+2&&wx>=4&&qy!==ky&&qy!==wy&&qx>=2) {
+  if(allowFarFile&&wy>=ky+2&&wx>=4&&qy!==ky&&qy!==wy&&qx>=2) {
     const escapeX=wx===7?6:wx+1;
     const f=escapeX===Math.abs(qy-wy)?1:0;
     return choose(g.queen,f,qy,
-      'KQK.FarFilePreparation.far_file_preparation.escape_preserving');
+      'KQK.FarFilePreparation.far_file_preparation.escape_preserving','far-file');
   }
   // EntryGeometry.low_right_entry: raise a cleared queen to the rank
   // directly above the king, then the existing Band controller applies.
@@ -429,8 +429,77 @@ function entryChoice(state,strong,frame,g) {
   return null;
 }
 
+/**
+ * FarFileEntry.right_offrank_entry uses FarFilePreparation to make a
+ * SINGLE queen transfer to a source-chosen file 0 or 1. After EVERY
+ * actual weak reply its proof invokes far_file_stage_bound, which must
+ * *not* re-enter far_file_preparation in another reflected frame.
+ *
+ * The previous global root dispatch could re-prepare a far file from
+ * the other side, Q(a7)-Q(h7)-Q(a7), despite a legal weak-king cycle.
+ * Keep the original frozen preparation frame in the one-reply token,
+ * verify the exact far_file_preparation.all continuation premises,
+ * then select a different existing SOURCE-DEFINED entry construction.
+ * No new arbitrary move and no search/engine; if no named continuation
+ * is translated, fail closed.
+ */
+function farFileReply(state,strong,token) {
+  const original=geometric(state,strong,token.frame);
+  if(!original)return null;
+  const [kx,ky]=original.k,[qx,qy]=original.q,
+    [wx,wy]=original.w;
+  if(qx>1||wx<3||wy<ky+1||
+     Math.max(Math.abs(kx-wx),Math.abs(ky-wy))<2||
+     qy===ky||qy===wy)return null;
+  // Any of the eight Lean QueenSym frames may prove the next step;
+  // reusing the far-file PREPARATION is forbidden after it has
+  // already been discharged by its real weak reply.
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    const [ax,ay]=g.k,[bx,by]=g.q,[cx,cy]=g.w;
+    if(ax===5&&ay===6&&by===5&&cx===7&&cy===7&&bx!==7){
+      const mate=targetMove(state,strong,g.queen,preimage(frame,7,5),
+        'KQK.OrientedEntry.high_file_corner_entry.corner_distant_mate');
+      if(mate)return {...mate,frame};
+    }
+  }
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    if(edge(g)){
+      const choice=edgeChoice(state,strong,frame,g);
+      if(choice)return {...choice,frame};
+    }
+  }
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    if(shadow(g)){
+      const choice=shadowStart(state,strong,frame,g);
+      if(choice)return {...choice,frame};
+    }
+  }
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    const choice=knightChoice(state,strong,frame,g);
+    if(choice)return {...choice,frame};
+  }
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    const choice=bandChoice(state,strong,frame,g);
+    if(choice)return {...choice,frame};
+  }
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    // Existing frozen SameRankEntry, ClearWallEntry, TightEntry and
+    // OrientedEntry actions are still available in their proven
+    // symmetry frames. No second far-file preparation is allowed.
+    const choice=entryChoice(state,strong,frame,g,false);
+    if(choice)return {...choice,frame};
+  }
+  return null;
+}
+
 function validToken(state,strong,token) {
-  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','knight-low-five','tight-file'].includes(token.kind)||
+  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','knight-low-five','tight-file','far-file'].includes(token.kind)||
      !Object.hasOwn(FRAMES,token.frame)||token.strong!==strong||
      state.log.length!==token.moveCount+1)return false;
   const weak=findKing(state.board,opposite(strong));
@@ -449,6 +518,7 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='shadow-bottom-reply')return bottomReply(state,strong,token);
     if(token.kind==='band-raise')return bandRaiseReply(state,strong,token);
     if(token.kind==='tight-file')return tightFileReply(state,strong,token);
+    if(token.kind==='far-file')return farFileReply(state,strong,token);
     if(token.kind==='knight-low-five')return knightLowFiveReply(state,strong,token);
     return knightSideReply(state,strong,token);
   }
