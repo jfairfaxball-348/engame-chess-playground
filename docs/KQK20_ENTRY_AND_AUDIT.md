@@ -23,6 +23,15 @@ geometric first actions, after the S018/S019 Edge/Shadow/Band priority:
   `protected_file_entry` forward/backward queen-wall action, or
   the source's narrow direct-corner mate.
 
+A late S020 falsification additionally found an under-constrained
+`SetupCorners.king_blocks_target_bound.finish` branch: Q(6,6) was
+allowed without the precise **K(5,5)** king protection required in
+`SetupCorners.lean`, letting the defender capture the queen.
+That branch now requires both king coordinates, with an exact-pattern
+regression. A rejection-only shared guard also refuses any proposed
+source move that gives the weak king an immediate legal KxQ; it never
+selects a replacement from unsourced moves.
+
 All choices still require a legal move from the unchanged local move
 generator, expose a `KQK.*` proof phase, and fail closed if a required
 premise or source continuation is not implemented. **No** Stockfish, Lozza,
@@ -37,7 +46,10 @@ Run `npm run audit:kqk-roots` to print a JSON summary of a fixed-seed sample
 of fresh legal strong-turn roots in both colours. Separate fields report:
 legal sampled roots, source action availability, immediate nonmate terminals,
 and total immediate weak-reply positions with/without a source continuation.
-A separate bounded first-legal-defender-line sample measures actual mating
+Captures of the queen are reported separately as `firstReplyQueenCaptures`
+and `queen-captured-draw`, not counted as successful KQK
+continuations merely because the previously released K/K draw engine
+can play on. A separate bounded first-legal-defender-line sample measures actual mating
 termination versus `unsupported`, `cycle`, and cap outcomes.
 Flags `--attempts=N --games=N --rounds=N` adjust sample sizes and bounds.
 This diagnostic never chooses real user moves. It does **not** claim
