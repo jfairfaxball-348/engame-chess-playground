@@ -247,6 +247,20 @@ function knightChoice(state,strong,frame,g) {
     post.board[result.move.from]=null;
     return tagged(result,makeToken(post,strong,frame,token));
   };
+  // SetupCorners.corner_knight_low_five_rescue: exactly the (6,5) queen
+  // and (7,7) weak king.  The source splits on whether K(5,5) blocks
+  // its ordinary Q(5,5) preparation. In the blocked case the proved
+  // king_blocks_target_bound instead plays Q(7,5), forcing ...K(6,7)
+  // followed by Q(6,6) mate. Both follow-on moves are already covered
+  // below by KnightPrison and king_blocks_target_bound.finish.
+  // Do not generalise this to arbitrary fifth-rank knight positions.
+  if(qx===6&&wx===7&&wy===7) {
+    if(kx===5&&ky===5)
+      return step(g.queen,7,5,
+        'KQK.SetupCorners.king_blocks_target_bound.queen_to_seven');
+    return step(g.queen,5,5,
+      'KQK.SetupCorners.corner_knight_low_five_rescue.queen_to_five');
+  }
   if(qx===5) {
     if(wx===6&&wy===7)
       return step(g.queen,4,6,'KQK.KnightPrison.knight_top_bound');
