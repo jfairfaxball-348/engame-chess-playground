@@ -105,3 +105,21 @@ test('the first-reply continuation from a newly covered knight-prison root reach
     assert.ok(finished,'unbroken source continuation must reach checkmate');
   }
 });
+
+test('the first-reply continuation from a newly covered separating-wall root reaches mate',()=>{
+  for(const strong of ['w','b']) {
+    let s=start(strong,[1,0],[2,2],[6,7]),token=null,finished=false;
+    for(let i=0;i<115;i++) {
+      const c=step(s,strong,token);
+      s=mathsPlayMove(s,c.move);
+      token=c.continuationToken;
+      const result=outcome(s.board,s.turn);
+      if(result.kind==='mate'){assert.equal(result.winner,strong);finished=true;break;}
+      assert.equal(result.kind,'ongoing','constructive move must not stalemate');
+      const replies=legalMoves(s.board,opposite(strong));
+      assert.ok(replies.length,'proof requires nonempty reply');
+      s=mathsPlayMove(s,replies[0]);
+    }
+    assert.ok(finished,'unbroken source continuation must reach checkmate');
+  }
+});
