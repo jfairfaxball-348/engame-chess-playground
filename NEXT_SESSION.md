@@ -1,67 +1,76 @@
-# S021 — KQK whole-game source continuation closure and honest release audit
+# S022 — finish adversarially playable KRK/KQK, then switch to full parity
 
-**Next execution session, installed after S020.**
+**Next execution session after S021.** Owner's binding two-stage plan
+is in `AGENTS.md` (top), `docs/KQK21_ADVERSARIAL_AUDIT.md`.
 
-## Binding purpose
+## Mission and priority
 
-Deliver a substantially more playable **Maths** KQK opponent from exact
-user-arranged legal positions by translating the existing frozen
-`jfairfaxball-348/engame-chess` theorem (EC-T0050 v1,
-SHA `c72365a8ba46f59114a2a77d9d38993f6a52df80`), not by
-inventing a new policy. KRK remains experimental. **Never remove the
-full board-specific KK, KBK, KNK mathematical equations, workings,
-proof steps and Lean links in setup or play.** Preserve independent
-Engines tab. Do not start KPK until KQK is substantially usable.
+Stage A: **complete the source-derived KRK and KQK winning strategies
+in the Maths Playground's currently simplified playable mode.**
+"Playable" means correct placement, either king colour and side to move,
+lawful moves, and an actual winning continuation to mate against
+every legal defender choice from the intended legal root domain — not
+just first-action selection. A failing lineage stays explicitly
+experimental and unsupported; never manufacture completeness.
 
-Owner deliberately defers strict 50/75-move and history parity. Do not
-let clock/history questions dominate this session. Be transparent that
-the KQK and KRK JavaScript selectors are not Lean-certified or global.
+Stage B: **the instant BOTH simplified strategies are complete, return
+to KRK and KQK to build the same full mathematical derivations,
+position-aware proof equations/working, and FIDE clock/history/terminal
+outcome parity already enjoyed by KK/KBK/KNK.** The Stage A shortcut
+is temporary. Do not divert to KPK or other material classes or
+experimental engine research. Never remove any current KK/KBK/KNK
+worked mathematical panels in setup or play.
 
-## Baseline from S020
+## S021 evidence and starting point
 
-- S019 source-tagged EdgeForce, ShadowForce, BandEntry/BandProgress,
-  BandRaise, RankFive and KnightPrison remain.
-- S020 adds source-conditional SameRankEntry positive/backrank, escaped
-  FarFilePreparation (file 0/1), direct EntryGeometry and OrientedEntry
-  first walls, and TightEntry king-approach with bound `tight-file`
-  protected-queen continuation.
-- `test/kqk20-entry-source.test.js` exercises both colours, frame
-  invariance, legal source steps and immediate replies.
-- `npm run audit:kqk-roots` (fixed seed, bounded) reports **separately**
-  sampled legal root selection, immediate defender continuation and
-  full first-reply game completion. It is an audit, never a live policy.
-  See `docs/KQK20_ENTRY_AND_AUDIT.md` for exact scope and gaps.
+- S020 main CI `41047939950` had 898/898 sampled source-selected
+  strong-turn legal roots, 3827/3827 immediate defender continuations,
+  32/32 first-legal-defender full games ending in mate. **Bounded
+  fixed-defender sampling, not universal playability.**
+- S021 introduces `npm run audit:kqk-adversarial`: seeded source-family
+  strata, strong- and weak-to-move fresh roots, all weak choices at
+  every visited ply, explicit `unsupported`, stalemate, captured
+  queen, cycle and cap classifications. The CI logs, with concrete
+  roots/paths, are the starting falsification dataset.
+- KRK mate-tree, restoration and all-root audits remain available.
+- Frozen Lean source EC-T0050 KQK `c72365a8...`; KRK source locks
+  retained. No runtime parent dependency.
 
-## Execute
+## Execute (not just report)
 
-1. Confirm latest `main` / CI and determine the actual production
-   Cloudflare Workers URL from reliable deployment evidence. Vercel
-   daily rate limiting is not a code failure; do not manufacture a URL.
-2. Run the reproducible S020 KQK coverage audit, recording counts and
-   examples by source family. **Measure end-to-end checkmate and
-   defender branch coverage**, not only first-move availability.
-3. Falsify source-continuation completeness with bounded,
-   root-stratified, **all legal weak-reply** game trees and strict
-   terminal-kind checks. Distinguish `unsupported`, `stalemate`,
-   `capture-to-KK`, `mate`, `cycle`, and cap.
-4. Implement actual missing `FarFileEntry` /
-   `OrientedEntry` / `SameRankEntry` /
-   `TightEntry` source cases and exact chained continuations,
-   respecting all proof premises, weak escape witnesses and corner
-   exceptions. Never substitute an unsourced move, scoring heuristic,
-   precomputed tablebase, minimax, imported engine, or "first legal" fallback
-   in the **live Maths opponent**.
-5. Test exact user placements, weak-to-move starts, captured-queen-to-KK,
-   all eight isometries, both colours, Undo and every immediate defender
-   reply, including checked weak kings and stalemate threats.
-6. Run `npm test`, `npm run check`, `npm run build`,
-   `npm run verify:krk-sources`, `npm run audit:kqk-roots`,
-   and both Chromium browser QA suites. Use exact-head CI,
-   commit to a branch, PR and **fast-forward merge** only on success.
-   Install the subsequent specific prompt with measured remaining gaps.
+1. Read *latest* main/PR CI and the full adversarial KQK JSON from
+   `audit:kqk-adversarial`; reconstruct earliest concrete failed path
+   and identify its exact first missing/mis-translated frozen Lean rule.
+   Do not count caps as successful mates.
+2. Run the **same all-defender falsification for KRK** using the existing
+   source-phase mate-tree scripts; prioritize any missing or cyclic
+   strategy from either material. Address the highest-impact missing
+   source continuations with literal source-premised moves and
+   strict position/phase tokens; do not promote partial strategies.
+3. Expand KQK root selection beyond sampled start states (exhaustive
+   fresh legal roots where feasible); include both strong colours,
+   all eight source symmetries, weak-turn checked positions, capture,
+   underpromotion not applicable, and full undo/restart/branch invariants.
+   Test all defender replies beyond immediate second move.
+4. Where an all-reply tree cannot be practically exhausted, report
+   bounded scope and remaining counterexamples. A line cycling under
+   adversarial play is NOT a completed winning strategy.
+5. **When KQK and KRK both genuinely pass the simplified-mode global
+   gameplay acceptance criteria, install the immediate Stage B
+   session to restore mathematical working plus all chess
+   terminal/history/clock rule fidelity for both**. Derivations must
+   come from actual existing upstream Lean, not an invented "proof"
+   of policy totality. Do not allow 50/75-move engineering to prevent
+   first completing Stage A.
+6. Run Node tests, syntax check, frozen-source verifier, build,
+   KQK and KRK audits, Chromium Maths and independent Engines QA,
+   exact-commit CI. Commit changes on branch; PR, merge and verify main
+   and update this next-session prompt to measurable remaining work.
 
-**Success criterion:** a demonstrably greater fraction of legal,
-user-arranged fresh KQK roots can complete actual lawful checkmates
-across *all* defender replies. Report exact empirical denominator,
-depth/caps, and counterexamples. Never call this fully certified merely
-because tests pass.
+## Nonnegotiable
+
+No Stockfish/Lozza, tablebase, generic minimax, arbitrary move or
+first-legal fallback in Maths. Live source controller and test-only
+adversarial audits are strictly separate. Keep KQK/KRK experimental
+disclosures and certification booleans honest. Never regress existing
+KK/KBK/KNK full worked explanations.
