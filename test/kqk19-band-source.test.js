@@ -87,3 +87,21 @@ test('uncovered fresh positions still refuse; all eight proof frames remain pres
   const s=start('w',[4,0],[0,0],[4,7]);
   assert.equal(kqkSourceChoice(s,'w'),null);
 });
+
+test('the first-reply continuation from a newly covered knight-prison root reaches mate',()=>{
+  for(const strong of ['w','b']) {
+    let s=start(strong,[2,3],[5,5],[6,7]),token=null,finished=false;
+    for(let i=0;i<75;i++) {
+      const c=step(s,strong,token);
+      s=mathsPlayMove(s,c.move);
+      token=c.continuationToken;
+      const result=outcome(s.board,s.turn);
+      if(result.kind==='mate'){assert.equal(result.winner,strong);finished=true;break;}
+      assert.equal(result.kind,'ongoing','constructive move must not stalemate');
+      const replies=legalMoves(s.board,opposite(strong));
+      assert.ok(replies.length,'proof requires nonempty reply');
+      s=mathsPlayMove(s,replies[0]);
+    }
+    assert.ok(finished,'unbroken source continuation must reach checkmate');
+  }
+});
