@@ -20,6 +20,16 @@ test('KQK21 bounded all-defender audit is reproducible and reports uncertainty',
   assert.ok(a.visitedNodes>0);
   assert.ok(a.roots<=a.legalCandidates);
   assert.ok(a.inconclusive>=0,'caps must not be silently counted as mate');
+  assert.ok(Number.isSafeInteger(a.fullyClosedSubtrees));
+  assert.ok(Number.isSafeInteger(a.closedSubtreesReused));
+  assert.ok(a.fullyClosedSubtrees>=0 && a.closedSubtreesReused>=0);
+  // A cap must remain an inconclusive classification, even when other
+  // all-defender subtrees of the same root were safely closed and cached.
+  for(const item of a.firstInconclusive) {
+    assert.ok(item.firstCap?.kind==='node-cap'||item.firstCap?.kind==='round-cap');
+    assert.ok(Array.isArray(item.firstCap.path));
+    assert.ok(item.firstCap.path.every(step=>/^source:|^defender:/.test(step)));
+  }
   for(const f of Object.values(a.families))
     assert.equal(f.allRepliesMate+f.falsified+f.inconclusive,f.roots);
 });
