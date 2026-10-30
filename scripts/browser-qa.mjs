@@ -67,7 +67,7 @@ async function run(){
     await add(page,'wK',4);
     await add(page,'bK',60);
     assert.equal(await page.locator('.maths-board .piece-icon').count(),2);
-    assert.equal(await page.locator('.maths-outcome').innerText(),'Guaranteed draw');
+    assert.equal(await page.locator('.maths-outcome').innerText(),'K vs K');
     assert.equal(await page.locator('#maths-start').isEnabled(),true);
     const before=await geometry(page,width+' arranged');
     const initial=await page.locator('.maths-board').evaluate(el=>Array.from(el.querySelectorAll('.maths-cell'),c=>[c.dataset.sq,Boolean(c.querySelector('.piece-icon'))]));
@@ -99,7 +99,7 @@ async function run(){
    await drag(page,rack(page,'bK'),cell(page,60));
    assert.equal(await page.locator('#maths-start').isEnabled(),true);
    await drag(page,rack(page,'wR'),cell(page,0));
-   assert.equal(await page.locator('.maths-outcome').innerText(),'Winning for White');
+   assert.equal(await page.locator('.maths-outcome').innerText(),'K+R vs K');
    assert.equal(await page.locator('#maths-start').isEnabled(),true,'Experimental KRK can start');
    assert.match(await page.locator('.maths-policy').innerText(),/Experimental KRK/);
    const krkPlaced=await page.locator('.maths-board').evaluate(el=>
@@ -122,7 +122,7 @@ async function run(){
    await drag(page,cell(page,0),rack(page,'wR'));
    assert.equal(await rack(page,'wB').isEnabled(),true,'tray reactivates after removal');
    await add(page,'bB',56);
-   assert.equal(await page.locator('.maths-outcome').innerText(),'Guaranteed draw');
+   assert.equal(await page.locator('.maths-outcome').innerText(),'K+B vs K');
    await page.locator('#maths-turn-b').click();
    await page.locator('#maths-start').click();
    assert.match(await page.locator('.maths-turn').innerText(),/You play White/);
@@ -130,7 +130,7 @@ async function run(){
    assert.equal(await cell(page,56).locator('.piece-icon').count(),1,'Bishop unchanged before first move');
    await page.locator('#maths-first').click();
    await page.waitForFunction(()=>document.querySelector('.maths-turn')?.textContent.includes('White to move'),null,{timeout:4000});
-   assert.equal(await page.locator('.maths-proof-steps li').count(),5,'working proof visible during game');
+   assert.equal(await page.locator('.maths-proof').count(),0,'Maths play stays board-first');
    await page.locator('#maths-undo').click();
    assert.equal(await cell(page,56).locator('.piece-icon').count(),1,'Opening undo restores exact placed bishop square');
    assert.equal(await page.locator('#maths-first').isVisible(),true,'Opening move can be replayed');
@@ -150,9 +150,9 @@ async function run(){
    await add(page,'wK',41); // b6
    await add(page,'bK',47); // h6
    await add(page,'wB',40); // a6
-   assert.match(await page.locator('.maths-worked').innerText(),/a6/);
-   assert.equal(await page.locator('.maths-proof-steps li').count(),5);
-   assert.match(await page.locator('.maths-theorem').getAttribute('href'),/EC-T0004\/v1\.md$/);
+   assert.equal(await page.locator('.maths-outcome').innerText(),'K+B vs K');
+   assert.equal(await page.locator('.maths-proof').count(),0);
+   assert.equal(await page.locator('.maths-verdict').count(),1);
    const original=await page.locator('.maths-board').evaluate(el=>[...el.querySelectorAll('.maths-cell')].map(x=>[x.dataset.sq,x.querySelector('.piece-icon')?.getAttribute('class')||null]));
    await page.locator('#maths-start').click();
    const after=await page.locator('.maths-board').evaluate(el=>[...el.querySelectorAll('.maths-cell')].map(x=>[x.dataset.sq,x.querySelector('.piece-icon')?.getAttribute('class')||null]));
