@@ -28,10 +28,16 @@ worked mathematical panels in setup or play.
   32/32 first-legal-defender full games ending in mate. **Bounded
   fixed-defender sampling, not universal playability.**
 - S021 introduces `npm run audit:kqk-adversarial`: seeded source-family
-  strata, strong- and weak-to-move fresh roots, all weak choices at
-  every visited ply, explicit `unsupported`, stalemate, captured
-  queen, cycle and cap classifications. The CI logs, with concrete
-  roots/paths, are the starting falsification dataset.
+  strata, strong- and weak-to-move roots and all weak replies at every
+  visited ply, with explicit unsupported/capture/stalemate/cycle/caps.
+  Initial CI run 41049858581: 56 legal roots; 26 all-replies-mate,
+  1 unsupported, 29 inconclusive; 35,879 visited states / 18,504
+  visited legal weak replies, cap 1,200 nodes and 48 rounds per root.
+  S021 source-backed correction resolves the previously unsupported
+  Black Ka8 Qa6 / White Kc7 root with the exact Lean
+  SameRankEntry.backrank_entry king-to-weak-file move. Check the
+  latest post-fix exact-head CI JSON; the many capped roots require
+  deeper counterexample discovery and continuation audits.
 - KRK mate-tree, restoration and all-root audits remain available.
 - Frozen Lean source EC-T0050 KQK `c72365a8...`; KRK source locks
   retained. No runtime parent dependency.
