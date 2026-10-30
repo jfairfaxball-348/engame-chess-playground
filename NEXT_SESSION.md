@@ -20,11 +20,17 @@ KPK and Engine experimentation do not displace this work.
   CI run 41057127613; unchanged-seed KQK 37/55 all-defender
   mate-closed, 18 capped, 0 confirmed hard failures;
   KRK 24/24 1,000-node capped, 0 genuine failures.
-- KRK diagnostic: 20,010 structural revisits in the stratified
-  24-root sample, **all with distinct incoming histories**.
-  A naive board+token closure cache would not be legitimate
-  FIDE-parity evidence. Larger KRK/KQK budget tier now in CI;
-  READ ITS EXACT OUTPUT, distinguish resource caps from failures.
+- Expanded S023 CI run **41057464801** (green) used
+  `--attempts=12000 --per-family=4 --nodes=2500 --rounds=64`:
+  **KQK 81/112** bounded all-defender roots mate-closed,
+  **31 capped**, **0 hard failures**; `FarFilePreparation`
+  7/8 capped, `WeakToMove` 6/8, `SameRankEntry` 5/8,
+  `EntryGeometry` 4/8. No claim of global completeness.
+- KRK expanded to 2,500 nodes *per root*: **24/24 capped**,
+  0 observed hard failures; 54,948 structural revisits,
+  **all with distinct incoming histories**. A naive board+token
+  closure cache would not be legitimate FIDE-parity evidence.
+  The existing first-root 40k-node audit also caps.
 
 ## Execute, don't stop at a diagnosis
 
