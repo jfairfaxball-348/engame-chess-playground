@@ -74,3 +74,16 @@ test('same-rank source entry remains legal across both colours and eight frozen 
     assert.notEqual(outcome(after.board,after.turn).kind,'stalemate');
   }
 });
+
+test('SetupCorners final queen check requires the frozen (5,5) protecting king',()=>{
+  for(const strong of ['w','b']){
+    const good=start(strong,[5,5],[7,5],[6,7]);
+    const mate=step(good,strong);
+    assert.equal(mate.sourcePhase,'KQK.SetupCorners.king_blocks_target_bound.finish');
+    assert.equal(outcome(mathsPlayMove(good,mate.move).board,opposite(strong)).kind,'mate');
+    const bad=start(strong,[1,1],[7,5],[6,7]);
+    const choice=chooseMathsOpponent(bad,strong);
+    assert.notEqual(choice?.sourcePhase,'KQK.SetupCorners.king_blocks_target_bound.finish',
+      'queen on (6,6) would be unprotected and captured');
+  }
+});
