@@ -264,6 +264,11 @@ function bandRaiseReply(state,strong,token) {
   if(!g)return null;
   const [qx,qy]=g.q,[kx,ky]=g.k,[wx,wy]=g.w;
   if(ky!==qy||kx<qx+1||qy>4||wy<qy+2||wx<kx)return null;
+  // BandRaise.prepared_raise_bound explicitly diverts the rank-four
+  // top-right corner into KnightBox. Q(qx,5) here is a stalemate.
+  if(qy===4&&kx===7)
+    return targetMove(state,strong,g.queen,preimage(token.frame,5,5),
+      'KQK.BandRaise.prepared_raise_bound.corner_knight_box');
   return targetMove(state,strong,g.queen,preimage(token.frame,qx,qy+1),
     'KQK.BandRaise.prepared_raise_bound.queen_rise');
 }
