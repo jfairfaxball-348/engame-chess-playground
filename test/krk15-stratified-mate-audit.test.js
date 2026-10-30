@@ -62,6 +62,15 @@ test('KRK15 falsifies whole games, reporting caps rather than certifying a root'
   assert.equal(result.summary.rootPhaseMismatches,0);
   assert.equal(result.summary.genuineFailures,0,
     JSON.stringify(result.failures));
+  assert.ok(result.summary.defenderRepliesExamined>=result.summary.nodesVisited,
+    'all-defender audit should record branching rather than silently reuse history');
+  assert.ok(result.summary.structuralRevisits>=result.summary.distinctHistoryRevisits);
+  assert.ok(result.summary.distinctStructuralStates>0);
+  assert.ok(result.summary.maximumDefenderBranching>=1);
+  for(const report of result.reports){
+    assert.ok(report.structuralRevisits>=report.distinctHistoryRevisits);
+    assert.ok(report.defenderRepliesExamined>=0);
+  }
   assert.equal(result.reports.length,24);
   assert.equal(result.completeGlobalMateProof,false);
   assert.equal(result.sourceSelectorFormalised,false);
