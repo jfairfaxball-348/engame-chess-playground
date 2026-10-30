@@ -125,10 +125,11 @@ test('shadow phase copies legal king replies with a bound continuation token and
   assert.equal(kqkSourceChoice(game,strong,fake),null);
  }
 });
-test('unknown geometric root fails closed; no external source or arbitrary legal fallback',()=>{
- const s=root('w',[4,0],[0,0],[4,7]); // initial default-like arrangement, outside edge/shadow
+test('backrank root gained source coverage; forged token still fails closed without fallback',()=>{
+ const s=root('w',[4,0],[0,0],[4,7]); // previously unsupported: now handled by SameRankEntry
  const c=chooseMathsOpponent(start(s),'w');
- assert.equal(c,null);
+ assert.equal(c?.sourcePhase,'KQK.SameRankEntry.backrank_entry.clear_low_wall');
+ assert.equal(chooseMathsOpponent(start(s),'w',{kind:'invented'}),null);
  const src=readFileSync('src/kqk-source-policy.js','utf8');
  assert.doesNotMatch(src.split('*/').slice(1).join('*/'),/Stockfish|Syzygy|tablebase|\bfetch\s*\(|\bminimax\s*\(/i);
  assert.equal(KQK_FRAMES.length,8);
