@@ -43,7 +43,9 @@ test('S025 first cap reports the actual source-token and board after replaying e
     const {path,at}=root.firstCap;
     assert.ok(Array.isArray(path));
     for(const [index,step] of path.entries()){
-      const [actor,phase,indices]=step.split(':');
+      const [actor,part1,part2]=step.split(':');
+      const phase=actor==='source'?part1:null;
+      const indices=actor==='source'?part2:part1;
       const [from,to]=indices.split('-').map(Number);
       let move;
       if(actor==='source'){
