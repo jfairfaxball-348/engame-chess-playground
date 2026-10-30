@@ -2,6 +2,10 @@
 
 30 October 2026. Owner has explicitly prioritised shipping a working mathematical demonstration over a complete proof that the *specific JavaScript controller* satisfies all FIDE history rules and a global all-defender mate theorem.
 
+## Owner's clarified product intent
+
+The Maths tab is a **strategy playground**, not a proof presentation. Do not display theorem derivations, proof steps, or in-depth WDL equations alongside play. The source mathematics stays in `engame-chess`. Show a simple material label and let the user arrange positions, make legal moves, watch the opponent and understand limitations when the experimental policy cannot continue. Legal terminal results are shown as game outcomes, not new mathematical claims.
+
 ## Behaviour
 
 - Place exactly two kings and one rook, choose the side to move, then **Start game**. The human controls the lone king; the source-derived attacker controls the king and rook.
