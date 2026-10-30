@@ -56,7 +56,10 @@ export function auditKRK15StratifiedMateTrees({
   const summary={roots:0,preparedWall:0,directEntry:0,twoStepSetup:0,
     rootPhaseMismatches:0,completedAllDefenderTrees:0,
     resourceCaps:0,genuineFailures:0,
-    nodesVisited:0,matingLeavesObserved:0,maximumPliesObserved:0};
+    nodesVisited:0,matingLeavesObserved:0,maximumPliesObserved:0,
+    structuralRevisits:0,distinctHistoryRevisits:0,
+    distinctStructuralStates:0,defenderRepliesExamined:0,
+    sourceChoicesExamined:0,maximumDefenderBranching:0};
   const reports=[],failures=[];
   for(const {phase,strong,frame,state} of krk15StratifiedRoots()){
     summary.roots++;
@@ -78,6 +81,13 @@ export function auditKRK15StratifiedMateTrees({
     const result=auditKRK14MateTree(state,{maxNodes,maxPlies});
     summary.nodesVisited+=result.nodes;
     summary.matingLeavesObserved+=result.terminalMates;
+    summary.structuralRevisits+=result.structuralRevisits;
+    summary.distinctHistoryRevisits+=result.distinctHistoryRevisits;
+    summary.distinctStructuralStates+=result.distinctStructuralStates;
+    summary.defenderRepliesExamined+=result.defenderRepliesExamined;
+    summary.sourceChoicesExamined+=result.sourceChoicesExamined;
+    summary.maximumDefenderBranching=Math.max(summary.maximumDefenderBranching,
+      result.maximumDefenderBranching);
     summary.maximumPliesObserved=Math.max(
       summary.maximumPliesObserved,result.maximumPlies);
     const reason=result.firstCounterexample?.reason??null;
@@ -88,6 +98,9 @@ export function auditKRK15StratifiedMateTrees({
     else summary.genuineFailures++;
     reports.push({...label,status,nodes:result.nodes,
       terminalMates:result.terminalMates,maximumPlies:result.maximumPlies,
+      structuralRevisits:result.structuralRevisits,
+      distinctHistoryRevisits:result.distinctHistoryRevisits,
+      defenderRepliesExamined:result.defenderRepliesExamined,
       firstReason:reason,firstAtFEN:result.firstCounterexample?.atFEN??null});
     if(!result.ok&&failures.length<maxExamples)
       failures.push({...label,status,...result.firstCounterexample});
