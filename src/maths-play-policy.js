@@ -16,7 +16,7 @@ import {kqkSourceChoice} from './kqk-source-policy.js';
 export const KRK_EXPERIMENTAL_PLAYABLE=true;
 export const KQK_EXPERIMENTAL_PLAYABLE=true;
 export const KQK_EXPERIMENTAL_DESCRIPTION=
-  'Experimental KQK · frozen EC-T0050 outcome; partial source-derived edge/shadow move policy (some positions unavailable); full-game selector not certified';
+  'Experimental KQK · frozen EC-T0050 outcome; partial source-derived edge/band/entry move policy (some positions unavailable); full-game selector not certified';
 export const KRK_EXPERIMENTAL_DESCRIPTION=
   'Experimental KRK · source-derived opponent; complete-game proof and FIDE clock/history certification pending';
 
@@ -45,7 +45,7 @@ export function chooseMathsOpponent(state,computerColor,token=null){
     return choice?.move?{
       move:choice.move,rule:choice.rule,sourcePhase:choice.sourcePhase,
       origin:'experimental-proof-derived-kqk',
-      reason:'KQK frozen constructive edge/shadow geometry; global JavaScript controller incomplete',
+      reason:'KQK frozen constructive geometric source phase; global JavaScript controller incomplete',
       continuationToken:choice.continuationPhase??null,
       mathematicallyCertifiedSelector:false,fideClockHistoryCertified:false
     }:null;
