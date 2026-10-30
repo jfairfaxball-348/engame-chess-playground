@@ -1,8 +1,14 @@
+## S019 KQK separating-band and knight construction — 30 October 2026
+
+The Maths KQK experimental source-derived opponent now includes **separating-rank wall preparation**, deterministic prepared king and queen progression, guarded king-cross / rank-raise continuations and source-defined rank-five / knight-box corner endings. Legal play was checked from exact user-selected positions and tested on complete knight-to-mate and separating-wall-to-mate first-reply lines. It remains **partial**, not a universal certified JavaScript KQK selector; missing phases stop honestly, never call a substitute chess engine.
+
+Full detailed KK, KBK and KNK positional mathematical proofs remain unchanged; KRK beta and the Engines tab are untouched. Full 50-move history parity remains deferred. See [S019 source and tests](docs/KQK19_BAND_EXTENSION.md) and [next S020 session](NEXT_SESSION.md).
+
 ## S018 experimental KQK gameplay — 30 October 2026
 
 **KQK is now selectable as an experimental Maths beta**: place either colour queen and the two kings at exact squares, choose the side to move, and play as the lone king against named frozen-proof geometric rules. The current source-derived controller implements edge-wall / corner-prison and queen-shadow / edge-exit phases, including 8 board symmetries, queen capture to KK and Undo. It explicitly stops rather than substitute an engine on unsupported positions. **Not every legal KQK position has a runnable strategy yet**; the Lean EC-T0050 class theorem proves the outcome, not that this particular JavaScript selector is complete.
 
-The previous full worked equations, positional calculations, derivations and Lean links **remain intact** for KK, KBK, KNK. KRK stays experimental. Strict 50-move history parity remains deferred. See [S018 scope and source provenance](docs/KQK18_PLAYABLE_BETA.md), [next KQK expansion session](NEXT_SESSION.md).
+The previous full worked equations, positional calculations, derivations and Lean links **remain intact** for KK, KBK, KNK. KRK stays experimental. Strict 50-move history parity remains deferred. See [S018 scope and source provenance](docs/KQK18_PLAYABLE_BETA.md), [S019 implementation notes](docs/KQK19_BAND_EXTENSION.md).
 
 # Endgame Chess Playground
 
@@ -10,7 +16,7 @@ The previous full worked equations, positional calculations, derivations and Lea
 
 For the existing **K vs K, K+B vs K and K+N vs K** draw demonstrations, the Maths tab again shows the **complete mathematical workings** from `src/maths-proof.js`: theorem equation, piece-position-dependent calculation, all reasoning steps and linked frozen Lean proof. This remains available while setting up positions and during play. The Maths explanations are not a disposable feature.
 
-The experimental **KRK** strategy remains playable with a compact, board-first presentation; its specific JavaScript winning controller is not globally certified. The successor [S019](NEXT_SESSION.md) expands the **partially playable experimental KQK** controller while preserving all three worked draw explanations.
+The experimental **KRK** strategy remains playable with a compact, board-first presentation; its specific JavaScript winning controller is not globally certified. The S019 source extension [documented here](docs/KQK19_BAND_EXTENSION.md) expands the **partially playable experimental KQK** controller while preserving all three worked draw explanations.
 
 
 ## KRK16 playable experimental Maths mode — 30 October 2026
