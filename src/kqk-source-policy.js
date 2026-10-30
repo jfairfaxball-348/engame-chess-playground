@@ -339,12 +339,22 @@ function entryChoice(state,strong,frame,g) {
   // SameRankEntry.backrank_entry: when a clear file wall is already
   // present, begin with the source's low-rank wall. The adjacent-king
   // case is the protected_backrank_entry constructed queen step.
-  if(qy===0&&ky===0&&wy>=2&&qx!==wx &&
-     (Math.abs(qx-wx)>=2||Math.abs(kx-qx)===1))
-    return choose(g.queen,qx,1,
-      Math.abs(qx-wx)>=2
-        ? 'KQK.SameRankEntry.backrank_entry.clear_low_wall'
-        : 'KQK.SameRankEntry.protected_backrank_entry.queen_up');
+  if(qy===0&&ky===0&&wy>=2&&qx!==wx) {
+    if(Math.abs(qx-wx)>=2||Math.abs(kx-qx)===1)
+      return choose(g.queen,qx,1,
+        Math.abs(qx-wx)>=2
+          ? 'KQK.SameRankEntry.backrank_entry.clear_low_wall'
+          : 'KQK.SameRankEntry.protected_backrank_entry.queen_up');
+    // Exact missing final branch of SameRankEntry.backrank_entry:
+    // queen adjacent to weak file, king adjacent on the opposite side.
+    // The frozen Lean proof moves K to (wk.file, king.rank) and after
+    // EVERY weak reply enters protected_backrank_entry. This is a
+    // geometric proof action, not a legal-move fallback or search.
+    if(Math.abs(qx-wx)===1&&Math.abs(kx-wx)===1&&
+       Math.abs(kx-qx)===2)
+      return choose(g.sk,wx,ky,
+        'KQK.SameRankEntry.backrank_entry.king_to_weak_file');
+  }
   // FarFilePreparation: choose file 0 or 1 from the explicit escape
   // witness, rather than always picking zero (which can stalemate).
   if(wy>=ky+2&&wx>=4&&qy!==ky&&qy!==wy&&qx>=2) {
