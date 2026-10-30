@@ -33,12 +33,19 @@ jobs:
       # all weak replies for 24 source/colour/frame seeds; report caps
       # separately and retain every source-derived move restriction.
       - run: node scripts/krk15-stratified-mate-audit.mjs --nodes=1000 --plies=160 --examples=6
+      # S023 second diagnostic tier: larger deterministic all-defender
+      # budgets help separate state-space explosion from source gaps.
+      # Non-strict, explicitly NOT a global mate certification.
+      - run: node scripts/krk15-stratified-mate-audit.mjs --nodes=2500 --plies=160 --examples=6
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
       # evidence only; unlike the deterministic-first-reply audit it explores
       # every legal weak response until the explicit node/depth caps.
       - run: npm run audit:kqk-adversarial
+      # S023: wider KQK family sampling and deeper capped trees.
+      # A cap remains inconclusive even if no hard counterexample appears.
+      - run: npm run audit:kqk-adversarial -- --attempts=12000 --per-family=4 --nodes=2500 --rounds=64
       - run: npm run check
       - run: npm run build
       # Provider-independent Cloudflare Pages handoff: ensure the deployable
