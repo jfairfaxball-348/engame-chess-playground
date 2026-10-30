@@ -1,0 +1,24 @@
+{
+  "material": "KQK",
+  "frozenTheorem": "EC-T0050 v1",
+  "verifiedLeanSourceSha": "c72365a8ba46f59114a2a77d9d38993f6a52df80",
+  "frozenTheoremDocument": "theorems/frozen/EC-T0050/v1.md",
+  "sourceFiles": [
+    "formal/EndgameChess/Rules/KQK/Edge.lean",
+    "formal/EndgameChess/Rules/KQK/EdgeForce.lean",
+    "formal/EndgameChess/Rules/KQK/ShadowGeometry.lean",
+    "formal/EndgameChess/Rules/KQK/ShadowForce.lean",
+    "formal/EndgameChess/Rules/KQK/ShadowExit.lean",
+    "formal/EndgameChess/Rules/KQK/FramedFinish.lean",
+    "formal/EndgameChess/Rules/KQK/Symmetry.lean"
+  ],
+  "policy": "experimental-subset",
+  "certifiedJavascriptPolicy": false,
+  "explicitGaps": [
+    "universal positive_entry",
+    "SameRankEntry and FarFileEntry",
+    "general separating-rank BandForce",
+    "arbitrary rooted all-reply coverage",
+    "FIDE incoming history and clock parity"
+  ]
+}
