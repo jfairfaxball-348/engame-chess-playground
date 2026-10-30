@@ -1,10 +1,9 @@
 /** The Maths tab is completely separate from the Engine Playground. */
-import {legalMoves,newGame,play,outcome,opposite,inCheck,squareName} from './chess.js';
+import {MATERIAL,legalMoves,newGame,outcome,opposite,inCheck,squareName} from './chess.js';
 import {chooseMathsOpponent,mathsPlayMove,KRK_EXPERIMENTAL_DESCRIPTION} from './maths-play-policy.js';
 import {pieceSVG,pieceLabel} from './pieces.js';
 import {squareForCell,squareAtPoint} from './board-ui.js';
 import {INVENTORY,blankBoard,available,put,relocate,setupVerdict} from './maths-model.js';
-import {proofFor} from './maths-proof.js';
 const root=document.getElementById('app');
 let board=blankBoard(),turn='w',human='w',game=null,phase='setup',picked=null,selected=-1;
 let facing='w',last=null,notice='',timer=null,busy=false,gesture=null,suppress=false,history=[],openingPending=false,policyToken=null;
@@ -149,20 +148,6 @@ function up(e){
  }else{if(to>=0)humanMove(g.from,to);else render();}
 }
 const escapeText=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-function proofMarkup(pos,side){
- const p=proofFor(pos,side);
- if(!p)return '';
- return '<div class="maths-equation" aria-label="Outcome equation">'+escapeText(setupVerdict(pos,side).equation)+'</div>'+
-  '<div class="maths-proof"><h2>Proof</h2><p class="maths-proof-lead">'+escapeText(p.lead)+'</p>'+
-  '<div class="maths-worked"><span>For this board</span><strong>'+escapeText(p.working)+'</strong></div>'+
-  '<ol class="maths-proof-steps">'+p.steps.map(x=>'<li><span class="maths-proof-math">'+escapeText(x.math)+
-     '</span><span class="maths-proof-reason">'+escapeText(x.why)+'</span></li>').join('')+'</ol>'+
-  '<a class="maths-theorem" target="_blank" rel="noopener noreferrer" href="'+escapeText(p.sourceUrl)+'">'+
-  escapeText(p.source)+' · Read frozen Lean proof ↗</a>'+
-  (p.auxSourceUrl?'<a class="maths-theorem" target="_blank" rel="noopener noreferrer" href="'+
-  escapeText(p.auxSourceUrl)+'">'+escapeText(p.auxSource)+' · Exact mating-move theorem ↗</a>':'')+
-  '</div>';
-}
 function render(){
  if(gesture)cancelGesture();
  const el=root.contains(document.activeElement)?document.activeElement:null;
@@ -171,8 +156,9 @@ function render(){
  const playing=phase==='playing',v=setupVerdict(current(),playing?game.turn:turn);
  const final=playing?outcome(game.board,game.turn,game.history,game.halfmove):null;
  const title=final?.kind==='mate'?name(final.winner)+' wins':
-  final&&['stalemate','75-move','fivefold'].includes(final.kind)?'Draw':v.title;
- const formula=v.equation?proofMarkup(current(),playing?game.turn:turn):'';
+  final&&['stalemate','75-move','fivefold'].includes(final.kind)?'Draw':
+  v.kind==='invalid'?'Illegal position':
+  v.material&&MATERIAL[v.material]?MATERIAL[v.material].label:'Arrange a position';
  root.innerHTML='<section class="maths-shell"><h1 class="maths-heading">Chess <span>· Mathematics</span></h1>'+
   '<div class="maths-layout"><aside class="maths-side maths-white">'+rack('w')+'</aside>'+
   '<div class="maths-centre"><div class="maths-board" role="group" aria-label="Endgame chessboard">'+boardMarkup()+'</div>'+
@@ -187,7 +173,7 @@ function render(){
    '<button id="maths-clear">Clear</button>')+'</div>'+
   '<div class="maths-notice" role="status">'+(notice||(!playing&&v.kind==='invalid'?v.reason:''))+'</div></div>'+
   '<aside class="maths-side maths-black">'+rack('b')+'</aside>'+
-  '<section class="maths-verdict" aria-live="polite"><div class="maths-outcome">'+title+'</div>'+formula+
+  '<section class="maths-verdict" aria-live="polite"><div class="maths-outcome">'+title+'</div>'+
   (playing&&game.material==='krk'||!playing&&v.experimental?'<div class="maths-policy">'+escapeText(KRK_EXPERIMENTAL_DESCRIPTION)+'</div>':'')+
   '</section></div></section>';
  root.querySelector('#maths-turn-w')?.addEventListener('click',()=>{turn='w';notice='';render();});
