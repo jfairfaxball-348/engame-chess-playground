@@ -55,6 +55,30 @@ function annotateSourceTrace(root,variation){
   return trace;
 }
 
+/**
+ * A cycle detector must compare the ENTIRE deterministic source controller,
+ * not just its outer phase or one nested stage. In particular, setup target
+ * file, nested restoration stage, orientation and preceding rook-wall key
+ * all affect which source lemma is legal next.
+ *
+ * Provenance counters are excluded: history length and halfmove rise even
+ * when the same board/controller recurs, so including them would hide loops.
+ * This is only a falsification key; FIDE history/clock obligations remain open.
+ */
+export function krk14ControlStateKey(token) {
+  function projection(value) {
+    if(Array.isArray(value))return value.map(projection);
+    if(value&&typeof value==='object'){
+      return Object.fromEntries(Object.entries(value)
+        .filter(([key])=>key!=='historyLength'&&key!=='halfmove')
+        .sort(([a],[b])=>a.localeCompare(b))
+        .map(([key,entry])=>[key,projection(entry)]));
+    }
+    return value;
+  }
+  return JSON.stringify(projection(token));
+}
+
 /** Every legal weak continuation from ONE fresh or tagged strong root.
  * maxNodes/maxPlies are diagnostic resource limits, not mathematical bounds.
  */
@@ -72,18 +96,9 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
     if(++data.nodes>maxNodes)return fail('node cap',s);
     data.maximumPlies=Math.max(data.maximumPlies,ply);
     if(ply>maxPlies)return fail('ply cap',s);
-    // Central policy has TWO independent tags: PreparedWall continuation
-    // stage='central' and the nested CentralRun control stage
-    // ('centre', 'lower', 'restore', ...). Omitting the latter creates a
-    // FALSE cycle at an identical board reached during different stages.
-    const control=token?.inner?.inner;
-    const key=positionKey(s.board,s.turn)+'|'+JSON.stringify({
-      mode:token?.mode??'root',
-      frame:token?.frame??null,
-      stage:token?.inner?.stage??null,
-      centralStage:control?.stage??null,
-      orientation:control?.orientation??null
-    });
+    // Full source control state avoids the KRK14 false cycle and any
+    // further conflation of distinct nested phases or setup parameters.
+    const key=positionKey(s.board,s.turn)+'|'+krk14ControlStateKey(token);
     if(stack.has(key))return fail('phase-position cycle',s);
     const o=outcome(s.board,s.turn,s.history,s.halfmove);
     if(o.kind!=='ongoing')return fail('terminal before strong action: '+o.kind,s);
