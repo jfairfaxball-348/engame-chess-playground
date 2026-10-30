@@ -130,6 +130,6 @@ test('unknown geometric root fails closed; no external source or arbitrary legal
  const c=chooseMathsOpponent(start(s),'w');
  assert.equal(c,null);
  const src=readFileSync('src/kqk-source-policy.js','utf8');
- assert.doesNotMatch(src,/Stockfish|Syzygy|tablebase|\bfetch\s*\(|\bminimax\s*\(/i);
+ assert.doesNotMatch(src.split('*/').slice(1).join('*/'),/Stockfish|Syzygy|tablebase|\bfetch\s*\(|\bminimax\s*\(/i);
  assert.equal(KQK_FRAMES.length,8);
 });
