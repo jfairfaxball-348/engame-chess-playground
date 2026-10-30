@@ -433,6 +433,23 @@ function entryChoice(state,strong,frame,g,allowFarFile=true) {
     return choose(g.queen,f,qy,
       'KQK.FarFilePreparation.far_file_preparation.escape_preserving','far-file');
   }
+  // OrientedEntry.horizontal_far_wall_entry: its high-file narrow
+  // branch needs only weak.rank >= king.rank+1, NOT equality.  In
+  // particular queen.rank = weak.rank+2 may occur with a larger vertical
+  // king/weak gap.  The frozen Lean proof sends Q to file 6 and enters
+  // framed EdgeWall (swap for below, reflectX∘swap for above).  Execute
+  // this specific source construction BEFORE general clear-wall entry:
+  // both lemmas apply in part of this region, but the horizontal proof
+  // already supplies the short direct edge-wall transition.
+  //
+  // Exclude the source's explicit corner-distant mate exception; that
+  // is selected before generic entry in kqkSourceChoice.
+  if(kx===5&&wx===7&&wy>=ky+1&&
+     Math.abs(qy-wy)===2&&qy!==ky&&
+     !(ky<qy&&qy<wy)&&qx!==6&&
+     !(ky===6&&qy===5&&wy===7))
+    return choose(g.queen,6,qy,
+      'KQK.OrientedEntry.horizontal_far_wall_entry.narrow_queen_to_six');
   // EntryGeometry.low_right_entry: raise a cleared queen to the rank
   // directly above the king, then the existing Band controller applies.
   if(wy>=ky+2&&ky<=4&&qx+2<=wx&&
@@ -445,20 +462,6 @@ function entryChoice(state,strong,frame,g,allowFarFile=true) {
      (qx!==kx||ky<qy)&&qy!==6)
     return choose(g.queen,qx,6,
       'KQK.OrientedEntry.small_file_wall_entry.edge_wall');
-  // OrientedEntry.horizontal_far_wall_entry: narrow high-file case of
-  // far_file_stage_bound.  The Lean proof splits at kx=5, wx=7, exact
-  // two-rank queen/weak gap, queen outside the separating band.  With
-  // the queen not already on file 6, it explicitly plays Q(6,qy), then
-  // enters the swapped EdgeWall family after any legal weak reply.
-  // Only the one-rank weak/strong gap enters here: wider vertical gaps
-  // belong to the earlier small_file_wall_entry preparation.  The
-  // corner-distant-mate exception is dispatched before all other rules.
-  if(kx===5&&wx===7&&wy===ky+1&&
-     Math.abs(qy-wy)===2&&qy!==ky&&
-     !(ky<qy&&qy<wy)&&qx!==6&&
-     !(ky===6&&qy===5&&wy===7))
-    return choose(g.queen,6,qy,
-      'KQK.OrientedEntry.horizontal_far_wall_entry.narrow_queen_to_six');
   // TightEntry.tight_above_entry / tight_king_step: a one-rank king
   // approach, followed by the source-mandated protected queen file.
   if(qx<=1&&wx>=3&&qy===ky+2&&wy===ky+1&&
