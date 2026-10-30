@@ -1,3 +1,11 @@
+# Owner clarification — preserve existing mathematical explanations (30 October 2026)
+
+The earlier KRK16 UI simplification **overreached**. The owner wants the original **full mathematical explanations** for the three already released draw classes: **K/K, K+B/K and K+N/K**. This is a binding *material-specific* display rule, superseding any "remove all Maths proof panels" direction: retain the equation, board-specific calculation, mathematical derivation steps, source theorem reference and live update as pieces are arranged and play progresses. The original working was already in `src/maths-proof.js`; it must not be deleted. Keep source hyperlinks and "Guaranteed draw" results for those classes.
+
+For **KRK and forthcoming KQK**, the previously owner-approved **short play-first experimental strategy demonstration** is fine for now. The fact that KQK/ KRK need not render long proofs **must never** justify removing the older KK/KBK/KNK content. Maintain a strict separation between the Lean-proved outcome and experimental JS move controller. Build KQK play next under `NEXT_SESSION.md`, and leave KPK disabled until its source theorem finishes.
+
+---
+
 # Owner direction — playable Maths beta first (30 October 2026)
 
 **This latest direction supersedes older blanket KRK experimental-play bans below.** The owner prioritises a working Playground now, accepts an explicitly labelled *experimental* reconstruction of proof-derived move rules before a formal proof of the exact JavaScript selector, and deliberately defers precise FIDE 50/75-move and repetition-history parity. Never label such play as formally certified or universally winning from every legal position. Keep the certified KRK release boolean false.
