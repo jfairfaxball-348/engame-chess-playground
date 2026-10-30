@@ -14,7 +14,8 @@
     "audit:krk-root-selector": "node scripts/krk13-root-selector-audit.mjs",
     "audit:krk14-continuations": "node scripts/krk14-continuation-audit.mjs",
     "audit:krk14-mate-tree": "node scripts/krk14-mate-tree.mjs",
-    "audit:krk-mate-strata": "node scripts/krk15-stratified-mate-audit.mjs --nodes=200 --strict"
+    "audit:krk-mate-strata": "node scripts/krk15-stratified-mate-audit.mjs --nodes=200 --strict",
+    "audit:kqk-roots": "node scripts/kqk20-coverage.mjs"
   },
   "dependencies": {
     "chess.js": "1.4.0",
