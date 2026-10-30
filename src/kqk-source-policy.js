@@ -247,20 +247,40 @@ function knightChoice(state,strong,frame,g) {
     post.board[result.move.from]=null;
     return tagged(result,makeToken(post,strong,frame,token));
   };
+  // SetupCorners.corner_knight_low_five_rescue: exactly the (6,5) queen
+  // and (7,7) weak king.  The source splits on whether K(5,5) blocks
+  // its ordinary Q(5,5) preparation. In the blocked case the proved
+  // king_blocks_target_bound instead plays Q(7,5), forcing ...K(6,7)
+  // followed by Q(6,6) mate. Both follow-on moves are already covered
+  // below by KnightPrison and king_blocks_target_bound.finish.
+  // Do not generalise this to arbitrary fifth-rank knight positions.
+  if(qx===6&&wx===7&&wy===7) {
+    if(kx===5&&ky===5)
+      return step(g.queen,7,5,
+        'KQK.SetupCorners.king_blocks_target_bound.queen_to_seven');
+    return step(g.queen,5,5,
+      'KQK.SetupCorners.corner_knight_low_five_rescue.queen_to_five');
+  }
   if(qx===5) {
     if(wx===6&&wy===7)
-      return step(g.queen,4,6,'KQK.KnightPrison.knight_top_bound');
+      return ky===5
+        ? step(g.sk,kx,4,
+          'KQK.KnightPrison.knight_prison_low_five_bound.king_down','knight-low-five')
+        : step(g.queen,4,6,'KQK.KnightPrison.knight_top_bound');
     if(wx===7&&wy===6)
       return ky<=4
         ? step(g.sk,kx===7?6:kx+1,ky,
           'KQK.KnightPrison.knight_prison_bound.king_tempo','knight-side')
-        : step(g.sk,kx,4,'KQK.KnightPrison.knight_prison_low_five_bound',
-          'knight-side');
+        : step(g.sk,kx,4,
+          'KQK.KnightPrison.knight_prison_low_five_bound.king_down','knight-low-five');
     return null;
   }
-  if(qx===1&&wx===0&&wy===7)
+  // RankFive.left_corner_bound and left_fork_weak_bound both require
+  // sk.rank <= 4. At rank five use SetupCorners.low_five instead;
+  // a reflected matching pattern is not a licence to drop 'low'.
+  if(ky<=4&&qx===1&&wx===0&&wy===7)
     return step(g.queen,2,5,'KQK.RankFive.left_corner_bound');
-  if(qx===1&&wx===2&&wy===7)
+  if(ky<=4&&qx===1&&wx===2&&wy===7)
     return step(g.queen,0,6,'KQK.RankFive.left_fork_weak_bound.edge_entry');
   // SetupCorners.king_blocks_target_bound: the last Q(6,6) is
   // protected ONLY by the strong king at (5,5). Without both king
@@ -284,6 +304,17 @@ function bandRaiseReply(state,strong,token) {
   return targetMove(state,strong,g.queen,preimage(token.frame,qx,qy+1),
     'KQK.BandRaise.prepared_raise_bound.queen_rise');
 }
+// KnightPrison.knight_prison_low_five_bound must lower a rank-five
+// strong king BEFORE using the low-king knight-prison constructions.
+// The weak king may enter either knight square after that legal step;
+// dispatch only those two proved branches in the original frame.
+function knightLowFiveReply(state,strong,token) {
+  const g=geometric(state,strong,token.frame);
+  if(!g||g.k[1]!==4||g.q[0]!==5||g.q[1]!==5||
+     !((g.w[0]===6&&g.w[1]===7)||(g.w[0]===7&&g.w[1]===6)))return null;
+  return knightChoice(state,strong,token.frame,g);
+}
+
 function knightSideReply(state,strong,token) {
   const g=geometric(state,strong,token.frame);
   if(!g||g.q[0]!==5||g.q[1]!==5||g.w[0]!==6||g.w[1]!==7||
@@ -399,7 +430,7 @@ function entryChoice(state,strong,frame,g) {
 }
 
 function validToken(state,strong,token) {
-  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','tight-file'].includes(token.kind)||
+  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','knight-low-five','tight-file'].includes(token.kind)||
      !Object.hasOwn(FRAMES,token.frame)||token.strong!==strong||
      state.log.length!==token.moveCount+1)return false;
   const weak=findKing(state.board,opposite(strong));
@@ -418,6 +449,7 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='shadow-bottom-reply')return bottomReply(state,strong,token);
     if(token.kind==='band-raise')return bandRaiseReply(state,strong,token);
     if(token.kind==='tight-file')return tightFileReply(state,strong,token);
+    if(token.kind==='knight-low-five')return knightLowFiveReply(state,strong,token);
     return knightSideReply(state,strong,token);
   }
   // Exact OrientedEntry.high_file_corner_entry (frozen Lean source):
@@ -449,6 +481,20 @@ export function kqkSourceChoice(state,strong,token=null) {
     const g=geometric(state,strong,frame);
     if(shadow(g)){
       const choice=shadowStart(state,strong,frame,g);
+      if(choice)return {...choice,frame};
+    }
+  }
+  // The rank-five sources have more restrictive hypotheses than
+  // general knight-prison/reflective corner actions. Dispatch them first
+  // whenever ANY proven frame matches. This prevents an earlier reflected
+  // frame from accidentally invoking a low-rank lemma at rank five.
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+    if(qx===6&&qy===5&&wx===7&&wy===7&&ky<=5 ||
+       qx===5&&qy===5&&ky===5&&
+         ((wx===6&&wy===7)||(wx===7&&wy===6))){
+      const choice=knightChoice(state,strong,frame,g);
       if(choice)return {...choice,frame};
     }
   }
