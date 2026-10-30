@@ -40,7 +40,8 @@ test('KRK classifies fresh roots and does not pretend to have an executable cert
  const b=position('wR');
  const v=setupVerdict(b,'w');
  assert.equal(v.title,'Winning for White');assert.equal(v.source,'EC-T0048');
- assert.equal(v.human,'b');assert.equal(v.canStart,false);assert.equal(v.strategyPending,true);
+ assert.equal(v.human,'b');assert.equal(v.canStart,true);assert.equal(v.experimental,true);
+ assert.equal(v.strategyPending,false);
 });
 test('weak king captures an exposed rook: draw according to KRK criterion',()=>{
  const b=blankBoard();b[sq(4,0)]='wK';b[sq(4,6)]='bK';b[sq(4,5)]='wR';

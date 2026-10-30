@@ -1,5 +1,6 @@
-/** Mathematics-only release gate and proved fresh-clock endgame outcomes.
- * No engine, search, per-position tables or unproved winning strategy.
+/** Mathematics-only classification and independent experimental KRK access.
+ * A proved game outcome does NOT prove the experimental JS policy complete.
+ * No engine, search or per-position tables participate in move choice.
  */
 import {makeBoard,validateSetup,legalMoves,outcome,distance,findKing,attacks,opposite} from './chess.js';
 export const INVENTORY=Object.freeze(['R','N','B','Q','K','B','N','R',...Array(8).fill('P')]);
@@ -51,6 +52,6 @@ export function setupVerdict(board,turn){
  const legal=legalMoves(board,turn).length>0;
  const win=(turn===strong&&legal)||mated||(turn===weak&&safeRook&&legal);
  return {kind:win?'win':'draw',title:win?('Winning for '+(strong==='w'?'White':'Black')):'Guaranteed draw',
-  equation:theorem.equation,source:theorem.id,canStart:false,material,human:weak,
-  strategyPending:true,safeRook,terminal:terminal.kind};
+  equation:theorem.equation,source:theorem.id,canStart:true,material,human:weak,
+  experimental:true,strategyPending:false,safeRook,terminal:terminal.kind};
 }

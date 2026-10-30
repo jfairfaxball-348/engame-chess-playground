@@ -3,7 +3,7 @@
  *
  * These are adversarial falsification tests, NOT a formal proof of winning play.
  * They must remain in CI when an eventual total proof-derived KRK policy lands.
- * In the meantime they assert that Maths KRK stays inaccessible.
+ * Experimental KRK play is separately opted in; certified release stays locked.
  *
  * Regression: practical PR #5, run 40891590400, drew by fivefold at ply 21
  * against a distance-seeking lone king. Green local witness tests alone do
@@ -54,10 +54,12 @@ test('the release flag, material gate, Maths Start gate and engine dispatch cann
     assert.equal(validateSetup(board,'krk',turn),null);
     const verdict=setupVerdict(board,turn);
     assert.equal(MATERIAL.krk.playable,KRK_GAMEPLAY_RELEASED);
-    assert.equal(verdict.canStart,KRK_GAMEPLAY_RELEASED);
+    assert.equal(verdict.canStart,true,'owner-approved experimental KRK Start');
+    assert.equal(verdict.experimental,true);
     if(!KRK_GAMEPLAY_RELEASED){
-      assert.equal(verdict.strategyPending,true);
-      assert.throws(()=>newGame(board,turn,'krk'),/not released/i);
+      assert.equal(verdict.strategyPending,false);
+      assert.throws(()=>newGame(board,turn,'krk'),/certified playground/i);
+      assert.equal(newGame(board,turn,'krk',{experimentalKRK:true}).turn,turn);
       const state={board,turn,material:'krk',halfmove:0,
         history:[positionKey(board,turn)],log:[]};
       assert.equal(chooseDecision(state,strong),null);

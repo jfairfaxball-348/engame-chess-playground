@@ -102,8 +102,8 @@ export function proofFor(board,turn){
     }
   }
   return {...general,
-   lead:immediate?'An exact frozen mate-in-one witness applies to this fresh setup. Full KRK gameplay remains gated.':
-    lastReply?'The frozen LastReply theorem certifies mate in at most two plies after EVERY legal weak-king reply. Full KRK gameplay remains gated.':
+   lead:immediate?'An exact frozen mate-in-one witness applies to this fresh setup. Experimental source-derived KRK play is available; its full-game winning controller is not yet certified.':
+    lastReply?'The frozen LastReply theorem certifies mate in at most two plies after EVERY legal weak-king reply. Experimental source-derived KRK play is available; its full-game winning controller is not yet certified.':
     'The frozen theorem classifies each fresh-clock KRK outcome against every defence.',
    working:'d∞(R,k) = '+near+';  rook defended by K = '+(guard?'yes':'no')+
     ';  SafeRook = '+(v.safeRook?'true':'false')+

@@ -85,6 +85,15 @@ export async function verifyKRKCentralPolicySources(
     'KRK_CENTRAL_POLICY_SOURCE_SHA','CentralPolicy',15);
 }
 
+/** Source-locked, still unreleased KRK11 preparation -> central policy. */
+export async function verifyKRKPreparedSources(
+  lock=JSON.parse(readFileSync('proof-sources/krk11-prepared-wall.lock.json','utf8')),
+  fetchSource=fetch
+){
+  return verifyDraftSourceLock(lock,fetchSource,'src/krk-prepared-wall.js',
+    'KRK_PREPARED_SOURCE_SHA','PreparedWallPolicy',19);
+}
+
 async function verifyDraftSourceLock(lock,fetchSource,localPath,anchor,required,count){
   if(lock?.schemaVersion!==1||lock.status!=='draft-unreleased'||
      lock.gameplayReleased!==false||
@@ -119,6 +128,8 @@ if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
     console.log('KRK routing provenance verified:',routing,'draft source files; gameplay remains unreleased');
     const policy=await verifyKRKCentralPolicySources();
     console.log('KRK central policy provenance verified:',policy,'draft source files; no FIDE or global-root certificate');
+    const prepared=await verifyKRKPreparedSources();
+    console.log('KRK prepared wall provenance verified:',prepared,'draft sources; gameplay unreleased');
   }catch(e){
     console.error(e);
     process.exitCode=1;
