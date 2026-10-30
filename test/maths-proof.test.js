@@ -57,30 +57,31 @@ test('KRK proof shows positional safety condition and both mate bounds without a
  assert.ok(p.steps.some(s=>s.math.includes('98')));
  assert.ok(p.steps.some(s=>s.math.includes('SafeRook')));
 });
-test('an exact one-ply KRK witness is explained without enabling gameplay',()=>{
+test('an exact one-ply KRK witness is explained without claiming certified gameplay',()=>{
  const b=blankBoard();
  b[sq(1,5)]='wK';b[sq(7,0)]='wR';b[sq(0,7)]='bK';
  const result=setupVerdict(b,'w'),p=proofFor(b,'w');
  assert.equal(result.kind,'win');
- assert.equal(result.canStart,false,'a local mate witness must not unlock the full game');
+ assert.equal(result.canStart,true,'experimental KRK is separate from selector certification');
+ assert.equal(result.experimental,true);
  assert.equal(p.source,'EC-T0048');
  assert.equal(p.auxSource,'EC-T0049');
  assert.match(p.auxSourceUrl,/EC-T0049\/v1\.md$/);
  assert.match(p.working,/MateNow = true/);
  assert.match(p.working,/Rh1 → h8#/);
  assert.ok(p.steps.some(s=>s.math.includes('MateNow')&&s.why.includes('immediate_iff')));
- assert.match(p.lead,/Full KRK gameplay remains gated/);
+ assert.match(p.lead,/Experimental source-derived KRK play is available/);
  const weak=proofFor(b,'b');
  assert.ok(weak,'weak-to-move on the same setup is a distinct legal condition');
  assert.equal(weak.auxSource,'EC-T0049','weak-turn LastReply is now a separately proved terminal case');
  assert.match(weak.formal,/KRKLastReply.model_last_iff/);
 });
 
-test('weak-turn frozen LastReply proof explains every legal mate-in-two branch but does not start KRK',()=>{
+test('weak-turn frozen LastReply proof explains every legal mate-in-two branch in KRK beta',()=>{
  const b=blankBoard();
  b[sq(1,5)]='wK'; b[sq(7,0)]='wR'; b[sq(0,7)]='bK';
  const verdict=setupVerdict(b,'b'),p=proofFor(b,'b');
- assert.equal(verdict.canStart,false);
+ assert.equal(verdict.canStart,true);
  assert.equal(verdict.kind,'win');
  assert.equal(p.source,'EC-T0048');
  assert.equal(p.auxSource,'EC-T0049');
@@ -91,11 +92,11 @@ test('weak-turn frozen LastReply proof explains every legal mate-in-two branch b
  assert.match(p.formal,/KRKLastReply.model_last_iff/);
 });
 
-test('Maths proof panel shows the exact constructive entry and local theorem, not an opponent policy',()=>{
+test('Maths proof panel shows constructive entry without claiming certified opponent policy',()=>{
  const b=blankBoard();
  b[sq(3,0)]='wK';b[sq(6,5)]='wR';b[sq(4,6)]='bK';
  const v=setupVerdict(b,'w'),p=proofFor(b,'w');
- assert.equal(v.canStart,false);
+ assert.equal(v.canStart,true);
  assert.ok(p.steps.some(s=>s.math.includes('R g6 → g2')&&s.why.includes('krk_clear_vertical_entry_force')));
  assert.ok(p.steps.some(s=>s.why.includes('no global mate policy')));
  assert.equal(p.source,'EC-T0048');
