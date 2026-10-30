@@ -303,6 +303,15 @@ export function kqkSourceChoice(state,strong,token=null) {
       if(choice)return {...choice,frame};
     }
   }
+  // Preserve the existing S018 ShadowForce selection before overlapping
+  // newly covered wall regions; shadow replies carry a distinct source token.
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    if(shadow(g)){
+      const choice=shadowStart(state,strong,frame,g);
+      if(choice)return {...choice,frame};
+    }
+  }
   for(const frame of KQK_FRAMES){
     const g=geometric(state,strong,frame);
     const choice=knightChoice(state,strong,frame,g);
@@ -312,13 +321,6 @@ export function kqkSourceChoice(state,strong,token=null) {
     const g=geometric(state,strong,frame);
     const choice=bandChoice(state,strong,frame,g);
     if(choice)return {...choice,frame};
-  }
-  for(const frame of KQK_FRAMES){
-    const g=geometric(state,strong,frame);
-    if(shadow(g)){
-      const choice=shadowStart(state,strong,frame,g);
-      if(choice)return {...choice,frame};
-    }
   }
   return null;
 }
