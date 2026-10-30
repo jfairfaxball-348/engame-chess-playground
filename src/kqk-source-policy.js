@@ -351,6 +351,26 @@ function tightFileReply(state,strong,token) {
   const g=geometric(state,strong,token.frame);
   return g?protectedFileChoice(state,strong,token.frame,g):null;
 }
+/**
+ * SameRankEntry.backrank_entry's FINAL branch is a two-ply composition:
+ * after K(wk.file,0), EVERY legal weak reply enters
+ * protected_backrank_entry. The protected Q(q.file,1) must be chosen in
+ * the original proof frame, not via a fresh root dispatcher. This is
+ * source-defined and does not rank/search moves.
+ */
+function protectedBackrankReply(state,strong,token) {
+  const g=geometric(state,strong,token.frame);
+  if(!g)return null;
+  const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+  // Exact protected_backrank_entry premises from frozen SameRankEntry:
+  // both strong pieces at rank 0, weak rank >= 2, king/queen files
+  // adjacent, and weak king not occupying the queen's file. Weak legal
+  // reply already supplies its non-check premise.
+  if(ky!==0||qy!==0||wy<2||Math.abs(kx-qx)!==1||wx===qx)
+    return null;
+  return targetMove(state,strong,g.queen,preimage(token.frame,qx,1),
+    'KQK.SameRankEntry.protected_backrank_entry.queen_up');
+}
 function entryChoice(state,strong,frame,g,allowFarFile=true) {
   const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
   const choose=(from,x,y,phase,kind=null)=>{
@@ -384,7 +404,8 @@ function entryChoice(state,strong,frame,g,allowFarFile=true) {
     if(Math.abs(qx-wx)===1&&Math.abs(kx-wx)===1&&
        Math.abs(kx-qx)===2)
       return choose(g.sk,wx,ky,
-        'KQK.SameRankEntry.backrank_entry.king_to_weak_file');
+        'KQK.SameRankEntry.backrank_entry.king_to_weak_file',
+        'backrank-protected');
   }
   // FarFilePreparation: choose file 0 or 1 from the explicit escape
   // witness, rather than always picking zero (which can stalemate).
@@ -499,7 +520,7 @@ function farFileReply(state,strong,token) {
 }
 
 function validToken(state,strong,token) {
-  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','knight-low-five','tight-file','far-file'].includes(token.kind)||
+  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','knight-side','knight-low-five','tight-file','far-file','backrank-protected'].includes(token.kind)||
      !Object.hasOwn(FRAMES,token.frame)||token.strong!==strong||
      state.log.length!==token.moveCount+1)return false;
   const weak=findKing(state.board,opposite(strong));
@@ -518,6 +539,8 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='shadow-bottom-reply')return bottomReply(state,strong,token);
     if(token.kind==='band-raise')return bandRaiseReply(state,strong,token);
     if(token.kind==='tight-file')return tightFileReply(state,strong,token);
+    if(token.kind==='backrank-protected')
+      return protectedBackrankReply(state,strong,token);
     if(token.kind==='far-file')return farFileReply(state,strong,token);
     if(token.kind==='knight-low-five')return knightLowFiveReply(state,strong,token);
     return knightSideReply(state,strong,token);
