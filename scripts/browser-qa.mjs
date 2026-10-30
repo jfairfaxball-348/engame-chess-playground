@@ -174,6 +174,25 @@ async function run(){
    assert.equal(await page.locator('#maths-first').count(),0);
    console.log('PASS reported screenshot starting arrangement and explicit first move');
   }finally{await capturedContext.close();}
+  // KNK's previously released worked explanation stays dynamic in the Maths UI.
+  const knightContext=await browser.newContext({viewport:{width:1024,height:880}});
+  try{
+   const page=await knightContext.newPage();
+   await fresh(page);
+   await add(page,'wK',0);await add(page,'bK',60);await add(page,'wN',18); // c3
+   assert.equal(await page.locator('.maths-outcome').innerText(),'Guaranteed draw');
+   assert.match(await page.locator('.maths-equation').innerText(),/V\(K \+ N : K\) = D/);
+   assert.match(await page.locator('.maths-worked').innerText(),/c3/);
+   assert.equal(await page.locator('.maths-proof-steps li').count(),5);
+   assert.match(await page.locator('.maths-theorem').getAttribute('href'),/EC-T0005\/v1\.md$/);
+   await drag(page,cell(page,18),cell(page,27)); // c3 -> d4 editor
+   assert.match(await page.locator('.maths-worked').innerText(),/d4/,
+      'KNK proof recalculates for the newly arranged square');
+   await page.locator('#maths-start').click();
+   assert.equal(await page.locator('.maths-proof-steps li').count(),5,
+      'full KNK derivation is still present during play');
+   console.log('PASS full KNK worked proof and dynamic square parity');
+  }finally{await knightContext.close();}
  }finally{await browser.close();}
 }
 try{await run();console.log('Maths BROWSER QA PASS');}
