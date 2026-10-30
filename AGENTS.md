@@ -1,3 +1,13 @@
+# Owner direction — playable Maths beta first (30 October 2026)
+
+**This latest direction supersedes older blanket KRK experimental-play bans below.** The owner prioritises a working Playground now, accepts an explicitly labelled *experimental* reconstruction of proof-derived move rules before a formal proof of the exact JavaScript selector, and deliberately defers precise FIDE 50/75-move and repetition-history parity. Never label such play as formally certified or universally winning from every legal position. Keep the certified KRK release boolean false.
+
+Permission is limited: every KRK attacking move must still come from the named source-derived constructive controller; do not insert Stockfish, Lozza, external engines, tablebases, minimax, heuristic scores or arbitrary first-legal choices in Maths. Missing continuation must fail closed, explain what happened, and allow Undo/New position. Exact user-arranged positions, lawful piece moves, checkmate, both colours, capture-to-KK drawing continuation and isolated Engine tab must work.
+
+KQK is now frozen in the mathematics repo as **EC-T0050** and is the highest-priority next *playable beta* import once KRK is tested. KPK is still mathematically incomplete; prepare interface capability but do not falsely advertise it as solved. Maintain separate labels for (1) proven material outcome, (2) experimental constructed JS policy, and (3) fully verified selector.
+
+---
+
 # Owner update — KRK02 executable release work authorised, 29 October 2026
 
 **Current instruction supersedes the historic KRK work ban below.** The owner authorises finishing and testing the **fully playable proof-derived KRK opponent** in the Maths tab. The verified KRK01 local constructions and proof source lock may be merged into `main` and deployed **with KRK gameplay still gated**. The next priority is the executable complete KRK policy and release under `NEXT_SESSION.md` (KRK02). The mathematical release gate remains binding: do not enable KRK until total proof-corresponding move selection, all adversarial replies, correct rule/clock semantics, integration tests and release CI pass. Upstream KRK is outcome-complete but its noncomputable global `Classical.choose` policy does not itself supply executable play. The owner has explicitly authorised KRK02 engineering; this is **not** permission to substitute any unproved engine/heuristic/tablebase for the mathematical policy.
