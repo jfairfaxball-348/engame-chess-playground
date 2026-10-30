@@ -1,26 +1,60 @@
-# S019 — Expand proof-derived KQK strategy coverage
+# S020 — Complete source-derived KQK entry and full-game adversarial coverage
 
-**NEXT EXECUTION SESSION — installed following S018.**
+**Next execution session, installed following S019.**
 
 ## Binding direction
 
-The Chess Maths Playground is a live demonstration of the strategies developed in the separate `engame-chess` Lean project. It does not discover new mathematics, run Stockfish/Lozza/Syzygy or look up tablebases. No invented minimax, first-legal, heuristic or atlas fallback is permitted.
+Chess Maths Playground demonstrates the *separate engame-chess Lean
+project's constructed strategies* as a playable opponent. Do not invent
+new mathematics in the Playground, call Stockfish/Lozza/tablebases/minimax,
+add arbitrary first-legal moves, or use a move atlas as a substitute.
+The 50/75-move full history parity is deliberately deferred.
 
-**Preserve the old detailed mathematical workings for KK/KBK/KNK**, including positional equations, calculations, proof steps and Lean theorem links in both setup and play. This is a permanent material-specific feature. KRK and KQK may remain compact, board-first demonstrations. The 50/75-move clock/history exactness is deliberately deferred.
+**Permanent regression constraint:** KK, KBK, KNK retain their original
+board-dependent mathematical proof panels, equations, working and Lean
+links in setup and play. KRK/KQK may remain compact, play-first, and
+explicitly experimental. Do not modify the independent Engines tab.
 
-## Incoming S018
+## Incoming S019
 
-- KQK now has local queen attacks, legal moves, terminal chess rules, original-square setup, two colours, explicit first opponent move, source-token undo, and queen-capture-to-KK.
-- The outcome panel imports frozen `EC-T0050` from `engame-chess`, proof-source SHA `c72365a8ba46f59114a2a77d9d38993f6a52df80`.
-- `src/kqk-source-policy.js` is a **partial and honest** controller implementing `Edge/EdgeForce` corner corridor and `ShadowForce/ShadowExit` copying/finishing through the eight proven symmetries. A missing case visibly refuses play. `MATERIAL.kqk.playable=false` keeps global certified gameplay gated.
-- KRK beta remains isolated, KK/KBK/KNK retain their full worked proofs. Tests in `test/kqk18-experimental-play.test.js` and `scripts/browser-qa.mjs`; source and scope recorded in `docs/KQK18_PLAYABLE_BETA.md` and `proof-sources/kqk.lock.json`.
+- S018 edge/shadow KQK working, two colours, user-chosen exact start, Undo,
+  captured-queen-to-KK and original mathematical proof restoration are
+  preserved.
+- `src/kqk-source-policy.js` now supports extra separating-rank king
+  preparation, prepared king/file progression, guarded cross/rise,
+  rank-five corner repair and knight-box cases from source SHA
+  `c72365a8ba46f59114a2a77d9d38993f6a52df80`.
+- Source proof references: BandEntry, BandProgress, BandForce, BandRaise,
+  RankFive, KnightPrison, EntryFrames, StrongEntry.
+- Crucial pitfall: `BandRaise.prepared_raise_bound` has a special
+  queen-to-(5,5) corner branch when its queen is on rank four and the
+  weak king at file seven. Never generalise the ordinary queen rise to
+  that case; that led to a reproducible stalemate.
+- Tests: `test/kqk19-band-source.test.js`; details:
+  `docs/KQK19_BAND_EXTENSION.md`. The certified flag stays false.
 
 ## Execution mission
 
-1. Inspect current exact `main`, confirm S018 CI, verify browser game behaviour, `npm test`, `npm run check`, `npm run build`, `npm run verify:krk-sources`, and both browser suites.
-2. Expand the runnable KQK controller from source-proved geometric constructions `StrongEntry`, `EntryFrames`, `SameRankEntry`, `FarFileEntry`, `OrientedEntry`, `BandForce`, `BandEntry`, `TightEntry`, `ClearWallEntry` at the pinned source SHA. Translate explicit phase premises and transitions, not only class outcome/existence.
-3. Test adversarial *every weak reply* from newly covered root families, colour symmetry and all eight orientations, and full legal continuations ending in checkmate. Also quantify supported legal fresh winning roots and fail-closed unsupported roots without pretending these samples constitute a mathematical proof.
-4. Keep the editor simple. Don't rework the old worked draw explanations, widen the UI into long KRK/KQK theorem displays, touch the independent Engine Playground, or start KPK prematurely.
-5. Commit and verify exact-head Node/Chromium CI; fast-forward merge to `main` only on success. Verify Cloudflare deployment state separately; keep `wrangler.jsonc` unchanged.
+1. Verify exact current `main` / S019 CI and the *actual* production
+   Cloudflare deployment independently; do not infer deployment from Git.
+2. Quantify supported legal fresh KQK roots and complete defender-branch
+   games under a reproducible, bounded, **diagnostic-only** corpus. Keep
+   availability, legal-move correctness and game termination separate.
+3. Implement the next missing *explicit, source-constructed* KQK phases,
+   prioritising `SameRankEntry`, `FarFilePreparation`,
+   `OrientedEntry` and `TightEntry`. Follow exact Lean premises and
+   defender reply cases, including diagonal/check and stalemate exclusions.
+   Build source-tagged continuations with tokens when needed.
+4. Test both colours, eight symmetries, adversarial all-reply children
+   and complete lines ending in actual checkmate. Fix failures instead
+   of softening release flags or deleting counterexamples.
+5. Run `npm test`, `npm run check`, `npm run build`,
+   `npm run verify:krk-sources`, and both Chromium suites. Commit and
+   PR/fast-forward merge only after exact-head CI success.
+6. Preserve `wrangler.jsonc` and the Engines tab unchanged. Do not
+   start KPK until the Playground's KQK is substantially playable.
 
-**Primary success metric:** substantially more *actual user-arranged KQK positions* complete lawful games against the source-derived queen-side opponent, not more paragraphs of status documentation.
+**Primary metric:** greater fraction of **user-arranged legal KQK roots**
+that actually complete lawful checkmates versus every legal defender
+reply, rather than more documentation or JavaScript outcome assertions.
+Be explicit about any still-incomplete root families.
