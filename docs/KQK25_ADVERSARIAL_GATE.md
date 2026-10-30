@@ -107,3 +107,24 @@ non-bouncing continuation for both colours/eight symmetry frames.
 This is an actual live KQK strategy fix, **not** mathematical
 certification of complete KQK play. Full final-head PR and merged-head
 expanded CI metrics still must be checked.
+
+## Post-repair audited result (exact code head `13da7ce`)
+
+PR-head [Actions 41094156645](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41094156645)
+passed Node tests, source locks, audits, build and Chromium.
+Fixed-seed 12,000-attempt/4-family/2,500-node/64-round KQK
+diagnostic: **120 roots**, **105 finite all-defender mate-closed**,
+**15 resource-capped**, **zero hard failures**. 79,861 nodes,
+76,611 actual defender replies, 7,810 successful cross-depth closure
+reuses. In contrast, the pre-repair monotone audit found 103 closed,
+16 caps and the explicit one-cycle failure above. These are
+same-seed same-scope diagnostics; no universal all-position theorem.
+
+After the fix, the largest capped KQK families are
+WeakToMove (4/8), FarFilePreparation (4/8),
+SameRankEntry (3/8); BandProgress, EntryGeometry, BandRaise
+and TightEntry each have one capped root. KRK remained
+24/24 resource-capped, no confirmed hard failures at 2,500 nodes.
+The **final merged main SHA and its own run** still require
+independent confirmation; do not substitute this earlier PR-head
+CI as that post-merge verification.
