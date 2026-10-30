@@ -114,5 +114,6 @@ test('starting orientation and first move are opt-in in the Maths runtime',()=>{
  assert.match(app,/history\.push\(save\(\)\);openingPending=false/);
  assert.match(app,/id="maths-first"/);
  assert.doesNotMatch(app,/facing=human/);
- assert.match(app,/proofMarkup\(current\(\),playing\?game\.turn:turn\)/);
+ assert.doesNotMatch(app,/proofMarkup|maths-proof-steps|maths-worked/);
+ assert.match(app,/MATERIAL\[v\.material\]\.label/);
 });
