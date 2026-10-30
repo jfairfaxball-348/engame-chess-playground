@@ -1,7 +1,8 @@
 /** The playground's deliberately limited, independent chess rules implementation.
  * No engine, tablebase, remote lookup or dependency. Board indices: a1=0, h8=63.
  * Playable: K v K, K+B v K, K+N v K. KRK geometry remains for local rules tests only;
- * KRK play is explicitly blocked pending an owner-approved, completed upstream release.
+ * KRK certified play remains gated; an explicitly opted-in experimental
+ * Maths controller can use the same legal board representation.
  * No pawns/castling/en-passant.
  */
 export const MATERIAL = Object.freeze({
@@ -124,8 +125,9 @@ export function play(state,move){
   return {...state,board,turn,history,halfmove:allowed.capture?0:state.halfmove+1,
     log:state.log.concat(`${state.turn==='w'?'White':'Black'} ${moveNotation(state.board,allowed,board,turn)}`)};
 }
-export function newGame(board,turn,material){
-  if(!MATERIAL[material]?.playable) throw new Error('This material class is not released for playground play. Wait for completed, frozen upstream results and owner approval.');
+export function newGame(board,turn,material,{experimentalKRK=false}={}){
+  if(!MATERIAL[material]?.playable && !(material==='krk'&&experimentalKRK))
+    throw new Error('This material class is not released for certified playground play.');
   const problem=validateSetup(board,material,turn);if(problem)throw new Error(problem);
   return {board:board.slice(),turn,material,halfmove:0,history:[positionKey(board,turn)],log:[]};
 }
