@@ -62,3 +62,26 @@ test('S027 BandProgress keeps each proved Prepared continuation for all weak rep
     assert.ok((counts.get(f.source+' '+strong)||0)>0,
       'fixture must exercise '+f.source+' with '+strong);
 });
+
+test('S027 first capped S025 WeakToMove path is resource-limited, not missing a prepared-band move',()=>{
+  // Reproducible first cap: white K44 Q32, black K12, white to move,
+  // reached from K48 Q32 vs K35 after a legal sequence of weak replies.
+  const board=makeBoard();board[44]='wK';board[32]='wQ';board[12]='bK';
+  assert.equal(validateSetup(board,'kqk','w'),null);
+  const state=newGame(board,'w','kqk',{experimentalKQK:true});
+  const first=chooseMathsOpponent(state,'w');
+  assert.equal(first?.sourcePhase,'KQK.BandProgress.prepared_queen_step');
+  assert.equal(first.move.from,32);
+  assert.equal(first.move.to,35);
+  assert.equal(first.continuationToken?.kind,'band-prepared');
+  const after=mathsPlayMove(state,first.move);
+  const replies=legalMoves(after.board,'b');
+  assert.ok(replies.length>0);
+  for(const move of replies){
+    const next=mathsPlayMove(after,move);
+    assert.ok(chooseMathsOpponent(next,'w',first.continuationToken)?.move,
+      'the original Prepared frame must survive every weak reply');
+  }
+  // This proves only a specific source step and its immediate all-reply
+  // continuation. It does not certify the full capped game tree.
+});
