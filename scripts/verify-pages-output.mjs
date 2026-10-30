@@ -6,7 +6,7 @@
  * served, or externally browser-tested the site.
  */
 import assert from 'node:assert/strict';
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = 'dist';
@@ -30,4 +30,25 @@ const html = readFileSync(join(root, 'index.html'), 'utf8');
 for (const path of ['/src/maths-app.js', '/src/arena-app.js', '/src/styles.css', '/src/maths.css']) {
   assert.ok(html.includes(path), `Static HTML entry does not reference ${path}`);
 }
-console.log(`Static hosting package verified: ${mustExist.length} nonempty assets, Maths and Engine entrypoints.`);
+
+// Workers Builds must upload only compiled browser assets; do not fall back
+// to Wrangler's interactive auto-configuration (which scanned node_modules/).
+const wrangler = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
+assert.equal(wrangler.name, 'engame-chess-playground');
+assert.equal(wrangler.assets?.directory, './dist', 'Cloudflare Workers must deploy only dist/, never the repository root');
+assert.equal(wrangler.main, undefined, 'This site is static; no Worker entrypoint is required');
+
+let assetCount = 0;
+const maxAssetBytes = 25 * 1024 * 1024;
+function verifySize(directory) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) verifySize(path);
+    else if (entry.isFile()) {
+      assetCount++;
+      assert.ok(statSync(path).size <= maxAssetBytes, `Cloudflare Worker asset exceeds 25 MiB: ${path}`);
+    }
+  }
+}
+verifySize(root);
+console.log(`Static hosting package verified: ${mustExist.length} nonempty required assets, ${assetCount} total files within 25 MiB, Maths and Engine entrypoints, Cloudflare Workers points to ./dist.`);

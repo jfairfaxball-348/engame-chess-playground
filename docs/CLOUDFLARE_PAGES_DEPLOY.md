@@ -1,3 +1,8 @@
+> **Update 29 October 2026:** The actual connected Cloudflare project shown by
+> the owner's build logs is a **Worker using Workers Builds**, not a Pages Git
+> project. This earlier Pages setup is not the active deployment path. See
+> [Cloudflare Workers deployment and fix](CLOUDFLARE_WORKERS_DEPLOY.md).
+>
 # Cloudflare Pages — Chess Playground deployment handoff
 
 **Prepared 29 October 2026; Cloudflare account connection and first production
