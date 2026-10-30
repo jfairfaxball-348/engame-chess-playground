@@ -1,6 +1,6 @@
-# S018 source-derived KQK beta — 30 October 2026
+# S020 source-derived KQK entry beta — 30 October 2026
 
-KQK has an approved **experimental partial playable translation**: local queen rules, EC-T0050 classification and a direct geometric source-tagged edge/shadow controller. `MATERIAL.kqk.playable=false` retains the distinction from a formally certified total JS strategy. Unsupported source phases fail closed. Do not use Stockfish, Lozza, tablebases, minimax or arbitrary legal moves in Maths. Detailed positional calculations, equations, proof steps and Lean links for KK/KBK/KNK remain mandatory in setup and during play. KRK remains experimental; KPK remains disabled. The next session is S019 in NEXT_SESSION.md.
+KQK has an approved **experimental partial playable translation**: local queen rules, EC-T0050 classification and a source-tagged geometric controller now covering edge/shadow, separating bands, same-rank entry, far-file preparation, low walls and some tight-entry cases. `MATERIAL.kqk.playable=false` retains the distinction from a formally certified total JS strategy. Unsupported source phases fail closed. Do not use Stockfish, Lozza, tablebases, minimax or arbitrary legal moves in Maths. Detailed positional calculations, equations, proof steps and Lean links for KK/KBK/KNK remain mandatory in setup and during play. KRK remains experimental; KPK remains disabled. The next session is S021 in NEXT_SESSION.md; see docs/KQK20_ENTRY_AND_AUDIT.md and run the diagnostic npm run audit:kqk-roots.
 
 ---
 
