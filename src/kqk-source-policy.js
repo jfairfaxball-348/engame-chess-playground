@@ -275,9 +275,12 @@ function knightChoice(state,strong,frame,g) {
           'KQK.KnightPrison.knight_prison_low_five_bound.king_down','knight-low-five');
     return null;
   }
-  if(qx===1&&wx===0&&wy===7)
+  // RankFive.left_corner_bound and left_fork_weak_bound both require
+  // sk.rank <= 4. At rank five use SetupCorners.low_five instead;
+  // a reflected matching pattern is not a licence to drop 'low'.
+  if(ky<=4&&qx===1&&wx===0&&wy===7)
     return step(g.queen,2,5,'KQK.RankFive.left_corner_bound');
-  if(qx===1&&wx===2&&wy===7)
+  if(ky<=4&&qx===1&&wx===2&&wy===7)
     return step(g.queen,0,6,'KQK.RankFive.left_fork_weak_bound.edge_entry');
   // SetupCorners.king_blocks_target_bound: the last Q(6,6) is
   // protected ONLY by the strong king at (5,5). Without both king
@@ -478,6 +481,20 @@ export function kqkSourceChoice(state,strong,token=null) {
     const g=geometric(state,strong,frame);
     if(shadow(g)){
       const choice=shadowStart(state,strong,frame,g);
+      if(choice)return {...choice,frame};
+    }
+  }
+  // The rank-five sources have more restrictive hypotheses than
+  // general knight-prison/reflective corner actions. Dispatch them first
+  // whenever ANY proven frame matches. This prevents an earlier reflected
+  // frame from accidentally invoking a low-rank lemma at rank five.
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+    if(qx===6&&qy===5&&wx===7&&wy===7&&ky<=5 ||
+       qx===5&&qy===5&&ky===5&&
+         ((wx===6&&wy===7)||(wx===7&&wy===6))){
+      const choice=knightChoice(state,strong,frame,g);
       if(choice)return {...choice,frame};
     }
   }
