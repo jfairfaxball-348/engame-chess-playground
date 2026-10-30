@@ -46,6 +46,9 @@ jobs:
       # S023: wider KQK family sampling and deeper capped trees.
       # A cap remains inconclusive even if no hard counterexample appears.
       - run: npm run audit:kqk-adversarial -- --attempts=12000 --per-family=4 --nodes=2500 --rounds=64
+      # S027 reference: SAME fixed-seed roots, no cross-depth cache reuse.
+      # Compare to default monotone results; both are diagnostic, never proof.
+      - run: npm run audit:kqk-adversarial -- --attempts=12000 --per-family=4 --nodes=2500 --rounds=64 --cache=exact
       - run: npm run check
       - run: npm run build
       # Provider-independent Cloudflare Pages handoff: ensure the deployable
