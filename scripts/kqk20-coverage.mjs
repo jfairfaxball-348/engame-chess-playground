@@ -41,6 +41,7 @@ function runLine(root,strong){
     if(!replies.length)return done('terminal-without-mate');
     trace.push('weak:'+replies[0].from+'-'+replies[0].to);
     s=mathsPlayMove(s,replies[0]); // fixed *diagnostic* line, not live policy
+    if(s.material==='kk')return done('queen-captured-draw');
     const after=outcome(s.board,s.turn);
     if(after.kind!=='ongoing')return done(after.kind);
     token=c.continuationToken;
@@ -49,7 +50,7 @@ function runLine(root,strong){
 }
 const report={diagnosticOnly:true,seed:'0x20c72365',attempts,legalRoots:0,
    selectableRoots:0,unavailableRoots:0,immediateNonmateTerminal:0,
-   firstReplyPositions:0,firstReplyAnswered:0,firstReplyMissing:0,
+   firstReplyPositions:0,firstReplyAnswered:0,firstReplyMissing:0,firstReplyQueenCaptures:0,
    fullLineSamples:0,fullLineResults:{},samplePolicy:'fixed first legal weak reply',failureExamples:[]};
 for(let i=0;i<attempts;i++){
   const strong=i%2?'b':'w',s=fresh(strong);
@@ -64,6 +65,7 @@ for(let i=0;i<attempts;i++){
     for(const reply of legalMoves(after.board,opposite(strong))){
       const child=mathsPlayMove(after,reply);
       report.firstReplyPositions++;
+      if(child.material==='kk') {report.firstReplyQueenCaptures++;continue;}
       const next=chooseMathsOpponent(child,strong,c.continuationToken);
       if(next?.move)report.firstReplyAnswered++;
       else report.firstReplyMissing++;
