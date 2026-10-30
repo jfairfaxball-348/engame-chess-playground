@@ -10,15 +10,21 @@
     "formal/EndgameChess/Rules/KQK/ShadowForce.lean",
     "formal/EndgameChess/Rules/KQK/ShadowExit.lean",
     "formal/EndgameChess/Rules/KQK/FramedFinish.lean",
-    "formal/EndgameChess/Rules/KQK/Symmetry.lean"
+    "formal/EndgameChess/Rules/KQK/Symmetry.lean",
+    "formal/EndgameChess/Rules/KQK/BandEntry.lean",
+    "formal/EndgameChess/Rules/KQK/BandProgress.lean",
+    "formal/EndgameChess/Rules/KQK/BandForce.lean",
+    "formal/EndgameChess/Rules/KQK/BandRaise.lean",
+    "formal/EndgameChess/Rules/KQK/RankFive.lean",
+    "formal/EndgameChess/Rules/KQK/KnightPrison.lean",
+    "formal/EndgameChess/Rules/KQK/EntryFrames.lean"
   ],
   "policy": "experimental-subset",
   "certifiedJavascriptPolicy": false,
   "explicitGaps": [
-    "universal positive_entry",
-    "SameRankEntry and FarFileEntry",
-    "general separating-rank BandForce",
-    "arbitrary rooted all-reply coverage",
+    "universal positive_entry and complete off-rank selection",
+    "SameRankEntry, FarFilePreparation and TightEntry for all legal roots",
+    "remaining oriented endgames and arbitrary rooted all-reply coverage",
     "FIDE incoming history and clock parity"
   ]
 }
