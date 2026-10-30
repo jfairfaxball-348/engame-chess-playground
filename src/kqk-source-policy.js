@@ -199,7 +199,7 @@ function bandChoice(state,strong,frame,g) {
   if(ky+1<qy)
     return choice(g.sk,kx,ky+1,'KQK.BandEntry.wall_prepare_bound.vertical');
   if(ky+1!==qy)return null;
-  if(kx!==qx)
+  if(kx<qx||kx>wx)
     return choice(g.sk,toward(kx,qx),ky,
       'KQK.BandEntry.wall_prepare_bound.horizontal');
   // Prepared sk qs wk: same king/queen file, king one rank below.
