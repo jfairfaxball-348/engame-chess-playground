@@ -1,13 +1,13 @@
 /** The Maths tab is completely separate from the Engine Playground. */
 import {legalMoves,newGame,play,outcome,opposite,inCheck,squareName} from './chess.js';
-import {chooseDecision} from './engine.js';
+import {chooseMathsOpponent,mathsPlayMove,KRK_EXPERIMENTAL_DESCRIPTION} from './maths-play-policy.js';
 import {pieceSVG,pieceLabel} from './pieces.js';
 import {squareForCell,squareAtPoint} from './board-ui.js';
 import {INVENTORY,blankBoard,available,put,relocate,setupVerdict} from './maths-model.js';
 import {proofFor} from './maths-proof.js';
 const root=document.getElementById('app');
 let board=blankBoard(),turn='w',human='w',game=null,phase='setup',picked=null,selected=-1;
-let facing='w',last=null,notice='',timer=null,busy=false,gesture=null,suppress=false,history=[],openingPending=false;
+let facing='w',last=null,notice='',timer=null,busy=false,gesture=null,suppress=false,history=[],openingPending=false,policyToken=null;
 const name=c=>c==='w'?'White':'Black',ongoing=()=>outcome(game.board,game.turn,game.history,game.halfmove).kind==='ongoing';
 const announcement=document.createElement('div');
 announcement.className='sr-only';announcement.setAttribute('role','status');announcement.setAttribute('aria-live','polite');root.after(announcement);
@@ -18,8 +18,8 @@ function cancelGesture(){
  root.querySelectorAll('.maths-drop,.maths-drag-source').forEach(x=>x.classList.remove('maths-drop','maths-drag-source'));
 }
 function cancel(){if(timer!==null)clearTimeout(timer);timer=null;busy=false;cancelGesture();}
-function reset(){cancel();board=blankBoard();turn='w';game=null;phase='setup';picked=null;selected=-1;last=null;notice='';history=[];openingPending=false;facing='w';render();}
-function edit(){cancel();phase='setup';game=null;picked=null;selected=-1;last=null;history=[];openingPending=false;notice='';render();}
+function reset(){cancel();board=blankBoard();turn='w';game=null;phase='setup';picked=null;selected=-1;last=null;notice='';history=[];openingPending=false;policyToken=null;facing='w';render();}
+function edit(){cancel();phase='setup';game=null;picked=null;selected=-1;last=null;history=[];openingPending=false;policyToken=null;notice='';render();}
 function trayClick(piece){if(phase!=='setup'||!available(board,piece))return;picked=picked===piece?null:piece;selected=-1;notice='';render();}
 function putOrMove(sq){
  if(picked){const next=put(board,picked,sq);if(next){board=next;picked=null;notice='';}else notice='Choose an empty square.';}
@@ -35,18 +35,19 @@ function launch(){
  if(!v.canStart)return;
  cancel();human=v.human;
  // Keep the original board orientation and ALL placed squares at the game start.
- try{game=newGame(board,turn,v.material);}catch(e){notice=e.message;render();return;}
- phase='playing';selected=-1;picked=null;last=null;history=[];notice='';
+ try{game=newGame(board,turn,v.material,{experimentalKRK:v.experimental===true});}catch(e){notice=e.message;render();return;}
+ phase='playing';selected=-1;picked=null;last=null;history=[];policyToken=null;notice='';
  openingPending=game.turn!==human&&outcome(game.board,game.turn,game.history,game.halfmove).kind==='ongoing';
  render();
 }
-function save(){return {game:{...game,board:game.board.slice(),history:game.history.slice(),log:game.log.slice()},last:last?{...last}:null,openingPending};}
-function undo(){if(!history.length)return;cancel();const h=history.pop();game=h.game;last=h.last;openingPending=h.openingPending;selected=-1;notice='';render();}
+function save(){return {game:{...game,board:game.board.slice(),history:game.history.slice(),log:game.log.slice()},last:last?{...last}:null,openingPending,policyToken};}
+function undo(){if(!history.length)return;cancel();const h=history.pop();game=h.game;last=h.last;openingPending=h.openingPending;policyToken=h.policyToken;selected=-1;notice='';render();}
 function humanMove(from,to){
  if(phase!=='playing'||busy||game.turn!==human||!ongoing())return false;
  const m=legalMoves(game.board,human).find(m=>m.from===from&&m.to===to);
  if(!m)return false;
- history.push(save());game=play(game,m);last={from,to};selected=-1;notice='';render();opponent();return true;
+ history.push(save());game=mathsPlayMove(game,m);if(game.material!=='krk')policyToken=null;
+ last={from,to};selected=-1;notice='';render();opponent();return true;
 }
 function playOpeningMove(){
  if(phase!=='playing'||!openingPending||busy||game.turn===human)return;
@@ -56,8 +57,15 @@ function opponent(){
  if(phase!=='playing'||openingPending||game.turn===human||!ongoing())return;
  busy=true;render();
  timer=setTimeout(()=>{
-  timer=null;const decision=chooseDecision(game,opposite(human));busy=false;
-  if(decision?.move){last={from:decision.move.from,to:decision.move.to};game=play(game,decision.move);}
+  timer=null;const decision=chooseMathsOpponent(game,opposite(human),policyToken);busy=false;
+  if(decision?.move){
+   last={from:decision.move.from,to:decision.move.to};
+   game=mathsPlayMove(game,decision.move);
+   policyToken=decision.continuationToken??null;
+   notice='';
+  }else{
+   notice=game.material==='krk'? 'Experimental KRK cannot continue from this position using the current proof-derived controller. Undo or choose New position. No substitute engine move was played.': 'No legal opponent decision.';
+  }
   selected=-1;render();
  },260);
 }
@@ -180,7 +188,7 @@ function render(){
   '<div class="maths-notice" role="status">'+(notice||(!playing&&v.kind==='invalid'?v.reason:''))+'</div></div>'+
   '<aside class="maths-side maths-black">'+rack('b')+'</aside>'+
   '<section class="maths-verdict" aria-live="polite"><div class="maths-outcome">'+title+'</div>'+formula+
-  (v.strategyPending?'<div class="maths-policy">KRK proved · Move policy not yet ported</div>':'')+
+  (playing&&game.material==='krk'||!playing&&v.experimental?'<div class="maths-policy">'+escapeText(KRK_EXPERIMENTAL_DESCRIPTION)+'</div>':'')+
   '</section></div></section>';
  root.querySelector('#maths-turn-w')?.addEventListener('click',()=>{turn='w';notice='';render();});
  root.querySelector('#maths-turn-b')?.addEventListener('click',()=>{turn='b';notice='';render();});
