@@ -1,6 +1,6 @@
 /** The playground's deliberately limited, independent chess rules implementation.
  * No engine, tablebase, remote lookup or dependency. Board indices: a1=0, h8=63.
- * Playable: K v K, K+B v K, K+N v K. KRK geometry remains for local rules tests only;
+ * Certified: K v K, K+B v K, K+N v K. KRK and KQK have explicitly experimental, partial local controllers;
  * KRK certified play remains gated; an explicitly opted-in experimental
  * Maths controller can use the same legal board representation.
  * No pawns/castling/en-passant.
@@ -9,7 +9,8 @@ export const MATERIAL = Object.freeze({
   kk: { label: 'K vs K', extra: null, theorem: 'EC-T0003', outcome: 'Dead position', playable: true },
   kbk: { label: 'K+B vs K', extra: 'B', theorem: 'EC-T0004', outcome: 'Dead position', playable: true },
   knk: { label: 'K+N vs K', extra: 'N', theorem: 'EC-T0005', outcome: 'Dead position', playable: true },
-  krk: { label: 'K+R vs K', extra: 'R', theorem: 'EC-T0019', outcome: 'Awaiting complete parent-release approval', playable: false },
+  krk: { label: 'K+R vs K', extra: 'R', theorem: 'EC-T0048', outcome: 'Experimental only', playable: false },
+  kqk: { label: 'K+Q vs K', extra: 'Q', theorem: 'EC-T0050', outcome: 'Experimental only', playable: false },
 });
 const KNIGHT = [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
 const KING = [[1,1],[1,0],[1,-1],[0,1],[0,-1],[-1,1],[-1,0],[-1,-1]];
@@ -55,7 +56,8 @@ export function attacks(board, color, target) {
     if(p[1]==='K' && Math.max(Math.abs(dx),Math.abs(dy))===1) return true;
     if(p[1]==='N' && (Math.abs(dx)===1 && Math.abs(dy)===2 || Math.abs(dx)===2 && Math.abs(dy)===1)) return true;
     if(p[1]==='B' && Math.abs(dx)===Math.abs(dy) && dx!==0 && rayAttacks(board,s,target,DIAG)) return true;
-    if(p[1]==='R' && (dx===0 || dy===0) && (dx!==0 || dy!==0) && rayAttacks(board,s,target,ORTHO)) return true;
+    if((p[1]==='R'||p[1]==='Q') && (dx===0 || dy===0) && (dx!==0 || dy!==0) && rayAttacks(board,s,target,ORTHO)) return true;
+    if(p[1]==='Q' && Math.abs(dx)===Math.abs(dy) && dx!==0 && rayAttacks(board,s,target,DIAG)) return true;
   }
   return false;
 }
@@ -71,7 +73,7 @@ function destinations(board,from){
   if(type==='K'||type==='N') {
     for(const [dx,dy] of (type==='K'?KING:KNIGHT)) push(squareAt(x+dx,y+dy));
   }else {
-    const dirs=type==='R'?ORTHO:DIAG;
+    const dirs=type==='R'?ORTHO:type==='Q'?[...ORTHO,...DIAG]:DIAG;
     for(const [dx,dy] of dirs){let nx=x+dx,ny=y+dy;while(squareAt(nx,ny)!==-1){const sq=squareAt(nx,ny);if(!push(sq))break;nx+=dx;ny+=dy;}}
   }
   return squares;
@@ -92,7 +94,7 @@ export function validateSetup(board,material,turn){
   const data=MATERIAL[material]; if(!data)return 'Select a supported material class.';
   if(!Array.isArray(board)||board.length!==64)return 'Invalid board.';
   if(!['w','b'].includes(turn))return 'Choose the side to move.';
-  if(board.some(p=>p!==null && !['wK','bK','wB','bB','wN','bN','wR','bR'].includes(p))) return 'Unsupported piece on board.';
+  if(board.some(p=>p!==null && !['wK','bK','wB','bB','wN','bN','wR','bR','wQ','bQ'].includes(p))) return 'Unsupported piece on board.';
   if(board.filter(p=>p==='wK').length!==1 || board.filter(p=>p==='bK').length!==1) return 'Place exactly one white king and one black king.';
   const extras=board.filter(p=>p && p[1]!=='K');
   if(data.extra ? extras.length!==1||extras[0][1]!==data.extra : extras.length!==0) return `Place exactly the pieces required for ${data.label}.`;
@@ -125,8 +127,8 @@ export function play(state,move){
   return {...state,board,turn,history,halfmove:allowed.capture?0:state.halfmove+1,
     log:state.log.concat(`${state.turn==='w'?'White':'Black'} ${moveNotation(state.board,allowed,board,turn)}`)};
 }
-export function newGame(board,turn,material,{experimentalKRK=false}={}){
-  if(!MATERIAL[material]?.playable && !(material==='krk'&&experimentalKRK))
+export function newGame(board,turn,material,{experimentalKRK=false,experimentalKQK=false}={}){
+  if(!MATERIAL[material]?.playable && !(material==='krk'&&experimentalKRK) && !(material==='kqk'&&experimentalKQK))
     throw new Error('This material class is not released for certified playground play.');
   const problem=validateSetup(board,material,turn);if(problem)throw new Error(problem);
   return {board:board.slice(),turn,material,halfmove:0,history:[positionKey(board,turn)],log:[]};
