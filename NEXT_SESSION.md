@@ -25,6 +25,16 @@ failures or mark experimental controllers certified.
   mathematical all-root certificates.
 - KQK frozen EC-T0050 upstream source SHA
   `c72365a8ba46f59114a2a77d9d38993f6a52df80` read-only.
+- S025's deeper monotone diagnostic exposed a **real 6-ply
+  FarFilePreparation oscillation** in a Black-queen, White-weak
+  root K=32, Q=54, weak K=12: weak 12-20, source
+  54-48, weak 20-19, source 48-55, weak 19-20, source 55-48.
+  S025 repairs it with a strict one-weak-reply `far-file` token
+  invoking source-defined `FarFileEntry.far_file_stage_bound`
+  continuations, instead of opposite-file re-preparation.
+  Regression `test/kqk25-far-file-cycle.test.js`. The **pre-fix**
+  monotone audit found 103/120 closed, 1 real cycle, 16 capped;
+  check the final PR-head **post-fix** audit before reuse.
 - `scripts/kqk21-adversarial.mjs` now reports each first cap's
   exact board/turn/source token and `crossDepthClosedReuses`.
   `--cache=exact` provides comparison against old depth-specific
