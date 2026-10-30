@@ -12,12 +12,12 @@ test('all sixteen normal chess pieces per side are visible in the tray',()=>{
  for(const type of ['R','N','B'])assert.equal(INVENTORY.filter(x=>x===type).length,2);
  assert.equal(INVENTORY.filter(x=>x==='P').length,8);
 });
-test('only two kings plus at most one bishop, knight or rook can be arranged',()=>{
+test('only two kings plus at most one bishop, knight, rook or queen can be arranged',()=>{
  let b=blankBoard();
- for(const side of ['w','b'])for(const piece of ['K','B','N','R'])assert.ok(available(b,side+piece));
- for(const side of ['w','b'])for(const piece of ['Q','P'])assert.equal(available(b,side+piece),false);
+ for(const side of ['w','b'])for(const piece of ['K','B','N','R','Q'])assert.ok(available(b,side+piece));
+ for(const side of ['w','b'])for(const piece of ['P'])assert.equal(available(b,side+piece),false);
  b=put(b,'wB',4);assert.equal(materialOf(b),'kbk');
- for(const side of ['w','b'])for(const piece of ['B','N','R'])assert.equal(available(b,side+piece),false);
+ for(const side of ['w','b'])for(const piece of ['B','N','R','Q'])assert.equal(available(b,side+piece),false);
  assert.equal(available(b,'bK'),true);
  assert.equal(put(b,'wK',4),null);
  b=relocate(b,4,-1);assert.equal(materialOf(b),'kk');
