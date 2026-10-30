@@ -1,5 +1,12 @@
 # Endgame Chess Playground
 
+## Maths presentation preserved by material (30 October 2026)
+
+For the existing **K vs K, K+B vs K and K+N vs K** draw demonstrations, the Maths tab again shows the **complete mathematical workings** from `src/maths-proof.js`: theorem equation, piece-position-dependent calculation, all reasoning steps and linked frozen Lean proof. This remains available while setting up positions and during play. The Maths explanations are not a disposable feature.
+
+The experimental **KRK** strategy remains playable with a compact, board-first presentation; its specific JavaScript winning controller is not globally certified. The next installed session [S018](NEXT_SESSION.md) builds **experimental KQK** in that same playable style, *preserving all three existing worked draw explanations*.
+
+
 ## KRK16 playable experimental Maths mode — 30 October 2026
 
 The KRK Maths board now allows **Start game** from an exactly arranged legal King + Rook versus King position, playing as the lone king against the local **source-tagged constructive KRK attacker**. Choose the side to move before starting. When the rook's side is to move first, click **Play opponent's first move** to preserve the exact arranged board until explicitly released. Undo retains the actual continuation phase. Capturing the rook transitions to the already proved KK draw demonstration.
