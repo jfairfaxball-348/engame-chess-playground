@@ -1,3 +1,9 @@
+# S018 source-derived KQK beta — 30 October 2026
+
+KQK has an approved **experimental partial playable translation**: local queen rules, EC-T0050 classification and a direct geometric source-tagged edge/shadow controller. `MATERIAL.kqk.playable=false` retains the distinction from a formally certified total JS strategy. Unsupported source phases fail closed. Do not use Stockfish, Lozza, tablebases, minimax or arbitrary legal moves in Maths. Detailed positional calculations, equations, proof steps and Lean links for KK/KBK/KNK remain mandatory in setup and during play. KRK remains experimental; KPK remains disabled. The next session is S019 in NEXT_SESSION.md.
+
+---
+
 # Owner clarification — preserve existing mathematical explanations (30 October 2026)
 
 The earlier KRK16 UI simplification **overreached**. The owner wants the original **full mathematical explanations** for the three already released draw classes: **K/K, K+B/K and K+N/K**. This is a binding *material-specific* display rule, superseding any "remove all Maths proof panels" direction: retain the equation, board-specific calculation, mathematical derivation steps, source theorem reference and live update as pieces are arranged and play progresses. The original working was already in `src/maths-proof.js`; it must not be deleted. Keep source hyperlinks and "Guaranteed draw" results for those classes.
