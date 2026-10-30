@@ -7,6 +7,8 @@
  * continuation, structural cycle and explicit resource caps. It intentionally
  * ignores FIDE claim/history clocks: this is the owner's temporary simplified
  * strategy audit, not certification of official chess rule parity.
+ * S022: cache ONLY depth-matched all-mate closed subtrees, never a capped
+ * branch, and expose the first capped path for targeted source triage.
  */
 import {
   makeBoard, opposite, validateSetup, newGame, legalMoves,
@@ -44,15 +46,36 @@ function shape(state,strong,token) {
 }
 function visit(root,strong) {
   const tally=Object.fromEntries(terminalKinds.map(k=>[k,0]));
-  let visited=0,defenderReplies=0,sourceChoices=0,firstFailure=null;
+  let visited=0,defenderReplies=0,sourceChoices=0,firstFailure=null,firstCap=null;
+  // Only complete, ALL-replies-mate subtrees are memoized. Inconclusive,
+  // failed, and partially traversed subtrees are NEVER reused as wins.
+  // Include the depth budget in this key: finishing the same board with
+  // fewer available rounds is NOT automatically a valid bounded result.
+  const closed=new Set();
+  let closedReuses=0;
   const phases={};
   function walk(state,token,rounds,active,path) {
-    if(visited>=maxNodes) {tally['node-cap']++;return false;}
-    if(rounds>=maxRounds) {tally['round-cap']++;return false;}
+    if(rounds>=maxRounds) {
+      tally['round-cap']++;
+      if(!firstCap)firstCap=terminal('round-cap',path);
+      return false;
+    }
     const key=shape(state,strong,token);
+    // Compare against the unbudgeted structural stack FIRST, so closure
+    // caching cannot conceal cycles across different arrival depths.
     if(active.has(key)) {
       tally.cycle++;
       if(!firstFailure)firstFailure=terminal('cycle',path);
+      return false;
+    }
+    const closedKey=key+'|rounds='+rounds;
+    if(closed.has(closedKey)) {
+      closedReuses++;
+      return true;
+    }
+    if(visited>=maxNodes) {
+      tally['node-cap']++;
+      if(!firstCap)firstCap=terminal('node-cap',path);
       return false;
     }
     visited++;
@@ -88,9 +111,8 @@ function visit(root,strong) {
       defenderReplies+=moves.length;
       // Do not prune on a failure: preserve coverage counts, until a cap.
       for(const move of moves) {
-        if(visited>=maxNodes) {
-          tally['node-cap']++;allWin=false;break;
-        }
+        // Every child, including a previously closed subtree, goes
+        // through walk(); do not cap early before checking memoized closure.
         const child=mathsPlayMove(state,move);
         const nextPath=path.concat('defender:'+move.from+'-'+move.to);
         if(child.material==='kk') {
@@ -102,6 +124,7 @@ function visit(root,strong) {
       }
     }
     active.delete(key);
+    if(allWin)closed.add(closedKey);
     return allWin;
   }
   const guaranteed=walk(root,null,0,new Set(),[]);
@@ -109,7 +132,9 @@ function visit(root,strong) {
   const hardFailure=['opponent-mate','stalemate','queen-captured-draw','unsupported','cycle','other-terminal']
     .some(k=>tally[k]>0);
   return {classification:hardFailure?'falsified':capped?'inconclusive':guaranteed?'all-replies-mate':'inconclusive',
-    nodes:visited,defenderReplies,sourceChoices,tally,firstFailure,phases};
+    nodes:visited,defenderReplies,sourceChoices,
+    fullyClosedSubtrees:closed.size,closedSubtreesReused:closedReuses,
+    tally,firstFailure,firstCap,phases};
 }
 
 const picked=new Map(),samples=[],families={};
@@ -147,12 +172,14 @@ const overall={diagnosticOnly:true,clockHistoryCertified:false,sourceSha:'c72365
   inconclusive:samples.filter(s=>s.classification==='inconclusive').length,
   visitedNodes:samples.reduce((n,s)=>n+s.nodes,0),
   legalDefenderRepliesVisited:samples.reduce((n,s)=>n+s.defenderReplies,0),
+  fullyClosedSubtrees:samples.reduce((n,s)=>n+s.fullyClosedSubtrees,0),
+  closedSubtreesReused:samples.reduce((n,s)=>n+s.closedSubtreesReused,0),
   families,
   firstCounterexamples:samples.filter(s=>s.classification==='falsified').slice(0,12).map(
     ({strong,turn,family,king,queen,weak,firstFailure})=>
       ({strong,turn,family,king,queen,weak,...firstFailure})),
   firstInconclusive:samples.filter(s=>s.classification==='inconclusive').slice(0,8).map(
-    ({strong,turn,family,king,queen,weak,tally})=>
-      ({strong,turn,family,king,queen,weak,tally}))
+    ({strong,turn,family,king,queen,weak,tally,firstCap})=>
+      ({strong,turn,family,king,queen,weak,tally,firstCap}))
 };
 console.log(JSON.stringify(overall,null,2));
