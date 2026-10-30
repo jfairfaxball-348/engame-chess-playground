@@ -41,7 +41,16 @@ const preimage = (frame,x,y) => {
 };
 const targetMove = (state,strong,from,to,sourcePhase) => {
   const move=legalMoves(state.board,strong).find(m=>m.from===from&&m.to===to);
-  return move?{move,sourcePhase,rule:sourcePhase,continuationPhase:null}:null;
+  if(!move)return null;
+  // Safety contract shared by the frozen KQK constructions: a purported
+  // winning action must not hand the queen to an immediate legal KxQ.
+  // This is a rejection-only proof-translation guard, NEVER a substitute
+  // selector or ranked alternative to the source-defined action.
+  const after=state.board.slice();
+  after[to]=after[from];after[from]=null;
+  if(legalMoves(after,opposite(strong)).some(r=>r.capture===strong+'Q'))
+    return null;
+  return {move,sourcePhase,rule:sourcePhase,continuationPhase:null};
 };
 const geometric = (state,strong,frame) => {
   const board=state.board,queen=board.indexOf(strong+'Q'),
