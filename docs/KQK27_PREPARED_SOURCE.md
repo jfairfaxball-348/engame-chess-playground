@@ -57,6 +57,31 @@ The GitHub Actions workflow now runs the *same* deterministic
 These are falsification diagnostics, not new mathematical
 proofs or a certificate that JS terminates on every legal board.
 
+## Measured post-change bounded evidence (S027 PR head)
+
+The exact-code PR head `607038d9a6cff854704d01de273ecc3b16a9df0c`
+passed Actions run **41126489134** (Node, immutable sources, KRK audits,
+12k-root KQK exact/monotone, build, and BOTH Chromium suites).
+The fixed-seed 120-root KQK audit reported:
+
+| Controller / cache | Mate-closed | Capped | Hard failures |
+|---|---:|---:|---:|
+| S026 merged-main / monotone | 105 | 15 | 0 |
+| S027 PR / monotone | **98** | **22** | **0** |
+| S027 PR / exact | **87** | **33** | **0** |
+
+On the **same roots and depth/node limits**, the new prepared-band source
+frame commitment did **not** improve finite closure: seven more monotone
+caps appeared. Specific changes: WeakToMove 4→6 caps, EntryGeometry 1→3,
+BandEntry 0→2 and SameRankEntry 3→4; FarFilePreparation stayed 4.
+The token adds distinct control states and may consume more exploration
+budget, or alter long-line behaviour. No genuine hard failure was found;
+none of these caps proves mate, source missing coverage, or an actual
+worsening of legal gameplay. S028 should evaluate whether exact source
+frame commitment is necessary here rather than blindly adding further
+tokens or hiding the change by increasing audit limits. The local all-reply
+tests pass. KRK still has 24/24 capped, 0 hard failures at 2,500 nodes.
+
 ## Verification and remaining gates
 
 S026 **merged-main** `f3bac9ab2ae76649d59a4ae9d924c9e05d854736`

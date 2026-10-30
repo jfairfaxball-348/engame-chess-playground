@@ -36,11 +36,14 @@ Do not edit read-only `engame-chess`; KQK frozen source
   through every legal defender reply. Test coverage for both
   colours/eight frames, token forgery and exact capped position.
   See `docs/KQK27_PREPARED_SOURCE.md`.
-- **Before quoting S027 improvements**, verify its final
-  merged-main commit, successful CI, and exact **both-mode**
-  KQK outputs (`--cache=exact` vs `--cache=monotone`), on the
-  same fixed seed and family count. Compare per-family caps and
-  failures, not just the overall closed tally.
+- **S027 measured post-change PR head** `607038d9a6cff854704d01de273ecc3b16a9df0c`
+  passed Actions **41126489134**: monotone KQK **98/120 mate-closed,
+  22 capped, 0 falsified**; exact **87/120 mate-closed, 33 capped,
+  0 falsified**. This is **seven more bounded caps** than S026's
+  monotone 105/120 on identical roots. No proven strategy failure;
+  the new continuation token may increase search state. See S027
+  report. Do not present it as improved finite coverage. Verify the
+  final merged-main CI before claiming release.
 - A **real KQK source cycle**, far-file oscillation, was fixed in
   S025; do not regress it. Backrank protected reply was fixed
   in S026; do not regress it.
