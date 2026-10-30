@@ -253,7 +253,10 @@ function knightChoice(state,strong,frame,g) {
     return step(g.queen,2,5,'KQK.RankFive.left_corner_bound');
   if(qx===1&&wx===2&&wy===7)
     return step(g.queen,0,6,'KQK.RankFive.left_fork_weak_bound.edge_entry');
-  if(qx===7&&wx===6&&wy===7)
+  // SetupCorners.king_blocks_target_bound: the last Q(6,6) is
+  // protected ONLY by the strong king at (5,5). Without both king
+  // coordinates this apparent mate simply hangs the queen to KxQ.
+  if(qx===7&&wx===6&&wy===7&&kx===5&&ky===5)
     return step(g.queen,6,6,'KQK.SetupCorners.king_blocks_target_bound.finish');
   return null;
 }
