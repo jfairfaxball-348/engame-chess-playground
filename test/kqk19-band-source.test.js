@@ -75,7 +75,7 @@ test('king cross is followed by the source-mandated queen rank rise for every le
 });
 test('rank-five knight prison steps work from either player colour',()=>{
   for(const strong of ['w','b']){
-    const s=start(strong,[2,2],[5,5],[6,7]);
+    const s=start(strong,[2,3],[5,5],[6,7]);
     const c=step(s,strong);
     assert.equal(c.sourcePhase,'KQK.KnightPrison.knight_top_bound');
     assert.equal(c.move.to,sq([4,6]));
