@@ -60,3 +60,17 @@ test('new entry paths never enable the certified selector or change the eight so
     assert.equal(step(s,strong).mathematicallyCertifiedSelector,false);
   }
 });
+
+test('same-rank source entry remains legal across both colours and eight frozen symmetries',()=>{
+  const transforms=[
+    ([x,y])=>[x,y],([x,y])=>[7-x,y],([x,y])=>[x,7-y],
+    ([x,y])=>[7-x,7-y],([x,y])=>[y,x],([x,y])=>[7-y,7-x],
+    ([x,y])=>[7-y,x],([x,y])=>[y,7-x]
+  ];
+  for(const strong of ['w','b'])for(const transform of transforms) {
+    const s=start(strong,transform([2,2]),transform([0,2]),transform([6,7]));
+    const c=step(s,strong);
+    const after=mathsPlayMove(s,c.move);
+    assert.notEqual(outcome(after.board,after.turn).kind,'stalemate');
+  }
+});
