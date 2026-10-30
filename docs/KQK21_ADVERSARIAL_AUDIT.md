@@ -39,6 +39,39 @@ the Node test checks fixed-seed reproducibility and honest accounting.
 No external engine, tablebase, minimax, scoring heuristic, or live
 fallback was added.
 
+## S021 first measured adversarial run and concrete policy correction
+
+Exact-head CI 41049858581 passed all Node/Chromium checks. Its
+`audit:kqk-adversarial` diagnostic used 4000 attempts and sampled
+**56 legal source-stratified roots** (including lone-king-to-move),
+exploring **35,879 positions** and **18,504 legal defender replies**,
+with per-root 1200-node and 48-round caps. It reported **26
+all-replies-mate**, **1 falsified**, **29 inconclusive due to caps**.
+This replaces earlier claims based only on one fixed defender path;
+the 29 unknown cases are *not* wins. In particular, the edge and
+oriented-entry families closed on all four sampled roots each, while
+same-rank, far-file and weak-to-move trees commonly reached caps.
+
+The concrete falsifier was an initially unsupported legal position:
+**Black K a8 (square 56), Black Q a6 (40), White K c7 (50);
+Black to move**. In the frozen
+`formal/EndgameChess/Rules/KQK/SameRankEntry.lean`,
+`backrank_entry` lines 99–131, the final exceptional case has
+adjacent king-to-weak and queen-to-weak files with the queen and king
+two files apart. Its actual construction is the
+`king_move (t := (wk.1,sk.2))`, followed after any weak reply by
+`protected_backrank_entry`.
+
+S021 adds exactly that source-derived `KQK.SameRankEntry.backrank_entry.king_to_weak_file`
+move under the three exact file-distance premises to
+`src/kqk-source-policy.js`. No generic move selection was added.
+The original counterexample corresponds to **...Ka7** from a8.
+Tests exercise the repaired placement, the legal move and every
+immediate defender response across eight symmetries and both
+colours. Do **not** describe this repair as closing the global policy:
+rerun the adversarial audit on the final head to measure the remaining
+gaps.
+
 ## Binding owner priority (supersedes historic gate language)
 
 1. Close **both KRK and KQK** simple-mode strategy demonstrations from
