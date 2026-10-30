@@ -29,6 +29,10 @@ jobs:
       - run: npm run audit:krk14-continuations -- --limit=2048
       # Bounded all-defender game tree on one source-wall root; no fallback.
       - run: npm run audit:krk14-mate-tree -- --nodes=40000
+      # S022: do not rely solely on the one KRK wall-root test. Falsify
+      # all weak replies for 24 source/colour/frame seeds; report caps
+      # separately and retain every source-derived move restriction.
+      - run: node scripts/krk15-stratified-mate-audit.mjs --nodes=1000 --plies=160 --examples=6
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
