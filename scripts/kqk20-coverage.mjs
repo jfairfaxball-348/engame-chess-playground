@@ -25,29 +25,32 @@ function fresh(strong){
 }
 function runLine(root,strong){
   let s=root,token=null,round=0;
-  const seen=new Set();
+  const seen=new Set(),trace=[];
+  const done=result=>({result,tail:trace.slice(-12)});
   while(round++<maxRounds){
-    if(seen.has(s.history.at(-1)))return 'cycle';
+    if(seen.has(s.history.at(-1)))return done('cycle');
     seen.add(s.history.at(-1));
     const c=chooseMathsOpponent(s,strong,token);
-    if(!c?.move)return 'unsupported';
+    if(!c?.move)return done('unsupported');
+    trace.push(c.sourcePhase+':'+c.move.from+'-'+c.move.to);
     s=mathsPlayMove(s,c.move);
     const result=outcome(s.board,s.turn);
-    if(result.kind==='mate')return result.winner===strong?'mate':'opponent-mate';
-    if(result.kind!=='ongoing')return result.kind;
+    if(result.kind==='mate')return done(result.winner===strong?'mate':'opponent-mate');
+    if(result.kind!=='ongoing')return done(result.kind);
     const replies=legalMoves(s.board,opposite(strong));
-    if(!replies.length)return 'terminal-without-mate';
+    if(!replies.length)return done('terminal-without-mate');
+    trace.push('weak:'+replies[0].from+'-'+replies[0].to);
     s=mathsPlayMove(s,replies[0]); // fixed *diagnostic* line, not live policy
     const after=outcome(s.board,s.turn);
-    if(after.kind!=='ongoing')return after.kind;
+    if(after.kind!=='ongoing')return done(after.kind);
     token=c.continuationToken;
   }
-  return 'round-cap';
+  return done('round-cap');
 }
 const report={diagnosticOnly:true,seed:'0x20c72365',attempts,legalRoots:0,
    selectableRoots:0,unavailableRoots:0,immediateNonmateTerminal:0,
    firstReplyPositions:0,firstReplyAnswered:0,firstReplyMissing:0,
-   fullLineSamples:0,fullLineResults:{},samplePolicy:'fixed first legal weak reply'};
+   fullLineSamples:0,fullLineResults:{},samplePolicy:'fixed first legal weak reply',failureExamples:[]};
 for(let i=0;i<attempts;i++){
   const strong=i%2?'b':'w',s=fresh(strong);
   if(!s)continue;
@@ -69,7 +72,10 @@ for(let i=0;i<attempts;i++){
   if(report.fullLineSamples<gameLimit){
     const result=runLine(s,strong);
     report.fullLineSamples++;
-    report.fullLineResults[result]=(report.fullLineResults[result]||0)+1;
+    report.fullLineResults[result.result]=(report.fullLineResults[result.result]||0)+1;
+    if(result.result!=='mate' && report.failureExamples.length<8)
+      report.failureExamples.push({strong,king:s.board.indexOf(strong+'K'),
+        queen:s.board.indexOf(strong+'Q'),weak:s.board.indexOf(opposite(strong)+'K'),...result});
   }
 }
 console.log(JSON.stringify(report,null,2));
