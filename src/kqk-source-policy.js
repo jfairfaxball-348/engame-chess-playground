@@ -406,6 +406,20 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='tight-file')return tightFileReply(state,strong,token);
     return knightSideReply(state,strong,token);
   }
+  // Exact OrientedEntry.high_file_corner_entry (frozen Lean source):
+  // K(5,6), Q(*,5), weak K(7,7) with non-checking Q on file != 7.
+  // The constructive proof moves Q to (7,5) for immediate corner mate.
+  // Dispatch before broader overlapping geometries: this is a precise
+  // source-premised terminal construction, not a positional preference.
+  for(const frame of KQK_FRAMES){
+    const g=geometric(state,strong,frame);
+    const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+    if(kx===5&&ky===6&&qy===5&&wx===7&&wy===7&&qx!==7) {
+      const mate=targetMove(state,strong,g.queen,preimage(frame,7,5),
+        'KQK.OrientedEntry.high_file_corner_entry.corner_distant_mate');
+      if(mate)return {...mate,frame};
+    }
+  }
   // Frame priority is a deterministic choice of PROVEN symmetry, not a
   // ranking of arbitrary legal moves. Every chosen move has a source tag.
   for(const frame of KQK_FRAMES){
