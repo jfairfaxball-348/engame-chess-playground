@@ -114,6 +114,37 @@ test('starting orientation and first move are opt-in in the Maths runtime',()=>{
  assert.match(app,/history\.push\(save\(\)\);openingPending=false/);
  assert.match(app,/id="maths-first"/);
  assert.doesNotMatch(app,/facing=human/);
- assert.doesNotMatch(app,/proofMarkup|maths-proof-steps|maths-worked/);
+ assert.match(app,/function drawProofMarkup\(pos,side\)/);
+ assert.match(app,/EXPLAINED_DRAWS=new Set\(\['kk','kbk','knk'\]\)/);
+ assert.match(app,/proofFor\(pos,side\)/);
+ assert.match(app,/maths-proof-steps/);
+ assert.match(app,/maths-worked/);
+ assert.match(app,/maths-theorem/);
+ assert.match(app,/v\.equation/);
  assert.match(app,/MATERIAL\[v\.material\]\.label/);
+});
+
+
+test('frozen drawn-material calculations remain board-specific for both colours and all three classes',()=>{
+ const samples=[
+  {kind:'kk',piece:null,steps:4,source:'EC-T0003'},
+  {kind:'kbk',piece:'bB',steps:5,source:'EC-T0004'},
+  {kind:'knk',piece:'wN',steps:5,source:'EC-T0005'}
+ ];
+ for(const {kind,piece,steps,source} of samples){
+  const board=blankBoard();
+  board[sq(0,0)]='wK';board[sq(7,7)]='bK';
+  if(piece)board[sq(1,2)]=piece;
+  for(const turn of ['w','b']){
+   const verdict=setupVerdict(board,turn),p=proofFor(board,turn);
+   assert.equal(verdict.material,kind);
+   assert.equal(verdict.kind,'draw');
+   assert.equal(verdict.canStart,true);
+   assert.equal(p.source,source);
+   assert.equal(p.steps.length,steps);
+   assert.ok(p.working);
+   if(piece)assert.match(p.working,/b3/);
+   else assert.match(p.working,/a1.*h8/);
+  }
+ }
 });
