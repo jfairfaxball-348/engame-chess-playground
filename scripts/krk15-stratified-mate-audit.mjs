@@ -47,7 +47,7 @@ export function krk15StratifiedRoots(){
  * Every cap is reported as inconclusive; never call it a mate certificate.
  */
 export function auditKRK15StratifiedMateTrees({
-  maxNodes=200,maxPlies=160,maxExamples=24
+  maxNodes=200,maxPlies=160,maxExamples=24,memoization='off'
 }={}){
   if(!Number.isSafeInteger(maxNodes)||maxNodes<1||
      !Number.isSafeInteger(maxPlies)||maxPlies<1||
@@ -57,6 +57,7 @@ export function auditKRK15StratifiedMateTrees({
     rootPhaseMismatches:0,completedAllDefenderTrees:0,
     resourceCaps:0,genuineFailures:0,
     nodesVisited:0,matingLeavesObserved:0,maximumPliesObserved:0,
+    closedSubtrees:0,closedSubtreeReuses:0,
     structuralRevisits:0,distinctHistoryRevisits:0,
     distinctStructuralStates:0,defenderRepliesExamined:0,
     sourceChoicesExamined:0,maximumDefenderBranching:0};
@@ -78,8 +79,10 @@ export function auditKRK15StratifiedMateTrees({
     else if(phase==='direct-entry')summary.directEntry++;
     else summary.twoStepSetup++;
 
-    const result=auditKRK14MateTree(state,{maxNodes,maxPlies});
+    const result=auditKRK14MateTree(state,{maxNodes,maxPlies,memoization});
     summary.nodesVisited+=result.nodes;
+    summary.closedSubtrees+=result.closedSubtrees;
+    summary.closedSubtreeReuses+=result.closedSubtreeReuses;
     summary.matingLeavesObserved+=result.terminalMates;
     summary.structuralRevisits+=result.structuralRevisits;
     summary.distinctHistoryRevisits+=result.distinctHistoryRevisits;
@@ -97,6 +100,8 @@ export function auditKRK15StratifiedMateTrees({
     else if(capped)summary.resourceCaps++;
     else summary.genuineFailures++;
     reports.push({...label,status,nodes:result.nodes,
+      closedSubtrees:result.closedSubtrees,
+      closedSubtreeReuses:result.closedSubtreeReuses,
       terminalMates:result.terminalMates,maximumPlies:result.maximumPlies,
       structuralRevisits:result.structuralRevisits,
       distinctHistoryRevisits:result.distinctHistoryRevisits,
@@ -106,7 +111,7 @@ export function auditKRK15StratifiedMateTrees({
       failures.push({...label,status,...result.firstCounterexample});
   }
   return {scope:'24 deterministic source-family/colour/frame root trees',
-    summary,reports,failures,
+    memoization,summary,reports,failures,
     completeGlobalMateProof:false,sourceSelectorFormalised:false,
     fideClockHistoryCertified:false,
     note:'Resource-capped finite samples are falsification only; no global Lean mate or clock/history certificate'};
@@ -120,7 +125,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const report=auditKRK15StratifiedMateTrees({
     maxNodes:option('--nodes=',200),
     maxPlies:option('--plies=',160),
-    maxExamples:option('--examples=',24)
+    maxExamples:option('--examples=',24),
+    memoization:process.argv.find(v=>v.startsWith('--memo='))?.slice(7)??'off'
   });
   console.log(JSON.stringify(report,null,2));
   if(process.argv.includes('--strict')&&

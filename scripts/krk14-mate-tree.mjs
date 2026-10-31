@@ -79,18 +79,45 @@ export function krk14ControlStateKey(token) {
   return JSON.stringify(projection(token));
 }
 
+/**
+ * Closed-subtree cache identity for the IMPLEMENTED chess rules.
+ *
+ * Never use board geometry alone. Clock, all historical repetition counts,
+ * source continuation (including authentication counters), ply/history
+ * length and the two last source-authentication positions are preserved.
+ * The local rules query repetition multiplicities rather than chronological
+ * order, while source continuations query the last two positions and the
+ * source token. This equivalence is for the finite JS audit only; NOT FIDE
+ * parity or a Lean certificate. Never export it into Maths move selection.
+ */
+export function krk31ClosedSubtreeKey(state,token){
+  const counts=new Map();
+  for(const key of state.history)counts.set(key,(counts.get(key)??0)+1);
+  return JSON.stringify([
+    positionKey(state.board,state.turn),state.halfmove,
+    state.history.length,state.history[0]??null,
+    state.history.at(-2)??null,state.log.length,
+    [...counts].sort(([a],[b])=>a.localeCompare(b)),token
+  ]);
+}
+
 /** Every legal weak continuation from ONE fresh or tagged strong root.
  * maxNodes/maxPlies are diagnostic resource limits, not mathematical bounds.
  */
-export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
+export function auditKRK14MateTree(root,{
+  maxNodes=12000,maxPlies=160,memoization='off'
+}={}){
+  if(!['off','history-counts'].includes(memoization))
+    throw new RangeError('Unknown KRK diagnostic memoization mode');
   const data={ok:false,scope:'one root, ALL legal defender replies',
     rootFEN:fen(root.board,root.turn),
     nodes:0,terminalMates:0,maximumPlies:0,
+    memoization,closedSubtrees:0,closedSubtreeReuses:0,
     structuralRevisits:0,distinctStructuralStates:0,
     distinctHistoryRevisits:0,defenderRepliesExamined:0,
     sourceChoicesExamined:0,maximumDefenderBranching:0,
     completeGlobalMateProof:false,fideClockHistoryCertified:false};
-  const stack=new Set(),moves=[];
+  const stack=new Set(),moves=[],closed=new Set();
   // Diagnostic-only: detect transpositions without merging branches.
   // Repeated geometries with distinct incoming clocks/histories MUST NOT
   // be treated as interchangeable for FIDE/continuation semantics.
@@ -100,13 +127,20 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
     sourceRule:rule??null,variation:moves.slice()
   });
   function visit(s,token,ply){
-    if(++data.nodes>maxNodes)return fail('node cap',s);
     data.maximumPlies=Math.max(data.maximumPlies,ply);
     if(ply>maxPlies)return fail('ply cap',s);
-    // Full source control state avoids the KRK14 false cycle and any
-    // further conflation of distinct nested phases or setup parameters.
+    // Keep the original source-aware active-stack cycle guard. Cache hits
+    // are checked AFTER this guard and only ever refer to fully closed
+    // subtrees under a stronger, history-sensitive identity.
     const key=positionKey(s.board,s.turn)+'|'+krk14ControlStateKey(token);
     if(stack.has(key))return fail('phase-position cycle',s);
+    const closedKey=memoization==='history-counts'
+      ?krk31ClosedSubtreeKey(s,token):null;
+    if(closedKey!==null&&closed.has(closedKey)){
+      data.closedSubtreeReuses++;
+      return null;
+    }
+    if(++data.nodes>maxNodes)return fail('node cap',s);
     const historySignature=s.halfmove+'|'+s.history.join(';');
     const previouslySeen=seenStructural.get(key);
     if(previouslySeen){
@@ -153,6 +187,13 @@ export function auditKRK14MateTree(root,{maxNodes=12000,maxPlies=160}={}){
       if(err){moves.pop();stack.delete(key);return err;}
     }
     stack.delete(key);moves.pop();
+    // ONLY a completely traversed, all-replies-mate subtree is closed.
+    // Caps, missing phases, captures, cycles and other terminal outcomes
+    // return earlier and can never populate this memo.
+    if(closedKey!==null){
+      closed.add(closedKey);
+      data.closedSubtrees=closed.size;
+    }
     return null;
   }
   const error=visit(root,null,0);

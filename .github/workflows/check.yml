@@ -36,7 +36,11 @@ jobs:
       # S023 second diagnostic tier: larger deterministic all-defender
       # budgets help separate state-space explosion from source gaps.
       # Non-strict, explicitly NOT a global mate certification.
-      - run: node scripts/krk15-stratified-mate-audit.mjs --nodes=2500 --plies=160 --examples=6
+      # S031: same roots, same depth, same 2,500-node budget with memo OFF.
+      # Report baseline beside history/source-sensitive closed-only memo.
+      # Neither result is a universal winning-strategy certificate.
+      - run: node scripts/krk15-stratified-mate-audit.mjs --nodes=2500 --plies=160 --examples=6 --memo=off
+      - run: node scripts/krk15-stratified-mate-audit.mjs --nodes=2500 --plies=160 --examples=6 --memo=history-counts
       # S030: deep deterministic weak-reply spines to triage source-controller
       # gaps beyond the 2,500-node branching cap. Not an all-reply proof.
       - run: npm run audit:krk-spines -- --pairs=80
