@@ -39,8 +39,9 @@ source pinned at c72365a8ba46f59114a2a77d9d38993f6a52df80.
 - KQK20 had logged one board-only repeat from fixed strong white
   K=7, Q=58, weak K=9. S030 distinguishes bare board recurrence from
   identical board+full source token and retains rankBefore in KQK21
-  all-defender cache identity. Verify the new CI numbers and whether a
-  genuine repeating source controller remains.
+  all-defender cache identity. [Actions #41188066437] found 32/32
+  mate on those same fixed-line samples (previously 31 mate + 1
+  board-only false cycle); 120-root bounded KQK results unchanged.
 - Frozen FarFileEntry.far_file_stage_bound has exact cases in order:
   separating rank wall; direct small-file wall; horizontal far wall;
   tight-above entry. The existing JS farFileReply iterates a number of
@@ -61,9 +62,8 @@ A. **KRK first**: use the S030 96 successful deep spines as a strict
    node counts and close actual full trees if possible. If a
    demonstrable, reproducible missing phase emerges, implement ONLY the
    matching frozen Lean branch, with full reply tests.
-B. **KQK source case**: reproduce the former fixed-line board repeat
-   with the S030 full controller key, trace source phases, classify as
-   true loop vs distinct prepared-band continuation. Compare actual
+B. **KQK source case**: retain the corrected 32/32 first-reply sample
+   and do not chase the already-resolved board-only false cycle. Compare actual
    capped FarFilePreparation / SameRankEntry / WeakToMove children to
    the four frozen FarFileEntry cases. Repair only a demonstrated source
    correspondence failure; do not add generic frame cycling or increase
