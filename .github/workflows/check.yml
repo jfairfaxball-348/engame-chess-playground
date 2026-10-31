@@ -37,6 +37,9 @@ jobs:
       # budgets help separate state-space explosion from source gaps.
       # Non-strict, explicitly NOT a global mate certification.
       - run: node scripts/krk15-stratified-mate-audit.mjs --nodes=2500 --plies=160 --examples=6
+      # S030: deep deterministic weak-reply spines to triage source-controller
+      # gaps beyond the 2,500-node branching cap. Not an all-reply proof.
+      - run: npm run audit:krk-spines -- --pairs=80
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
