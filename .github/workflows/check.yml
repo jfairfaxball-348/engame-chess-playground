@@ -44,6 +44,11 @@ jobs:
       # S030: deep deterministic weak-reply spines to triage source-controller
       # gaps beyond the 2,500-node branching cap. Not an all-reply proof.
       - run: npm run audit:krk-spines -- --pairs=80
+      # S032: source-phase edge registry and original-frame ordered KQK case
+      # correspondence. These are negative/source-fidelity audits, not mate
+      # certificates; cross-frame obligations and missing cases remain visible.
+      - run: npm run audit:krk-phase-edges
+      - run: npm run audit:kqk-far-file
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
