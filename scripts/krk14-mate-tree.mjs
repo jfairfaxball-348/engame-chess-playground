@@ -105,7 +105,7 @@ export function krk31ClosedSubtreeKey(state,token){
  * maxNodes/maxPlies are diagnostic resource limits, not mathematical bounds.
  */
 export function auditKRK14MateTree(root,{
-  maxNodes=12000,maxPlies=160,memoization='history-counts'
+  maxNodes=12000,maxPlies=160,memoization='off'
 }={}){
   if(!['off','history-counts'].includes(memoization))
     throw new RangeError('Unknown KRK diagnostic memoization mode');
