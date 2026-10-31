@@ -1,106 +1,87 @@
-# S034 — complete KQK original-case source action correspondence; build a compositional KRK termination certificate
+# S035 — source-exact KQK complete lines and first KRK rank bridge
 
-**Execution session; write, test and merge code, not another planning essay.**
-Working repo ONLY: https://github.com/jfairfaxball-348/engame-chess-playground .
-Parent endgame-chess is READ-ONLY. Read AGENTS.md,
-docs/S033_SOURCE_CORRESPONDENCE.md, docs/KQK32_FAR_FILE_CASE_AUDIT.md,
-docs/KRK30_DEEP_SPINES.md, docs/KRK31_CLOSED_MEMO.md and S033 PR #42
-Actions before editing. Exact source locks: KRK EC-T0048
-2311abe71bc1a4eed47026feccd5ba5a0760d5bb
-(KRK sourceCommit e7de0930fc61caeb11795cf3c10fde11e4774a40);
-KQK EC-T0050 c72365a8ba46f59114a2a77d9d38993f6a52df80.
+**Execution session: implement, test, commit, merge, verify and install S036.**
+Working repository ONLY: https://github.com/jfairfaxball-348/engame-chess-playground .
+Parent https://github.com/jfairfaxball-348/engame-chess is READ-ONLY.
+Read AGENTS.md, docs/S033_SOURCE_CORRESPONDENCE.md,
+docs/S034_REACHABILITY_RANK.md, scripts/kqk34-reachability.mjs,
+scripts/krk34-rank-obligations.mjs and PR #43 before editing.
 
-## Binding owner priorities
+## Owner priorities and source locks
 
-1. Source-derived KRK and KQK attacking strategies that actually force
-   mate from EVERY legal user-arranged root against EVERY lawful weak
-   reply. The live Maths strong-side selection must come only from named
-   frozen Lean constructions; never engine/tablebase/minimax/heuristic,
-   arbitrary first legal move, invented rank, or uncited symmetry jump.
-   No live fallback on missing source; fail closed.
-2. Once both Stage A strategies genuinely reach universal coverage,
-   **immediately** complete KRK/KQK to existing KK/KNK/KBK worked
-   board-specific equations, derivation, source/proof provenance,
-   repetition and 50/75-move rule/clock parity, with accurate history.
-   Preserve already rich maths panels; do not start KPK or Engine research.
-3. MATERIAL.krk.playable and MATERIAL.kqk.playable remain false until
-   certification. Experimental simplified play may remain disclosed.
-   Never call resource caps successes or CI a universal mate proof.
+1. Make both KRK and KQK play from EVERY legal user-arranged root against
+   EVERY lawful weak reply, mating through real source-derived strong
+   actions. No engine/tablebase/minimax/heuristic/first-legal fallback,
+   invented token/rank or uncited symmetry. Fail closed where unsupported.
+2. Immediately after BOTH Stage A strategies are genuinely complete,
+   complete BOTH Stage B engines to KK/KNK/KBK maths parity: board-specific
+   equations, derivations, move proof provenance, 50/75-move clock and
+   repetition history and verified terminal outcomes. Keep existing
+   KK/KNK/KBK worked panels; do not start KPK or unrelated Engine work.
+3. KQK EC-T0050 SHA c72365a8ba46f59114a2a77d9d38993f6a52df80;
+   KRK EC-T0048 2311abe71bc1a4eed47026feccd5ba5a0760d5bb;
+   KRK sourceCommit e7de0930fc61caeb11795cf3c10fde11e4774a40.
+   MATERIAL.krk.playable and MATERIAL.kqk.playable remain false until certified.
 
-## Exact S033 handoff (PR #42)
+## Current evidence and exact open obligations
 
-- Authentic KQK FarFilePreparation roots 4; immediate weak replies 24,
-  all under original-frame horizontal-far-wall case.
-- **24/24** different-frame chosen source moves authenticated
-  independently by pinned SameRankEntry.backrank_entry +
-  clear_low_wall_entry theorem premises. No missing.
-- Static already-far-file original-case fixtures: 16 x each of 4
-  cases across 2 colours/8 isometries. All have an initial source-tagged
-  move, but several are from OTHER frames and are not certified full
-  lines.
-- Tight-above is *arithmetically impossible* immediately after genuine
-  FarFilePreparation: offWeak + pre-reply rank gap and one-square weak
-  reply contradict its postconditions. It remains an already-far-file
-  / direct-entry root obligation, NOT a fourth preparation-token seed.
-- KRK 24 source roots -> 168 first weak replies -> 980 second legal weak
-  replies -> **980/980 named third moves**, 0 missing. The 60
-  setup/nonwall-entry -> prep transitions demonstrate why a simplistic
-  one-way phase order is insufficient. Still no universal descent
-  certificate or finite all-defender proof.
-- Legacy fixed 24 KRK all-defender trees at nodes=2500, plies=160:
-  0 mate-closed / 24 capped / 0 failures. KQK adversarial fixed
-  reference 98/120 monotone, 87/120 exact-depth; no changes to live
-  controller in S033.
+- S033: four authentic FarFilePreparation roots, 24 lawful
+  post-preparation replies; all 24 chose independently authenticated
+  SameRankEntry backrank actions in another proven frame. All were
+  horizontal-far-wall in the original frame: NOT a four-case proof.
+- S034: deterministic bounded canonical legal-root probe plus authentic
+  S025 fixtures, preserving actual FarFilePreparation tokens; replay
+  first and second legal weak replies. Reports original cases, real
+  witnesses, missing sources and independent-frame verification.
+  **Tight-above cannot arise immediately after preparation**:
+  source weak rank >= strong king rank+2, queen rank != weak rank,
+  and weak king can change rank by only one. Cover tight-above via
+  genuinely legal already-far-file roots, NOT forged tokens.
+- KRK S033: 24 roots -> 168 first weak replies -> 980 second weak
+  replies -> 980 source-tagged third moves. Global descending rank
+  still missing. S034 groups all second-source tags and successor
+  branches: the graph itself is NOT a proof of termination.
+- Frozen KRKWinning.Policy.winning_policy uses Classical.choose;
+  StrategyTransport carries ForceMate existence. Neither implies
+  the concrete JS tagged action decreases a verified board/token
+  measure across setup/nonwall/prep, central and restoration.
 
-## Do in S034
+## Do in S035
 
-A. **KQK literal original-frame correspondence, no re-preparation
-cycling.** Focus on FarFileEntry.far_file_stage_bound's first three
-reachable post-preparation cases. Generate ORIGINAL, legally admitted
-strong-turn boards that lead to a genuine kqkSourceChoice
-FarFilePreparation source step and real one-ply weak replies; find
-replayable separating-rank and direct-small-file witnesses, both
-colours/eight board isometries. If a case cannot occur, prove its
-source-derived incompatibility instead of minting a token. The
-tight-above case is already known impossible immediately after prep:
-cover independently from already-far-file legal roots. For each
-observed chosen cross-frame source action, check the EXACT independent
-pinned Lean theorem's prerequisites in the chosen frame, its literal
-constructive target, its mandatory weak reply and queen safety.
-**Implement missing ORIGINAL-frame constructive case actions** only
-where authentic source coverage demonstrates a gap; do not replace
-the current safe actions speculatively. Run all immediate defender
-replies and then continue actual complete lines, with no alternative
-search policy.
+A. **KQK literal source action closure.** Inspect real report from
+   npm run audit:kqk-original-cases -- --legal=6000 --prepared=64.
+   For genuinely reached separating-rank, direct-small-file and
+   horizontal-far-wall cases, authenticate the EXACT first ORIGINAL-frame
+   constructive action and continue all lawful defender replies.
+   For absent cases, expand admissible source-root strata; don't
+   call bounded absence a proof of impossibility. Authenticate
+   every non-backrank cross-frame chosen theorem against its own
+   pinned prerequisites, exact target and queen safety. Build an
+   independent legal already-far-file tight-above continuation.
+   Only add source moves when a replayable gap and exact frozen
+   construction justify them; forbid repeat preparation cycles.
 
-B. **KRK rank/composition, not more breadth-only runs.** Use the
-KRK33 second-edge phase registry as the concrete induction obligations.
-The frozen existence proof KRKWinning.Policy.winning_policy uses
-Classical.choose; StrategyTransport transports ForceMate existence,
-neither directly proves the tagged JS action's phase decrease.
-Investigate exactly which finite combinatorial source lemmas for
-central/restoration plus setup->nonwall->prep transfers can supply a
-verified lexicographic rank (including board and inner token). Prove
-all weak replies preserve the premises and decrease the source rank,
-or isolate the FIRST missing theorem and a replayable state. Do not
-just increase node budgets or weaken history-aware equivalence.
-If enough of the induction is proved, wire the named source actions
-and measure as a rejection-only/assertion test, NOT an invented selector.
+B. **KRK compositional rank bridge.** Inspect
+   npm run audit:krk-rank-obligations and the exact incoming source
+   tokens in two-layer phase registry. Pick a concrete named source
+   phase transfer, check the frozen premises and all lawful weak replies,
+   and seek a source-backed board+token strict rank. If unavailable,
+   isolate the FIRST missing upstream frozen-source lemma with board,
+   move, token and theorem name; do not invent a rank. No raw budget
+   escalation as a replacement.
 
-C. **Regress without reducing quality.** Run npm test,
-npm run verify:krk-sources, npm run check, npm run build; existing
-KRK phase/root/continuation/mate-strata/spine/first+second-edge
-audits; KQK all-four-case, source-correspondence, root and
-monotone/exact all-defender audits on identical seeds/caps; both
-Chromium browser suites. Preserve actual starting squares and
-side-to-move, both colours, capture-to-KK, undo, new position, proof
-panels for KK/KNK/KBK, and independent Engine tab. Track mate-closed,
-capped and genuine failure separately, with exact counterexample
-tokens, never vague success claims.
+C. Run npm test; npm run verify:krk-sources; npm run check;
+   npm run build; all old KRK and KQK root, phase, spine,
+   adversarial, first/second edge, source-case and complete-line
+   audits, both Chromium suites. Compare identical seed/cap settings
+   for monotone and exact KQK. Preserve user-placed starting position,
+   legal turns, both colours, capture-to-KK, undo/new position,
+   maths panels and isolated Engine tab. Clearly separate mating
+   leaves, capped trees and genuine failures. No finite sample
+   establishes universal proof.
 
-D. Commit isolated branch, PR, inspect **PR-head** CI, merge/fast
-forward, inspect **merged-main** CI, then document exact numbers and
-install full S035. Do not infer live Cloudflare deployment from CI.
+D. Commit branch, PR-head CI, merge/fast forward after validation,
+   merged-main CI, precise docs, install full S036. Never claim
+   GitHub CI proves a Cloudflare production deployment.
 
-Owner sequence remains BOTH Stage A controllers -> BOTH Stage B full
-mathematical and FIDE-aware parity, before KPK/other classes.
+Sequence is BOTH Stage A -> BOTH Stage B, before KPK/other research.
