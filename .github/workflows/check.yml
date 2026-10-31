@@ -53,6 +53,10 @@ jobs:
       # tokens; and check two whole layers of KRK weak replies, not closure.
       - run: npm run audit:kqk-source-correspondence
       - run: npm run audit:krk-second-edges
+      # S034: bounded original KQK case witnesses, exact second reply layer,
+      # and source-tagged KRK rank obligations; not a universal proof.
+      - run: npm run audit:kqk-original-cases -- --legal=1200 --prepared=32
+      - run: npm run audit:krk-rank-obligations
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
