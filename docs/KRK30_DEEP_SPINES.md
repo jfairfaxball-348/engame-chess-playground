@@ -40,6 +40,12 @@ repair, not a measured global closure advance.
 
 The older KQK20 fixed-first-defender line audit reported a board-only
 "cycle" for strong white K=7, Q=58, weak K=9 (31/32 lines mate).
+After replacing its board-only key with the full source-controller key,
+[Actions run #41188066437](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41188066437)
+reported **32/32 mate, 0 cycles** on the SAME fixed-line samples. The
+previous cycle was a diagnostic false positive, NOT a proved source
+strategy failure. All 120-root KQK all-defender counts stayed unchanged
+(monotone 98/22/0, exact 87/33/0).
 That diagnostic used only the **board position**, ignoring the active
 proof continuation. A board revisited under a different source token is
 not a repeated deterministic controller state. S030 therefore uses a
