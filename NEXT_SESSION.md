@@ -1,73 +1,85 @@
-# S030 — close KRK all-defender source controller, then KQK and maths parity
+# S031 — close KRK all-defender proof-derived play and KQK exact source branches
 
-**Execution session**, downstream `jfairfaxball-348/engame-chess-playground`
-only. Check current `main`, `AGENTS.md`, `docs/KQK29_WALL_PREPARATION.md`,
-and the exact last merged-main GitHub Actions run. Upstream
-`engame-chess` is **read-only**. Frozen KQK source lock:
-`c72365a8ba46f59114a2a77d9d38993f6a52df80`.
+**Execution session** for downstream jfairfaxball-348/engame-chess-playground
+only. Read AGENTS.md, docs/KRK30_DEEP_SPINES.md, docs/KQK29_WALL_PREPARATION.md
+and the exact merged-main GitHub Actions run before changing code.
+Upstream jfairfaxball-348/engame-chess is **READ-ONLY**. KQK EC-T0050
+source pinned at c72365a8ba46f59114a2a77d9d38993f6a52df80.
 
-## Binding owner priority
+## Binding owner order
 
-1. Complete the actual **all-defender, every legal arranged-root**
-   source-derived mating controllers for **both KRK and KQK** in
-   simplified playable mode. Every chosen attacking move must translate
-   a real pinned Lean construction. No Engines, tablebases, minimax,
-   guessing or first-legal fallbacks in Maths. Preserve legal moves,
-   colours, exact arranged positions, mates, rook/queen capture-to-KK
-   and the entire existing detailed KK/KNK/KBK proof UI.
-2. **Immediately after both strategies truly close**, implement full
-   board-specific worked maths, equations, theorem links, source move
-   provenance, complete outcome semantics and FIDE 50/75-move and
-   repetition-history parity for KRK and KQK. Do not start KPK, engines
-   or unrelated new material first.
-3. Until verified, label the JS policies experimental. An outcome
-   theorem or tested first actions do not establish a total policy.
+1. **Finish the actual proof-derived legal-root, all-defender mating
+   controllers for both KRK and KQK.** Simplified or 'cheat' play-first
+   is temporary, but each strong move MUST be authorised by an exact
+   frozen Lean constructor. No Stockfish, Lozza, tablebase, minimax,
+   heuristic scoring, guessed move or arbitrary legal fallback in Maths.
+   Keep exact arranged boards, colours, legal moves, capture-to-KK,
+   Undo/restart and all current KK/KNK/KBK maths proofs.
+2. Once BOTH complete, immediately implement full KRK/KQK board-specific
+   mathematical equations, worked proof steps, theorem/branch provenance,
+   full outcome semantics and proper 50/75-move/repetition-history parity.
+   Do NOT begin KPK, unrelated UI polish or Engine research first.
+3. Do not label an experimental controller or 96 deterministic sample
+   successes a universal, fully formally verified mating policy.
 
-## Last session S029
+## S030 handoff
 
-- S028 merged-main `a97a44c65d63ff9dc45575e87b191b24be0230a3`;
-  Actions run `41131434927` passed.
-- S029 PR [#38](https://github.com/jfairfaxball-348/engame-chess-playground/pull/38)
-  introduced an exact one-reply `band-wall-prepare` token for frozen
-  `BandEntry.wall_prepare_bound`, preserving the original Lean frame
-  and requiring `preparationPotential(next)+1=preparationPotential(previous)`.
-  It added two-colour/eight-frame/all-immediate-reply tests and
-  documentation. **Verify S029 merge and its exact CI results** before
-  quoting post-change closure figures or proceeding.
-- Last known pre-S029 fixed 120-root KQK audits: monotone 98 mate-closed /
-  22 capped / 0 hard failures; exact 87 / 33 / 0. KRK remained 24/24
-  resource-capped, 0 known hard failures at 2,500 nodes. Do not mistake
-  sampling resource exhaustion for a counterexample or complete proof.
+- PR #39 introduces deep phase-spine KRK diagnostics and controller-aware
+  KQK cycle/cache keys. Check its actual merge state and exact latest CI
+  before beginning work, and report changed KQK closure numbers honestly.
+- Original S029 merged-main Actions #41183631312 passed. KQK fixed
+  120-root, 2,500-node, 64-round results: monotone 98/120 mate-closed,
+  22 capped, 0 falsified; exact 87/120 mate-closed, 33 capped, 0 falsified.
+  KRK 24/24 capped and no genuine failure at 2,500 nodes.
+- First S030 PR-head Actions #41187774682 passed all tests/build/Chromium.
+  Across 24 KRK source-root/colour/frame fixtures and four deterministic
+  LEGAL defender schedules, **96/96 deep lines reached actual checkmate**
+  within 80 attacking turns. This is positive evidence about phase depth,
+  not all-defender or universal closure. Do not throw away this progress.
+- KQK20 had logged one board-only repeat from fixed strong white
+  K=7, Q=58, weak K=9. S030 distinguishes bare board recurrence from
+  identical board+full source token and retains rankBefore in KQK21
+  all-defender cache identity. [Actions #41188066437] found 32/32
+  mate on those same fixed-line samples (previously 31 mate + 1
+  board-only false cycle); 120-root bounded KQK results unchanged.
+- Frozen FarFileEntry.far_file_stage_bound has exact cases in order:
+  separating rank wall; direct small-file wall; horizontal far wall;
+  tight-above entry. The existing JS farFileReply iterates a number of
+  source helpers under reflected frames. Inspect the actual tests before
+  alleging a mismatch.
 
-## Execute S030
+## Execute S031
 
-1. **KRK first.** Examine `src/krk-tagged-strategy.js`,
-   `src/krk-prepared-wall.js`, `src/krk-central-sequence.js` and
-   `scripts/krk14-mate-tree.mjs`. Use source-phase/structural-state
-   traces from a fixed KRK15 root to distinguish repeated *identical*
-   controller states from distinct branching and false history-dependent
-   duplicates. Pin the first real missing phase/cycle if one exists.
-   Implement only an exact theorem-authorised action or ranking
-   continuation that addresses that precise failure.
-2. **KQK follow-through.** Audit the same capped KQK seed/family and
-   the exact/monotone cache modes as S028/S029. Determine whether the
-   new wall-preparation token changes closure or only expands state.
-   Trace deep `WeakToMove`, `FarFilePreparation` and `SameRankEntry`
-   children and compare every actual branch of frozen
-   `FarFileEntry.far_file_stage_bound` with `farFileReply`.
-   Fix only a demonstrated source mismatch.
-3. Add a regression for each real repair: both colours, eight board
-   frames, every immediate legal defender reply, and exact before/after
-   source position. Reject a cap increase or mere extra token as
-   evidence of game closure.
-4. Run Node tests, frozen-source verification, all KRK root/continuation
-   and all-defender audits, both KQK cache modes with identical seeds
-   and caps, syntax/build, and two Chromium QA suites. Review
-   Maths/Engine isolation and existing KK/KNK/KBK proofs. Separate
-   live Cloudflare deployment evidence from CI evidence.
-5. Commit on an isolated branch, PR, verify exact PR-head checks,
-   merge, verify merged-main checks, and install **S031**. Report
-   actual mate-closed, capped and genuine failure counts; do not
-   call Stage A or FIDE parity complete without the missing proof.
-
-**No speculative 'strategy complete' language.**
+A. **KRK first**: use the S030 96 successful deep spines as a strict
+   regression. Attack the branch-width explosion of
+   scripts/krk14-mate-tree.mjs and scripts/krk15-stratified-mate-audit.mjs,
+   without replacing the frozen strong move policy. A sound
+   all-defender *closed-subtree* memo may be considered only after
+   proving its identity keeps every decision-relevant clock, source
+   continuation and repetition-history fact. Do not memoize capped,
+   unsupported or failed nodes and do not conflate merely geometric
+   transpositions with FIDE-equivalent states. Provide before/after
+   node counts and close actual full trees if possible. If a
+   demonstrable, reproducible missing phase emerges, implement ONLY the
+   matching frozen Lean branch, with full reply tests.
+B. **KQK source case**: retain the corrected 32/32 first-reply sample
+   and do not chase the already-resolved board-only false cycle. Compare actual
+   capped FarFilePreparation / SameRankEntry / WeakToMove children to
+   the four frozen FarFileEntry cases. Repair only a demonstrated source
+   correspondence failure; do not add generic frame cycling or increase
+   caps and pretend this is mate closure.
+C. Test every repaired branch for both strong colours, all eight
+   KQK or four KRK transformations, every immediate legal defender
+   response and the exact source pre/post geometry. Include no rook/
+   queen capture and correct mate/undo/restart tests. Preserve
+   material-specific KK/KBK/KNK explanations and Engine isolation.
+D. Run npm test, npm run check, npm run build, source locks, KRK root/
+   continuation/all-defender/spine audits, KQK first-reply and both
+   identical-seed cache modes, and both Chromium QA suites. Note
+   scope and counters: mate-closed / capped / genuine failures, cycles
+   vs distinct-source-token board repeats. A passing Actions workflow
+   does not verify live Cloudflare deployment.
+E. Commit isolated branch, PR, verify exact PR-head checks, merge,
+   verify merged-main checks, install S032 with a targeted remaining
+   obligation. Never claim Stage A finished unless every legal root
+   really closes under all defender replies; Stage B remains next.
