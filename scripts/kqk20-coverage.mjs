@@ -4,7 +4,8 @@
  * reply, and plays a separate first-reply demonstration set to termination.
  * A bounded sample is NOT an all-roots/all-defender proof.
  */
-import {makeBoard,opposite,validateSetup,newGame,legalMoves,outcome} from '../src/chess.js';
+import {makeBoard,opposite,validateSetup,newGame,legalMoves,outcome,positionKey} from '../src/chess.js';
+import {kqk30ControlShape} from './kqk30-state-key.mjs';
 import {chooseMathsOpponent,mathsPlayMove} from '../src/maths-play-policy.js';
 
 const narg=(name,fallback)=>{
@@ -25,11 +26,18 @@ function fresh(strong){
 }
 function runLine(root,strong){
   let s=root,token=null,round=0;
-  const seen=new Set(),trace=[];
-  const done=result=>({result,tail:trace.slice(-12)});
+  const seen=new Set(),seenBoards=new Set(),trace=[];
+  let geometricRevisits=0;
+  const done=result=>({result,geometricRevisits,tail:trace.slice(-12)});
   while(round++<maxRounds){
-    if(seen.has(s.history.at(-1)))return done('cycle');
-    seen.add(s.history.at(-1));
+    // A repeated board with a distinct source proof token is NOT yet a
+    // repeated controller state. Retain rankBefore, but omit moveCount.
+    const key=kqk30ControlShape(s,strong,token);
+    if(seen.has(key))return done('cycle');
+    seen.add(key);
+    const boardOnly=positionKey(s.board,s.turn);
+    if(seenBoards.has(boardOnly))geometricRevisits++;
+    seenBoards.add(boardOnly);
     const c=chooseMathsOpponent(s,strong,token);
     if(!c?.move)return done('unsupported');
     trace.push(c.sourcePhase+':'+c.move.from+'-'+c.move.to);
