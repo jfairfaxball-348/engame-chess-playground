@@ -47,7 +47,7 @@ export function krk15StratifiedRoots(){
  * Every cap is reported as inconclusive; never call it a mate certificate.
  */
 export function auditKRK15StratifiedMateTrees({
-  maxNodes=200,maxPlies=160,maxExamples=24,memoization='history-counts'
+  maxNodes=200,maxPlies=160,maxExamples=24,memoization='off'
 }={}){
   if(!Number.isSafeInteger(maxNodes)||maxNodes<1||
      !Number.isSafeInteger(maxPlies)||maxPlies<1||
@@ -126,7 +126,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
     maxNodes:option('--nodes=',200),
     maxPlies:option('--plies=',160),
     maxExamples:option('--examples=',24),
-    memoization:process.argv.find(v=>v.startsWith('--memo='))?.slice(7)??'history-counts'
+    memoization:process.argv.find(v=>v.startsWith('--memo='))?.slice(7)??'off'
   });
   console.log(JSON.stringify(report,null,2));
   if(process.argv.includes('--strict')&&
