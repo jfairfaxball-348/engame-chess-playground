@@ -191,7 +191,13 @@ function bandChoice(state,strong,frame,g) {
     const post={...state,board:state.board.slice(),log:state.log.concat('band-cross')};
     post.board[result.move.to]=post.board[result.move.from];
     post.board[result.move.from]=null;
-    return tagged(result,makeToken(post,strong,frame,continuation));
+    const token=makeToken(post,strong,frame,continuation);
+    // BandEntry.wall_prepare_bound is an induction on the ORIGINAL
+    // oriented wall's potential. Keep this exact measure across the
+    // intervening weak reply instead of restarting in another frame.
+    if(continuation==='band-wall-prepare')
+      token.rankBefore=qy-1-ky+Math.abs(kx-qx);
+    return tagged(result,token);
   };
   // BandEntry.wall_ninety_one: last-rank wall at file five is widened.
   if(qy===6 && qx===5 && wx===7 && wy===7)
@@ -208,11 +214,12 @@ function bandChoice(state,strong,frame,g) {
   if(qy===5&&qx>5)return null;
   // BandEntry.wall_prepare_bound: approach the queen rank, then file.
   if(ky+1<qy)
-    return choice(g.sk,kx,ky+1,'KQK.BandEntry.wall_prepare_bound.vertical');
+    return choice(g.sk,kx,ky+1,
+      'KQK.BandEntry.wall_prepare_bound.vertical','band-wall-prepare');
   if(ky+1!==qy)return null;
   if(kx<qx||kx>wx)
     return choice(g.sk,toward(kx,qx),ky,
-      'KQK.BandEntry.wall_prepare_bound.horizontal');
+      'KQK.BandEntry.wall_prepare_bound.horizontal','band-wall-prepare');
   // Prepared sk qs wk: same king/queen file, king one rank below.
   if(qy===5&&wx===7&&wy===7&&qx!==5)
     return choice(g.queen,5,5,'KQK.RankFive.rank_five_corner_bound');
@@ -331,6 +338,22 @@ function knightSideReply(state,strong,token) {
  * an unrelated frame. Recheck the exact Prepared coordinates before
  * taking another source-defined band action; otherwise fail closed.
  */
+function bandWallPrepareReply(state,strong,token) {
+  const g=geometric(state,strong,token.frame);
+  if(!g)return null;
+  const [kx,ky]=g.k,[qx,qy]=g.q,[wx,wy]=g.w;
+  // BandEntry.wall_prepare_bound / preparation_step: the king's source
+  // move decreases preparationPotential by EXACTLY one; no weak king
+  // reply may alter that measure or the chosen wall orientation.
+  // OpenBand is needed for the induction (not arbitrary rank-six walls).
+  if(!(ky<qy&&qy<wy&&qx<wx)||
+      !(qy<=4||(qy===5&&qx<=5))||
+      !Number.isSafeInteger(token.rankBefore)||
+      qy-1-ky+Math.abs(kx-qx)+1!==token.rankBefore)
+    return null;
+  return bandChoice(state,strong,token.frame,g);
+}
+
 function bandPreparedReply(state,strong,token) {
   const g=geometric(state,strong,token.frame);
   if(!g)return null;
@@ -541,7 +564,7 @@ function farFileReply(state,strong,token) {
 }
 
 function validToken(state,strong,token) {
-  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','band-prepared','knight-side','knight-low-five','tight-file','far-file','backrank-protected'].includes(token.kind)||
+  if(!token||typeof token!=='object'||!['shadow-reply','shadow-bottom-reply','band-raise','band-prepared','band-wall-prepare','knight-side','knight-low-five','tight-file','far-file','backrank-protected'].includes(token.kind)||
      !Object.hasOwn(FRAMES,token.frame)||token.strong!==strong||
      state.log.length!==token.moveCount+1)return false;
   const weak=findKing(state.board,opposite(strong));
@@ -560,6 +583,8 @@ export function kqkSourceChoice(state,strong,token=null) {
     if(token.kind==='shadow-bottom-reply')return bottomReply(state,strong,token);
     if(token.kind==='band-raise')return bandRaiseReply(state,strong,token);
     if(token.kind==='band-prepared')return bandPreparedReply(state,strong,token);
+    if(token.kind==='band-wall-prepare')
+      return bandWallPrepareReply(state,strong,token);
     if(token.kind==='tight-file')return tightFileReply(state,strong,token);
     if(token.kind==='backrank-protected')
       return protectedBackrankReply(state,strong,token);
