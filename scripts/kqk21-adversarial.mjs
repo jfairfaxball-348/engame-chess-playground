@@ -15,6 +15,7 @@ import {
   outcome, positionKey
 } from '../src/chess.js';
 import {chooseMathsOpponent, mathsPlayMove} from '../src/maths-play-policy.js';
+import {kqk30ControlShape as shape} from './kqk30-state-key.mjs';
 
 function positiveArg(name, fallback, maximum=100000) {
   const item=process.argv.find(arg=>arg.startsWith('--'+name+'='));
@@ -63,10 +64,6 @@ function capWitness(kind,path,state,strong,token) {
       queen:token.queen,king:token.king,weak:token.weak,
       moveCount:token.moveCount}:null
   }};
-}
-function shape(state,strong,token) {
-  return positionKey(state.board,state.turn)+'|'+strong+'|'+
-    (token?token.kind+':'+token.frame+':'+token.queen+':'+token.king+':'+token.weak:'none');
 }
 function visit(root,strong) {
   const tally=Object.fromEntries(terminalKinds.map(k=>[k,0]));
