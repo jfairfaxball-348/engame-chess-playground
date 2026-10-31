@@ -57,6 +57,32 @@ may exercise fewer than four cases; no global case correspondence is
 asserted by this audit. Expand with legitimate reachable proof tokens
 for remaining cases before claiming branch completeness.
 
+## Measured S032 PR-head diagnostics (first corrected run)
+
+- KRK: **24/24** source root moves, **168/168** lawful first
+  defender replies with a tagged next source move, **0** missing,
+  **0** rook captures. Edge counts: prepared-wall/prep to central
+  **40**; direct/nonwall-entry to central **64**; two-step-setup
+  to nonwall-entry **64**. This validates only the FIRST source
+  phase transition, not a universally decreasing rank.
+- KQK: **4** authentic S025 FarFilePreparation source roots,
+  **24** immediate weak replies, all **24 horizontal-far-wall**
+  in their original proof frame, **0** missing source moves and
+  **24** differently framed subsequent source selections.
+  The observed sample includes the independently framed
+  SameRankEntry.backrank_entry.clear_low_wall action.
+  It may be justified by another frozen theorem, but original-case
+  attribution is not established merely by move legality. No
+  genuine preparation-token sample here exercised separating-rank,
+  direct-small-file or tight-above cases. Their static geometric
+  classifier coverage is not equivalent to complete source
+  continuation coverage.
+- The initial PR-head test run failed because the static 90/270-degree
+  board fixtures used the same transform rather than its inverse when
+  recovering the proof frame. The transform was corrected and the
+  real-token test had already passed. The later comprehensive checks
+  are the release gate, not the initial failed run.
+
 ## Release gate and handoff
 
 Stage A (source-derived, all-defender constructive mate from ALL legal
