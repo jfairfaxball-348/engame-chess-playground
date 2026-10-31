@@ -41,6 +41,15 @@ c72365a8ba46f59114a2a77d9d38993f6a52df80.
   FarFilePreparation-token replay for every lawful weak reply of S025
   fixture. Cross-frame actions are flagged, not automatically credited
   to a case. Static case witnesses do not show live reachability.
+- First corrected S032 audit: KRK 24/24 source root moves and
+  168/168 immediate lawful weak replies have named next moves:
+  prep -> central 40, direct -> central 64, setup -> direct 64,
+  with zero missing continuations. NOT a global rank.
+- Authentic S025 KQK far-file tokens: 4 eligible roots, 24 legal
+  replies, ALL horizontal-far-wall, zero missing, but 24 different-
+  frame selections (including SameRankEntry.backrank_entry).
+  Each has an independent source-proof applicability obligation.
+  The other three theorem cases are covered geometrically only.
 - Check exact S032 counts and any failures from Actions before work.
   Both KRK/KQK simplified Stage A strategies remain incomplete.
 
