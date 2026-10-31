@@ -49,6 +49,10 @@ jobs:
       # certificates; cross-frame obligations and missing cases remain visible.
       - run: npm run audit:krk-phase-edges
       - run: npm run audit:kqk-far-file
+      # S033: authenticate cross-frame theorem premises against source-issued
+      # tokens; and check two whole layers of KRK weak replies, not closure.
+      - run: npm run audit:kqk-source-correspondence
+      - run: npm run audit:krk-second-edges
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
