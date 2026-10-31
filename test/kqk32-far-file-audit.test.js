@@ -29,7 +29,9 @@ test('S032 all four ordered frozen FarFileEntry cases retain their original fram
         assert.equal(validateSetup(board,'kqk',strong),null,
           JSON.stringify({f,strong,frame}));
         const state=newGame(board,strong,'kqk',{experimentalKQK:true});
-        assert.equal(kqk32CaseFromState(state,strong,frame),f.branch,
+        const sourceFrame=frame==='rotate90'?'rotate270':
+          frame==='rotate270'?'rotate90':frame;
+        assert.equal(kqk32CaseFromState(state,strong,sourceFrame),f.branch,
           JSON.stringify({f,strong,frame}));
         checked++;
       }
