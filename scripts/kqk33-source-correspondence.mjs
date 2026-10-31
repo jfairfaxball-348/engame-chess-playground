@@ -58,7 +58,7 @@ export function authenticateKQK33Backrank(state,strong,choice){
     return fail('no required weak reply after frozen strong action');
   if(legalMoves(post,weak).some(m=>m.capture===strong+'Q'))
     return fail('frozen action exposes a queen capture');
-  return {authenticated:true,theorem,frame:choice.frame,
+  return {authenticated:true,theorem:THEOREM,frame:choice.frame,
     premises:{sameBackrank:true,weakAtLeastTwo:true,queenFileGapAtLeastTwo:true,
       clearLowWall:true,weakNotInCheck:true,queenSafe:true}};
 }
