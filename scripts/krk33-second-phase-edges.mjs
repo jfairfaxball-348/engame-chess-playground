@@ -67,8 +67,9 @@ export function auditKRK33SecondPhaseEdges(){
             incoming:krk14ControlStateKey(second.continuationPhase)});
         }
         if(third?.move&&positionKey(state2.board,state2.turn)===
-            positionKey(root.board,root.turn)&&
-            krk14ControlStateKey(second.continuationPhase)==='null')
+            positionKey(state1.board,state1.turn)&&
+            krk14ControlStateKey(second.continuationPhase)===
+              krk14ControlStateKey(first.continuationPhase))
           recurrences.push({phase,strong,frame,at:positionKey(state2.board,state2.turn)});
       }
     }
