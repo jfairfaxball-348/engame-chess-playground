@@ -57,6 +57,9 @@ jobs:
       # and source-tagged KRK rank obligations; not a universal proof.
       - run: npm run audit:kqk-original-cases -- --legal=1200 --prepared=32
       - run: npm run audit:krk-rank-obligations
+      # S035: exact selected KQK source-move premises, real tight legal
+      # roots and source-verified KRK PREP-rank transfer. Local only.
+      - run: npm run audit:s035-source-bridges -- --strict
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
