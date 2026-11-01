@@ -48,3 +48,16 @@ test('S037 refuses invalid bounds',()=>{
   assert.throws(()=>auditS037KRKBridge({maxRoots:0}),RangeError);
   assert.throws(()=>compareS037KQKCaches({maxRounds:0}),RangeError);
 });
+
+test('S037 node budgets record skipped legal replies rather than silent caps',()=>{
+  // This real preparation orbit historically exhausted exactly the node
+  // budget and skipped siblings without marking cappedNodes/firstProblem.
+  const r=auditS037Prepared({maxLegalRoots:150,maxPrepared:1,
+    maxNodes:100,maxPairs:24});
+  assert.ok(r.continuationsProbed>0);
+  assert.ok(r.resourceCapped>0);
+  for(const witness of r.examples.filter(e=>e.verdict==='resource-cap')){
+    assert.ok(witness.firstProblem,'a resource cap needs a replayable witness');
+    assert.match(witness.firstProblem.kind,/cap/);
+  }
+});
