@@ -202,6 +202,10 @@ const overall={diagnosticOnly:true,clockHistoryCertified:false,sourceSha:'c72365
   seed:'0x21c72365',attempts,perFamily,maxNodes,maxRounds,
   cacheMode,
   legalCandidates,roots:samples.length,
+  // S037: explicit identities, not merely the same random seed and counts.
+  // Cache mode must not change WHICH legal roots are sampled.
+  sampledRootKeys:samples.map(({strong,turn,family,king,queen,weak})=>
+    [strong,turn,family,king,queen,weak].join(':')),
   allRepliesMate:samples.filter(s=>s.classification==='all-replies-mate').length,
   falsified:samples.filter(s=>s.classification==='falsified').length,
   inconclusive:samples.filter(s=>s.classification==='inconclusive').length,

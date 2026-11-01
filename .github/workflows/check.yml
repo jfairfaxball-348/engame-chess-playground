@@ -64,6 +64,11 @@ jobs:
       # branches, record exact cross-phase witnesses and honest resource caps.
       # This is NOT a universal termination/rank/FIDE certificate.
       - run: npm run audit:s036-cross-phase -- --nodes=200 --pairs=36 --prepared=4 --tight=2 --krk-roots=3 --strict
+      # S037: replay authentic KQK preparatory tokens across every legal
+      # first reply, retain exact source/frame gaps and the first KRK
+      # central/restoration handoff. Compare identical seeded exact-vs-
+      # monotone closed-only cache audits, never claiming global mate.
+      - run: npm run audit:s037-source-gap -- --nodes=100 --pairs=24 --legal=1200 --prepared=4 --krk-roots=4 --attempts=500 --per-family=1 --cache-nodes=250 --rounds=30 --strict
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
