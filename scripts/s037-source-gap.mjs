@@ -195,18 +195,15 @@ export function compareS037KQKCaches({
     {encoding:'utf8',maxBuffer:32*1024*1024}));
   }
   const exact=run('exact'),monotone=run('monotone');
-  const identity=x=>[x.strong,x.turn,x.king,x.queen,x.weak,x.family].join(':');
-  const rootsExact=exact.samples??[],rootsMono=monotone.samples??[];
-  // S021's top-level JSON exposes tallies and first examples, not its full
-  // per-root sample array. Its deterministic seed and family sampling are
-  // invariant across modes; confirm the public root counts and candidates.
+  // S021 reports every sampled root's full material/turn/family identity.
+  // Compare the ACTUAL sampled roots, not just matching seed and totals.
   const sameSampling=exact.seed===monotone.seed&&
     exact.legalCandidates===monotone.legalCandidates&&
     exact.roots===monotone.roots&&
     exact.attempts===monotone.attempts&&
     exact.perFamily===monotone.perFamily&&
-    JSON.stringify(Object.keys(exact.families).sort())===
-      JSON.stringify(Object.keys(monotone.families).sort());
+    JSON.stringify(exact.sampledRootKeys)===
+      JSON.stringify(monotone.sampledRootKeys);
   // Only an EXACT closed result disappearing under monotone may suggest
   // unsound regressions; inconclusive caps may legitimately improve.
   const exactFamilyClosed=Object.fromEntries(Object.entries(exact.families)
