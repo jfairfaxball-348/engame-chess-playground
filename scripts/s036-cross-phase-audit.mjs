@@ -124,7 +124,8 @@ export function probeS036Tree(mode,root,strong,firstToken=null,{
     }
     active.add(key);
     let allMate=true;
-    for(const reply of replies){
+    for(let i=0;i<replies.length;i++){
+      const reply=replies[i];
       r.defenderReplies++;
       const child=advance(mode,after,reply);
       if(reply.capture||child.material==='kk'){
@@ -136,8 +137,17 @@ export function probeS036Tree(mode,root,strong,firstToken=null,{
       const done=visit(child,choice.continuationPhase??null,
         pairs+1,current,nextTrace.concat('defender:'+moveKey(reply)));
       if(!done)allMate=false;
-      // Exhaust legal siblings unless the node budget was consumed.
-      if(r.nodes>=maxNodes){allMate=false;break;}
+      // At a consumed budget, count EVERY skipped legal sibling as
+      // explicitly unvisited work. Previously this returned resource-cap
+      // without incrementing cappedNodes or preserving a firstProblem.
+      // Reaching exactly maxNodes on the LAST sibling can still close.
+      if(r.nodes>=maxNodes&&i+1<replies.length){
+        r.cappedNodes++;
+        issue('node-cap-with-unvisited-defender-siblings',child,
+          nextTrace.concat('defender:'+moveKey(reply)),
+          {pairs:pairs+1,unvisitedSiblings:replies.length-i-1});
+        allMate=false;break;
+      }
     }
     active.delete(key);
     return allMate;
