@@ -60,6 +60,10 @@ jobs:
       # S035: exact selected KQK source-move premises, real tight legal
       # roots and source-verified KRK PREP-rank transfer. Local only.
       - run: npm run audit:s035-source-bridges -- --strict
+      # S036: extend actual tagged continuations through successive all-reply
+      # branches, record exact cross-phase witnesses and honest resource caps.
+      # This is NOT a universal termination/rank/FIDE certificate.
+      - run: npm run audit:s036-cross-phase -- --nodes=200 --pairs=36 --prepared=4 --tight=2 --krk-roots=3 --strict
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
