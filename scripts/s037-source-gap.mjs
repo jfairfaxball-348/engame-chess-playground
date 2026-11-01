@@ -117,6 +117,9 @@ export function auditS037Prepared({
       seenChildren.add(childKey);
       const tree=probeS036Tree('kqk',state,strong,originalToken,
         {maxNodes,maxPairs});
+      if(tree.verdict==='resource-cap'&&
+         !tree.cappedNodes&&!tree.cappedPairs)
+        throw Error('Uncounted S036 KQK source-tree resource cap');
       r.continuationsProbed++;
       r.sourceUnsupported+=tree.unsupported;
       r.sourceCaptured+=tree.captured;
