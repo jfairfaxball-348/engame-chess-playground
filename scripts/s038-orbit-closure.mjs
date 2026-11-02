@@ -112,6 +112,7 @@ export function auditS038Widened({
         weakKing:state.board.indexOf(opposite(strong)+'K'),
         originalCase,weakReply:uci(reply),moveHistory:state.log,
         chosenFrame:selected?.frame??null,
+        selectedTheoremIndependentlyAuthenticated:false,
         chosenRule:selected?.sourcePhase??null,
         chosenMove:selected?.move?uci(selected.move):null};
       if(!selected?.move){
@@ -124,10 +125,18 @@ export function auditS038Widened({
         // A theorem invoked in a changed frame must be checked against
         // the changed-frame proof, not the original FarFileEntry split.
         const sameFrame=selected.frame===token.frame;
-        const a=sameFrame
-          ?authenticateKQK35LowWall(state,strong,selected,token.frame)
+        // Verify the theorem ACTUALLY chosen in its own selected
+        // frame. A switched low-wall theorem is not a proof of the
+        // ORIGINAL-frame FarFileEntry branch, but it has its own
+        // independently checkable frozen low-wall hypotheses.
+        const lowWall=selected.sourcePhase===
+          'KQK.EntryGeometry.clear_low_wall_entry.queen_wall';
+        const a=lowWall
+          ?authenticateKQK35LowWall(state,strong,selected,selected.frame)
           :authenticateKQK33Backrank(state,strong,selected);
         if(a.authenticated){
+          w.selectedTheoremIndependentlyAuthenticated=true;
+          w.authenticatedTheorem=a.theorem;
           if(sameFrame)report.matchedOriginalFrame++;
           else report.authenticatedSwitchedFrame++;
         } else {
