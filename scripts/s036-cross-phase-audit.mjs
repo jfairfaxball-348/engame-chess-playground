@@ -57,12 +57,22 @@ export function probeS036Tree(mode,root,strong,firstToken=null,{
     captured:0,nonmateTerminal:0,structuralRepeats:0,
     crossPhaseEdges:{},firstCrossPhaseWitness:null,
     firstRestorationHandoff:null,firstProblem:null,
+    // S041: first issue PER category. The legacy firstProblem may be a
+    // resource cap even when a different later sibling exposes a hard gap.
+    firstIssues:{unsupported:null,capture:null,nonmate:null,
+      cycle:null,cap:null},
     closedAllReplies:false,completeGlobalMateProof:false,
     fideHistoryCertified:false};
   const active=new Set();
   const issue=(kind,s,trace,details={})=>{
-    if(!r.firstProblem)r.firstProblem={kind,
-      at:positionKey(s.board,s.turn),trace:trace.slice(-24),...details};
+    const witness={kind,at:positionKey(s.board,s.turn),
+      trace:trace.slice(-24),...details};
+    if(!r.firstProblem)r.firstProblem=witness;
+    const category=kind==='missing frozen-source continuation'
+      ?'unsupported':kind==='defender captured attacking piece'
+      ?'capture':kind.startsWith('repeated board')
+      ?'cycle':kind.includes('cap')?'cap':'nonmate';
+    if(!r.firstIssues[category])r.firstIssues[category]=witness;
   };
   function visit(s,token,pairs,previous,trace){
     if(pairs>=maxPairs){
