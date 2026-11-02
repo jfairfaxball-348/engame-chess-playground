@@ -1,80 +1,54 @@
-# S040 — close the first genuine source-phase obstruction (or prove the gate absent)
+# S041 — source-certified whole-game continuation and KRK composition
 
-**Execution session; build, test, PR, complete CI, and merge only when green.**
-Work only in `jfairfaxball-348/engame-chess-playground`;
-`jfairfaxball-348/engame-chess` is immutable mathematical
-source, pinned below. Read `AGENTS.md`, S039 documentation,
-`scripts/s039-source-phase-pairs.mjs`, the latest merged PR and
-completed **PR-head AND main** GitHub Actions reports.
+**Execution:** review S040 PR-head and main green Actions first; use the
+actual S040 summary, first failed/unchecked cases and exact S039
+root/token/history. Read AGENTS.md and docs/S040_SOURCE_PREMISES.md.
+Work ONLY in jfairfaxball-348/engame-chess-playground; the pinned
+endgame-chess Lean repository is source-of-truth and READ ONLY.
 
-**Priority A first.** KRK and KQK need a source-derived *whole
-adversarial game* mate controller from every legal user-arranged board.
-Neither an existence theorem, bounded witness, finite policy coverage
-nor a cap is this certificate. No engine, tablebase, arbitrary legal
-fallback, invented rank, minimax or uncited Lean lemma. The production
-Maths selectors must remain separate from audit-only scripts.
-Do not alter KK/KBK/KNK original worked mathematical explanations.
+## Primary mathematical-engineering obligation
 
-1. Parse the **exact S039** `firstActualGap`, `firstUnverifiedTheorem`,
-   `firstUncheckedLaterTheorem`, `firstPotentialCycle`,
-   `firstResourceCap` and `firstKRKCrossPhase`. Reproduce with
-   `--full` on the **same** canonical legal roots, original source
-   frames, exact nested tokens and *complete actual move histories*.
-   Do not lose the root by replacing it with a transformed fixture.
-2. **Measured S039 next source-fidelity obligation:** 214/214
-   genuine second defender replies received tagged third actions, but
-   none has an independent complete-premise checker in the S039 audit.
-   Prioritise exact frozen-source premise verification, beginning with
-   `KQK.BandEntry.wall_prepare_bound.horizontal` (86),
-   `KQK.BandProgress.prepared_queen_step` (82),
-   `KQK.BandProgress.prepared_king_step` (42), and
-   `KQK.RankFive.rank_five_corner_bound` (4).
-   Preserve their *actual* selected frame, exact move and continuation
-   token; do not pretend lack of checker is a refutation. Reproduce the
-   first genuine `prepared_queen_step` 38-35 after
-   `White Qg2+, Black Kb8, White Qg5, Black Kc8`.
-   The 160-node trees closed 4/42, the 320-node trees closed 6/42;
-   36 remain resource-capped, not source falsified.
-3. If S040 exposes an actual missing KQK later action, trace the exact
-   frozen source lemma and all premises. Implement that exact
-   constructor and its token **only if** the pinned source really
-   supplies it; prove local action agreement for all legal first,
-   second and third defender replies. If only an unchecked checker
-   exists, write a complete independent *premise validator*, not
-   a replacement attacker heuristic. If neither is sourced,
-   preserve the minimal repro and explicitly identify an upstream
-   mathematical obligation.
-4. If a KQK root is resource-limited, rerun identical root+token
-   at pair and node budgets of 2x and 4x S039 (within CI runtime
-   limits), retaining the first real cap, source rule and exact
-   move history. Distinguish cap-depth pressure from structural
-   cycles and from source-falsifying missing actions; never cache
-   any subtree before **all** its defender branches are closed.
-   Include genuine `separating-rank` and already-far-file
-   `tight-above` root obligations without minting a false
-   FarFilePreparation token.
-5. For KRK, take S039's *real* PREP-rank-2 `prep -> central`
-   nested continuation and first `central -> restoration` /
-   `restoration -> central` transitions. Search exact pinned
-   source for a frozen theorem ranking **board + whole nested
-   token** through these transitions for every weak reply.
-   If no such lemma exists, output the exact smallest concrete
-   proof prerequisite; do NOT create a synthetic lexicographic rank.
-   Keep `globalTerminationCertified=false`.
-6. Run `npm test`, exact source locks, S035–S040 diagnostics,
-   all KRK/KQK adversarial/phase/rank audits, `npm run check`,
-   `npm run build`, and both Chromium browser suites. Require
-   completed successful CI on the PR's exact head before merge;
-   re-check main CI. Verify actual Cloudflare Worker separately,
-   not by inference. Provide results, exact obstructions, and
-   install S041 based on measured evidence.
+Finish a complete source-derived KRK/KQK attack controller from
+**every legal user-arranged root and all legal adversarial continuations**.
+Neither an early move, full-premise local checker, bounded closed tree,
+a cap nor `MateWithin` existence proves the JS policy. Never
+insert engine, tablebase, minimax, arbitrary legal fallback, invented
+ranking, fabricated source token or uncited source theorem.
 
-**Stage B begins only after both Stage A move controllers really are
-complete:** restore KRK/KQK full board-specific mathematical
-equations, source-traceable derivation panels and strict FIDE
-clock/repetition/terminal parity with KK/KBK/KNK. Preserve all
-older Maths working; KPK and Engine work remain lower priority.
+1. Examine S040 authentication counts by all four real later source
+   families. If any failed theorem premise, reproduce the **first
+   actual board, selected frame, full four-ply move history and nested
+   token** against immutable source. Repair only a demonstrably exact
+   source translation; never silence a contradictory verifier.
+2. Run same-root S039/S040 all-reply audits at baseline, 2x and 4x
+   caps (within CI limits). Separate first ACTUAL missing action,
+   falsified theorem, structural recurrence and resource cap. Fully
+   mate-closed means ALL defender children recursively closed, not
+   just a winning first move or a memoized partial tree.
+3. Investigate previously isolated original-frame separating-rank and
+   already-far-file tight-above legal roots. Use source's actual
+   theorem frame and genuine previous move, not a fabricated
+   FarFilePreparation token. Verify all-premise selectors and then
+   whole adversarial continuation.
+4. For KRK, replay the real S039 first PREP(rank 2) -> central,
+   central -> restoration and restoration -> central witnesses with
+   exact nested continuation token. Inspect frozen EC-T0048 and
+   executable Lean SHA for a global rank on the BOARD PLUS TOKEN that
+   strictly decreases across every weak reply and cross-phase edge.
+   If absent, give the smallest missing upstream proof obligation;
+   NEVER invent a synthetic rank. Keep globalTerminationCertified false.
+5. No change to older KK/KBK/KNK full mathematical workings. Keep
+   simplified KRK/KQK beta honest. After both complete Stage A,
+   immediately restore KRK/KQK board-specific equations, derivations,
+   proof provenance and strict FIDE clock/repetition/terminal parity
+   (Stage B); defer KPK/Engine until after parity.
+6. Run all npm tests, exact source locks, S035–S041 diagnostics,
+   KRK/KQK adversarial/phase/rank audits, npm run check/build, and both
+   Chromium suites. Require completed green PR-head CI before merge,
+   verify main CI afterward, and check the actual Cloudflare Worker
+   separately. Commit/merge/fast-forward and install S042 based on
+   measured evidence, not inferred success.
 
-Frozen KQK EC-T0050 `c72365a8ba46f59114a2a77d9d38993f6a52df80`;
-KRK EC-T0048 `2311abe71bc1a4eed47026feccd5ba5a0760d5bb`;
-KRK executable source `e7de0930fc61caeb11795cf3c10fde11e4774a40`.
+Frozen KQK EC-T0050: c72365a8ba46f59114a2a77d9d38993f6a52df80.
+KRK EC-T0048: 2311abe71bc1a4eed47026feccd5ba5a0760d5bb.
+KRK executable: e7de0930fc61caeb11795cf3c10fde11e4774a40.

@@ -77,6 +77,10 @@ jobs:
       # exact selected continuation and first independent theorem checks.
       # Paired finite budgets on identical full roots; NOT global mate proof.
       - run: npm run audit:s039-source-pairs -- --tuples=1600 --prepared=10 --nodes=320 --pairs=56 --krk-roots=4 --strict
+      # S040: independently validate the EXACT frozen theorem premises,
+      # constructor targets, all legal immediate defender replies and
+      # same-frame invariants for all S039 third actions; NOT global mate.
+      - run: npm run audit:s040-premises -- --tuples=1600 --prepared=10 --nodes=320 --pairs=56 --krk-roots=4 --strict
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
