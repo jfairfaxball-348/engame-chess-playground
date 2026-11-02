@@ -39,11 +39,13 @@ existing source controller actually issues a
 Every legal first defender reply is replayed with exactly that token.
 For each child the auditor preserves source/frame theorem identities,
 exact piece squares, complete original move log, legal reply, selected
-source rule and selected move. An original-frame
-`EntryGeometry.clear_low_wall_entry` is authenticated with
-`authenticateKQK35LowWall`; a switched-frame
+source rule and selected move. A selected `EntryGeometry.clear_low_wall_entry` is authenticated in
+its **selected theorem frame** (whether original or switched) with
+`authenticateKQK35LowWall`; a selected
 `SameRankEntry.backrank_entry` is independently authenticated with
-`authenticateKQK33Backrank`. No other case is counted as proved.
+`authenticateKQK33Backrank`. A switched-frame source application is
+never credited to the **original-frame** FarFileEntry case. No other
+source case is counted as proved.
 
 For each genuine child, two all-defender branch budgets use the same
 root and token. An observed missing action, unverified theorem,
@@ -51,6 +53,24 @@ structural repeat, capture/nonmate and exhausted resource budget are
 different obligations. A structural state repeat is **potential**
 cyclic behaviour, not certified repetition and not an automatic
 source-theorem counterexample. A resource cap is never a mate proof.
+
+The first S038 CI sweep (PR #48 before the verifier correction) sampled
+36 legal candidate roots, located 10 genuine preparations and replayed
+42 legal first weak replies. It found 38 selected original-frame low-wall
+applications and **four** switched-frame low-wall actions that its
+backrank-only verification dispatch failed to authenticate. They were
+**not missing policy moves**: the exact source action was Q(0-5) in
+selected frame `rotate270` after a genuine `reflectY` token and
+...K(36-44), with real history `White Qa1+, Black Ke6`. The
+S038 amendment authenticates this **selected-frame low-wall theorem**
+using the frozen `clear_low_wall_entry` premise checker. This
+closes the previously unverified theorem-application bridge, not a
+global mate tree or the original-frame case. The same first sweep
+reported four mate-closed finite child trees and 38 resource-capped
+ones at both the 80/14 and 160/28 node/pair budgets;
+no missing action, capture, nonmate or structural repeat was found
+in those selected roots. The corrected CI run must be checked before
+considering the bridge verified.
 
 The KRK half uses the S037 nested-token real phase witness.
 No mathematical rank, move fallback, source lemma, minimax, engine,
