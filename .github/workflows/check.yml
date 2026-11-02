@@ -69,6 +69,10 @@ jobs:
       # central/restoration handoff. Compare identical seeded exact-vs-
       # monotone closed-only cache audits, never claiming global mate.
       - run: npm run audit:s037-source-gap -- --nodes=100 --pairs=24 --legal=1200 --prepared=4 --krk-roots=4 --attempts=500 --per-family=1 --cache-nodes=250 --rounds=30 --strict
+      # S038: independent wide-root orbit sweep; replay actual source tokens
+      # through all immediate legal weak replies at two finite budgets.
+      # A cap is explicitly an obligation, NOT a mating certificate.
+      - run: npm run audit:s038-orbits -- --tuples=1600 --prepared=10 --nodes=160 --pairs=28 --krk-roots=4 --strict
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
