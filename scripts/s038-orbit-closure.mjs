@@ -78,7 +78,7 @@ export function auditS038Widened({
     matchedOriginalFrame:0,authenticatedSwitchedFrame:0,
     missingSource:0,unverifiedTheorem:0,
     firstActualGap:null,firstUnverifiedTheorem:null,
-    firstResourceCap:null,firstNewObligation:null,
+    firstResourceCap:null,firstPotentialCycle:null,firstNewObligation:null,
     roots:[],outcomes:budgets.map(b=>({...b,mateClosed:0,
       unsupported:0,capture:0,nonmate:0,repeat:0,resourceCap:0})),
     genuineTokensOnly:true,universalMatingCertified:false,
@@ -110,7 +110,7 @@ export function auditS038Widened({
         king:state.board.indexOf(strong+'K'),
         queen:state.board.indexOf(strong+'Q'),
         weakKing:state.board.indexOf(opposite(strong)+'K'),
-        originalCase,weakReply:uci(reply),
+        originalCase,weakReply:uci(reply),moveHistory:state.log,
         chosenFrame:selected?.frame??null,
         chosenRule:selected?.sourcePhase??null,
         chosenMove:selected?.move?uci(selected.move):null};
@@ -148,9 +148,12 @@ export function auditS038Widened({
           t.structuralRepeats?'repeat':'resourceCap';
         o[kind]++;
         if(!t.closedAllReplies&&
-           (t.unsupported||t.captured||t.nonmateTerminal||t.structuralRepeats)&&
+           (t.unsupported||t.captured||t.nonmateTerminal)&&
            !report.firstActualGap)
           report.firstActualGap={root:key,token,...w,reason:kind,
+            firstProblem:t.firstProblem,depthBudget:b};
+        if(t.structuralRepeats&&!report.firstPotentialCycle)
+          report.firstPotentialCycle={root:key,token,...w,
             firstProblem:t.firstProblem,depthBudget:b};
         if((t.cappedNodes||t.cappedPairs)&&!report.firstResourceCap)
           report.firstResourceCap={root:key,token,...w,
@@ -170,7 +173,8 @@ export function auditS038Widened({
   // A cap is the FIRST NEXT OBLIGATION only if no hard source gap
   // or theorem authentication failure is observed.
   report.firstNewObligation=report.firstActualGap??
-    report.firstUnverifiedTheorem??report.firstResourceCap;
+    report.firstUnverifiedTheorem??report.firstPotentialCycle??
+    report.firstResourceCap;
   return report;
 }
 
