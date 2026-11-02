@@ -45,6 +45,13 @@ test('S039 every second defender reply preserves genuine source history and toke
       b.potentialCycle+b.resourceCap,r.firstWeakReplies);
   assert.ok(r.firstKRKCrossPhase,
     'retain real KRK central/restoration phase handoff');
+  if(r.firstKRKRestoration){
+    assert.match(r.firstKRKRestoration.incomingPhase+
+      ' -> '+r.firstKRKRestoration.outgoingPhase,/restoration/);
+    assert.ok(Array.isArray(r.firstKRKRestoration.moveHistory));
+    assert.ok(r.firstKRKRestoration.incomingToken);
+    assert.equal(r.firstKRKRestoration.frozenGlobalRankTheoremAvailable,false);
+  }
 });
 
 test('S039 exact repeated scan has identical root, move and cap identities',()=>{
