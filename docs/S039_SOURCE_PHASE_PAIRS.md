@@ -70,6 +70,39 @@ npm run build
 PR-head CI also includes all earlier KRK/KQK source, rank and
 adversarial audits and both Chromium browser suites.
 
+## Measured S039 PR-head scope
+
+The first completed S039 PR-head workflow [run 41420751670](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41420751670) passed Node unit tests, S039 audit, existing source/adversarial diagnostics, build and both Chromium suites. Exact same deterministic root identities as S038: 36 legal candidates; 10 genuine roots; **42/42** first actions verified with the independent frozen low-wall checker.
+
+There were **214 legal second weak replies**, all followed by named source-selected third attacking actions (zero missing moves, captures, nonmate terminals or detected structural recurrences within this bounded sample). Crucially, **0/214 third-source actions have independent complete-premise checkers in this audit**; that is an *unchecked checker obligation*, not evidence that their frozen mathematical source is false. Third-source breakdown:
+
+| Real third source family | Count |
+| --- | ---: |
+| `KQK.BandEntry.wall_prepare_bound.horizontal` | 86 |
+| `KQK.BandProgress.prepared_queen_step` | 82 |
+| `KQK.BandProgress.prepared_king_step` | 42 |
+| `KQK.RankFive.rank_five_corner_bound` | 4 |
+
+The **same 42 KQK first-reply trees**, all legal defenders, gave:
+- at 160 nodes / 28 attacking turns: **4 mate-closed**, 38 resource-capped;
+- at 320 nodes / 56 attacking turns: **6 mate-closed**, 36 resource-capped;
+- at both: **0 observed missing source moves, captures, nonmate endings and potential structural recurrences**.
+
+The first unchecked continuation is the *actual* third action
+`KQK.BandProgress.prepared_queen_step` 38-35 (selected
+frame `reflectX`) after real log
+`White Qg2+, Black Kb8, White Qg5, Black Kc8`.
+The genuine incoming `FarFilePreparation` token and exact board
+are captured in S039 JSON. At the 160-node budget the first
+`firstResourceCap` was **node-cap** at the same first-reply
+root with first weak move 56-57; it is a finite-resource limit.
+
+KRK still reports a real `prep -> central` handoff with PREP
+rank 2 and source `offCentreUpper_sound` move 16-24.
+The new `firstRestorationHandoff` capture records the first
+central/restoration crossing and actual history where reached;
+it is **not** a well-founded global rank proof.
+
 ## Release decisions
 
 **Stage A is still OPEN.** A sample of mate-closed subtrees, local
