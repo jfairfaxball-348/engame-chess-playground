@@ -21,7 +21,21 @@ Do not alter KK/KBK/KNK original worked mathematical explanations.
    `--full` on the **same** canonical legal roots, original source
    frames, exact nested tokens and *complete actual move histories*.
    Do not lose the root by replacing it with a transformed fixture.
-2. If S039 exposes an actual missing KQK third action, trace the exact
+2. **Measured S039 next source-fidelity obligation:** 214/214
+   genuine second defender replies received tagged third actions, but
+   none has an independent complete-premise checker in the S039 audit.
+   Prioritise exact frozen-source premise verification, beginning with
+   `KQK.BandEntry.wall_prepare_bound.horizontal` (86),
+   `KQK.BandProgress.prepared_queen_step` (82),
+   `KQK.BandProgress.prepared_king_step` (42), and
+   `KQK.RankFive.rank_five_corner_bound` (4).
+   Preserve their *actual* selected frame, exact move and continuation
+   token; do not pretend lack of checker is a refutation. Reproduce the
+   first genuine `prepared_queen_step` 38-35 after
+   `White Qg2+, Black Kb8, White Qg5, Black Kc8`.
+   The 160-node trees closed 4/42, the 320-node trees closed 6/42;
+   36 remain resource-capped, not source falsified.
+3. If S040 exposes an actual missing KQK later action, trace the exact
    frozen source lemma and all premises. Implement that exact
    constructor and its token **only if** the pinned source really
    supplies it; prove local action agreement for all legal first,
@@ -30,7 +44,7 @@ Do not alter KK/KBK/KNK original worked mathematical explanations.
    a replacement attacker heuristic. If neither is sourced,
    preserve the minimal repro and explicitly identify an upstream
    mathematical obligation.
-3. If a KQK root is resource-limited, rerun identical root+token
+4. If a KQK root is resource-limited, rerun identical root+token
    at pair and node budgets of 2x and 4x S039 (within CI runtime
    limits), retaining the first real cap, source rule and exact
    move history. Distinguish cap-depth pressure from structural
@@ -39,7 +53,7 @@ Do not alter KK/KBK/KNK original worked mathematical explanations.
    Include genuine `separating-rank` and already-far-file
    `tight-above` root obligations without minting a false
    FarFilePreparation token.
-4. For KRK, take S039's *real* PREP-rank-2 `prep -> central`
+5. For KRK, take S039's *real* PREP-rank-2 `prep -> central`
    nested continuation and first `central -> restoration` /
    `restoration -> central` transitions. Search exact pinned
    source for a frozen theorem ranking **board + whole nested
@@ -47,7 +61,7 @@ Do not alter KK/KBK/KNK original worked mathematical explanations.
    If no such lemma exists, output the exact smallest concrete
    proof prerequisite; do NOT create a synthetic lexicographic rank.
    Keep `globalTerminationCertified=false`.
-5. Run `npm test`, exact source locks, S035–S040 diagnostics,
+6. Run `npm test`, exact source locks, S035–S040 diagnostics,
    all KRK/KQK adversarial/phase/rank audits, `npm run check`,
    `npm run build`, and both Chromium browser suites. Require
    completed successful CI on the PR's exact head before merge;
