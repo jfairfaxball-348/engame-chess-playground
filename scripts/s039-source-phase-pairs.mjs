@@ -76,6 +76,7 @@ export function auditS039SourcePairs({
     firstActualGap:null,firstUnverifiedTheorem:null,
     firstUncheckedLaterTheorem:null,firstPotentialCycle:null,
     firstResourceCap:null,firstKRKCrossPhase:null,
+    firstKRKRestoration:null,
     krkGlobalPhaseCompositionCertified:false,
     globalMateCertified:false,fideHistoryCertified:false,
     outcomes:budgets.map(b=>({...b,...counts()})),
@@ -215,6 +216,7 @@ export function auditS039SourcePairs({
   const krk=auditS037KRKBridge({maxRoots:maxKrkRoots,
     maxNodes:Math.min(maxNodes,320),maxPairs:Math.min(maxPairs,56)});
   r.firstKRKCrossPhase=krk.firstRealPhaseHandoff;
+  r.firstKRKRestoration=krk.firstRealRestorationHandoff;
   r.krkSourceCounterexample=krk.firstSourceCounterexample;
   r.krkResourceCappedRoots=krk.resourceCappedRoots;
   r.firstNewObligation=r.firstActualGap??r.firstUnverifiedTheorem??
