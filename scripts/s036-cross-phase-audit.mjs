@@ -55,7 +55,8 @@ export function probeS036Tree(mode,root,strong,firstToken=null,{
     nodes:0,defenderReplies:0,sourceMoves:0,mates:0,
     cappedNodes:0,cappedPairs:0,unsupported:0,
     captured:0,nonmateTerminal:0,structuralRepeats:0,
-    crossPhaseEdges:{},firstCrossPhaseWitness:null,firstProblem:null,
+    crossPhaseEdges:{},firstCrossPhaseWitness:null,
+    firstRestorationHandoff:null,firstProblem:null,
     closedAllReplies:false,completeGlobalMateProof:false,
     fideHistoryCertified:false};
   const active=new Set();
@@ -99,6 +100,15 @@ export function probeS036Tree(mode,root,strong,firstToken=null,{
       if(isGlobalBridge(previous,current)&&!r.firstCrossPhaseWitness)
         r.firstCrossPhaseWitness={incomingPhase:previous,outgoingPhase:current,
           at:positionKey(s.board,s.turn),
+          selectedSource:choice.rule??choice.sourcePhase,
+          move:moveKey(choice.move),incomingToken:token,
+          trace:trace.slice(-24),
+          frozenGlobalRankTheoremAvailable:false};
+      if(!r.firstRestorationHandoff&&
+         (/restoration/.test(previous)||/restoration/.test(current)))
+        r.firstRestorationHandoff={
+          incomingPhase:previous,outgoingPhase:current,
+          at:positionKey(s.board,s.turn),moveHistory:s.log,
           selectedSource:choice.rule??choice.sourcePhase,
           move:moveKey(choice.move),incomingToken:token,
           trace:trace.slice(-24),
