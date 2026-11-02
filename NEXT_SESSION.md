@@ -5,6 +5,10 @@ and merged-main CI. Read AGENTS.md and docs/S041_EXACT_CAP_SWEEP.md.
 Work ONLY in jfairfaxball-348/engame-chess-playground. Read frozen
 endgame-chess at the pinned SHAs; NEVER alter the parent mathematics repo.
 
+## Starting measurements — do not erase these distinctions
+
+S041 PR-head Actions run 41475477171 was green. On identical 10 real KQK prepared roots, all 42 first defender replies and 214 legal second replies, the same-root all-reply mate closures were **4/42 at 160/28**, **6/42 at 320/56**, and **8/42 at 640/112**; the remaining **34** at 4x are resource caps, with **zero observed source gaps, captures, cycles or nonmate failures**. This is bounded evidence, not universal termination. S040 already authenticated 214/214 third-source theorem applications. Continue with genuinely stronger global reasoning rather than mistaking larger enumerations for a proof.
+
 ## Start with measured S041 evidence
 
 1. Run `npm run audit:s041-cap-sweep -- --tuples=1600 --prepared=10 --nodes=160 --pairs=28 --krk-roots=4 --strict --full`. Preserve 1x/2x/4x counts over the EXACT same S039 42 roots and *all* legal defender replies. Use category-specific firstIssues, not solely firstProblem: a first cap may precede a genuine later hard gap. Record count and replayable first actual source gap, failure, structural cycle, resource cap or newly closed tree. Never call a cap a win or mistake a tested subtree for all legal initial positions.
