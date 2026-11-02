@@ -157,12 +157,15 @@ export function auditS037KRKBridge({
   const audit=auditS036KRK({maxRoots,maxNodes,maxPairs});
   const witness=audit.reports.find(x=>x.firstCrossPhaseWitness)
     ?.firstCrossPhaseWitness??null;
+  const restoration=audit.reports.find(x=>x.firstRestorationHandoff)
+    ?.firstRestorationHandoff??null;
   const counterexample=audit.reports.find(x=>problemKind(x))??null;
   return {sampledRoots:audit.reports.length,
     nodes:audit.reports.reduce((a,x)=>a+x.nodes,0),
     defenderReplies:audit.reports.reduce((a,x)=>a+x.defenderReplies,0),
     sourceMoves:audit.reports.reduce((a,x)=>a+x.sourceMoves,0),
     firstRealPhaseHandoff:witness,
+    firstRealRestorationHandoff:restoration,
     firstSourceCounterexample:counterexample?{
       rootPhase:counterexample.rootPhase,root:counterexample.root,
       firstProblem:counterexample.firstProblem,kind:problemKind(counterexample)
@@ -173,9 +176,10 @@ export function auditS037KRKBridge({
     globalRankTheoremLocated:false,globalTerminationCertified:false,
     preciseOutstandingObligation:'Identify an immutable frozen lemma ranking the exact (board, nested continuation token) transition through central/restoration for every legal weak reply; S035 proves PREP descent only.',
     reports:audit.reports.map(({rootPhase,frame,root,verdict,
-      firstProblem,firstCrossPhaseWitness,crossPhaseEdges})=>({
+      firstProblem,firstCrossPhaseWitness,firstRestorationHandoff,
+    crossPhaseEdges})=>({
         rootPhase,frame,root,verdict,firstProblem,
-        firstCrossPhaseWitness,crossPhaseEdges}))
+        firstCrossPhaseWitness,firstRestorationHandoff,crossPhaseEdges}))
   };
 }
 
