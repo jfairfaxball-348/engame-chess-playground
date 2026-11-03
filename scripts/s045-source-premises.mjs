@@ -73,6 +73,15 @@ function incoming(state,strong,frame,token,kind){
      !equal(before.w,after.w)||
      origin.board.filter(Boolean).length!==3)
     return failed('predecessor construction does not preserve KQK geometry');
+  // Also replay the actual preceding strong move in the ORIGINAL board:
+  // a plausible token coordinate must not authenticate an illegal/fabricated
+  // attacker transition preserved only as a handwritten history key.
+  const sourceMove=legalMoves(origin.board,strong).find(m=>
+    m.from===before.ki&&m.to===after.ki);
+  if(validateSetup(origin.board,'kqk',strong)!==null||!sourceMove||
+     positionKey(applyMove(origin.board,sourceMove),weak)!==
+       positionKey(prior.board,weak))
+    return failed('recorded previous strong source action is not a legal exact replay');
   const [kx,ky]=before.k,[qx,qy]=before.q,[wx,wy]=before.w;
   if(kind==='tight-file'){
     // TightEntry.tight_king_step: K(sk.file,wk.rank), then a weak reply.
