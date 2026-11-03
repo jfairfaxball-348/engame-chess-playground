@@ -34,7 +34,20 @@ original eight roots per family and widened 24 roots per family,
 with `--strict --full` artifacts, explicit all-tree caps,
 source tokens, full board and legal two-defender-layer histories.
 None of this proves universal checkmate/selector totality.
-See S044 doc and verified run for actual results.
+In successful S044 CI [run 41625590512](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41625590512),
+48 widened legal roots gave **242 first and 1,288 second weak
+replies**, **1,464 authenticated / 114 unchecked** local
+source actions, **0 failed premises or hard source gaps**,
+and **48/48 capped** full trees with no mate closure.
+The unchecked split is exact: 90
+`KQK.TightEntry.protected_file_entry.forward_wall`
+second actions; 4
+`KQK.SameRankEntry.backrank_entry.king_to_weak_file`
+first actions; 20
+`KQK.SameRankEntry.protected_backrank_entry.queen_up`
+second actions. Full root/frame/token/history trace available in
+`s044-full-source-audit` CI artifact. An unchecked constructor
+is not a false mathematical premise.
 
 ## Required S045 execution
 
