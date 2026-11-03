@@ -15,6 +15,8 @@ import {authenticateKQK35TightKing,authenticateKQK35LowWall}
 import {authenticateKQK33Backrank}
   from './kqk33-source-correspondence.mjs';
 import {probeS036Tree} from './s036-cross-phase-audit.mjs';
+import {authenticateS040LaterAction,S040_RULES}
+  from './s040-source-premises.mjs';
 
 const CASES=['separating-rank','tight-above'];
 const LOW='KQK.EntryGeometry.clear_low_wall_entry.queen_wall';
@@ -31,9 +33,26 @@ const classify=t=>t.closedAllReplies?'mateClosed':
   t.unsupported?'sourceGap':t.captured?'capture':
   t.nonmateTerminal?'nonmate':
   t.structuralRepeats?'potentialCycle':'resourceCap';
-function check(state,strong,choice){
+function check(state,strong,choice,token=null){
   if(!choice?.move)return {status:'missing'};
   const p=choice.sourcePhase;
+  if(S040_RULES.includes(p)){
+    // S040's checker verifies exact frozen premises, constructor and all
+    // immediate weak replies. Never count an unverified cross-frame token
+    // as an authenticated continuation, even when local premises hold.
+    const crossFrame=token!==null&&token.frame!==choice.frame;
+    const checked=authenticateS040LaterAction(state,strong,choice,
+      crossFrame?null:token);
+    if(checked.status==='failed-premise')
+      return {status:'failed-premise',theorem:p,reason:checked.reason};
+    if(crossFrame)return {status:'unchecked',source:p,
+      reason:'cross-frame continuation token not authenticated',
+      localPremises:checked.status};
+    if(checked.status==='authenticated')
+      return {status:'authenticated',theorem:p,
+        legalWeakReplies:checked.legalWeakReplies};
+    return {status:'unchecked',source:p,reason:checked.status};
+  }
   const result=p===TIGHT
     ?authenticateKQK35TightKing(state,strong,choice)
     :p===LOW
@@ -114,6 +133,7 @@ export function auditS042FreshFamilies({
       selectedOriginalFrame:0,selectedOtherFrame:0,
       firstAuthenticated:0,firstUnchecked:0,firstFailedPremise:0,
       followAuthenticated:0,followUnchecked:0,followFailedPremise:0,
+      thirdAuthenticated:0,thirdUnchecked:0,thirdFailedPremise:0,
       missingFirst:0,missingFollow:0,missingThird:0,
       captures:0,otherTerminals:0,sourceRules:{},trees:empty()
     }])),
@@ -175,7 +195,7 @@ export function auditS042FreshFamilies({
             }else{
               const next=kqkSourceChoice(state,strong,
                 choice.continuationPhase??null);
-              const a=check(state,strong,next);
+              const a=check(state,strong,next,choice.continuationPhase??null);
               row.nextSource=next?.sourcePhase??null;
               row.nextFrame=next?.frame??null;
               row.nextMove=id(next?.move);
@@ -209,6 +229,30 @@ export function auditS042FreshFamilies({
                         f.missingThird++;issue('sourceGap',{...witness,...row,
                           secondReply:id(weak2),moveHistory:state2.log,
                           thirdToken:next.continuationPhase??null});
+                      }else{
+                        const a3=check(state2,strong,third,
+                          next.continuationPhase??null);
+                        if(a3.status==='authenticated')f.thirdAuthenticated++;
+                        else if(a3.status==='unchecked'){
+                          f.thirdUnchecked++;issue('unchecked',{...witness,...row,
+                            secondReply:id(weak2),moveHistory:state2.log,
+                            thirdToken:next.continuationPhase??null,
+                            thirdSource:third.sourcePhase,thirdPremise:a3});
+                        }else if(a3.status==='failed-premise'){
+                          f.thirdFailedPremise++;issue('failedPremise',
+                            {...witness,...row,secondReply:id(weak2),
+                              moveHistory:state2.log,
+                              thirdToken:next.continuationPhase??null,
+                              thirdSource:third.sourcePhase,thirdPremise:a3});
+                        }
+                        if(full){
+                          row.secondReplies??=[];
+                          row.secondReplies.push({reply:id(weak2),
+                            history:state2.log,thirdSource:third.sourcePhase,
+                            thirdMove:id(third.move),
+                            thirdToken:next.continuationPhase??null,
+                            premise:a3});
+                        }
                       }
                     }
                   }
@@ -263,6 +307,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   console.log(JSON.stringify(r,null,2));
   if(process.argv.includes('--strict')&&
      (CASES.some(c=>r.families[c].roots===0)||
-      Object.values(r.families).some(f=>f.firstFailedPremise>0)))
+      Object.values(r.families).some(f=>f.firstFailedPremise>0||
+        f.followFailedPremise>0||f.thirdFailedPremise>0)))
     process.exitCode=1;
 }
