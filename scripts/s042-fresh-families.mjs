@@ -17,6 +17,8 @@ import {authenticateKQK33Backrank}
 import {probeS036Tree} from './s036-cross-phase-audit.mjs';
 import {authenticateS040LaterAction,S040_RULES}
   from './s040-source-premises.mjs';
+import {authenticateS044Action,S044_RULES}
+  from './s044-source-premises.mjs';
 
 const CASES=['separating-rank','tight-above'];
 const LOW='KQK.EntryGeometry.clear_low_wall_entry.queen_wall';
@@ -61,6 +63,8 @@ function check(state,strong,choice,token=null){
         legalWeakReplies:checked.legalWeakReplies};
     return {status:'unchecked',source:p,reason:checked.status};
   }
+  if(S044_RULES.includes(p))
+    return authenticateS044Action(state,strong,choice,token);
   const result=p===TIGHT
     ?authenticateKQK35TightKing(state,strong,choice)
     :p===LOW
@@ -143,7 +147,8 @@ export function auditS042FreshFamilies({
       followAuthenticated:0,followUnchecked:0,followFailedPremise:0,
       thirdAuthenticated:0,thirdUnchecked:0,thirdFailedPremise:0,
       missingFirst:0,missingFollow:0,missingThird:0,
-      captures:0,otherTerminals:0,sourceRules:{},trees:empty()
+      captures:0,otherTerminals:0,sourceRules:{},uncheckedBySource:{},
+      trees:empty()
     }])),
     firstIssues:{sourceGap:null,failedPremise:null,unchecked:null,
       capture:null,nonmate:null,cycle:null,cap:null},
@@ -151,6 +156,13 @@ export function auditS042FreshFamilies({
     globalKQKMateCertified:false,krkCrossPhaseCertified:false,
     fideHistoryCertified:false};
   const seen=new Set();
+  // Genuine selected theorem, stage and reason: a missing local checker
+  // must never be misreported as a disproved Lean premise.
+  const noteUnchecked=(family,stage,choice,verdict)=>{
+    const label=[stage,choice?.sourcePhase??'missing',
+      verdict?.reason??'named theorem lacks complete checker'].join(' | ');
+    family.uncheckedBySource[label]=(family.uncheckedBySource[label]??0)+1;
+  };
   const issue=(kind,w)=>{
     if(!r.firstIssues[kind])r.firstIssues[kind]=w;
   };
@@ -176,7 +188,8 @@ export function auditS042FreshFamilies({
       else f.selectedOtherFrame++;
       if(selected.status==='authenticated')f.firstAuthenticated++;
       if(selected.status==='unchecked'){
-        f.firstUnchecked++;issue('unchecked',witness);
+        f.firstUnchecked++;noteUnchecked(f,'first',choice,selected);
+        issue('unchecked',witness);
       }
       if(selected.status==='failed-premise'){
         f.firstFailedPremise++;issue('failedPremise',witness);
@@ -213,7 +226,8 @@ export function auditS042FreshFamilies({
               }else{
                 if(a.status==='authenticated')f.followAuthenticated++;
                 else if(a.status==='unchecked'){
-                  f.followUnchecked++;issue('unchecked',{...witness,...row});
+                  f.followUnchecked++;noteUnchecked(f,'second',next,a);
+                  issue('unchecked',{...witness,...row});
                 }else if(a.status==='failed-premise'){
                   f.followFailedPremise++;issue('failedPremise',{...witness,...row});
                 }
@@ -242,7 +256,8 @@ export function auditS042FreshFamilies({
                           next.continuationPhase??null);
                         if(a3.status==='authenticated')f.thirdAuthenticated++;
                         else if(a3.status==='unchecked'){
-                          f.thirdUnchecked++;issue('unchecked',{...witness,...row,
+                          f.thirdUnchecked++;noteUnchecked(f,'third',third,a3);
+                          issue('unchecked',{...witness,...row,
                             secondReply:id(weak2),moveHistory:state2.log,
                             thirdToken:next.continuationPhase??null,
                             thirdSource:third.sourcePhase,thirdPremise:a3});
