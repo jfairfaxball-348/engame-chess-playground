@@ -43,6 +43,14 @@ continuation token is checked for board/history/ply identity.
 **Cross-frame incoming tokens remain unchecked as continuations**;
 a passed local premise on the new frame cannot prove a token bridge.
 
+The source policy sometimes omits `choice.frame` on a continuation
+because the exact theorem frame is carried in the **actual issued**
+incoming token. S043's first CI attempt exposed this as an erroneous
+`unknown source theorem frame` diagnostic. The audit now reconstructs
+that frame exclusively from the genuine token, verifies the token's
+board/history identity with S040, and reports the effective frame and
+its provenance. This is **not** an invented token or a runtime change.
+
 The checker is now applied at THREE successive attacker decisions
 after every legal first and second weak reply, using only actual
 runtime-selected source moves and exact source-issued nested tokens.
@@ -93,9 +101,49 @@ KPK and Engine development are deferred. FIDE clock/history
 certification is not newly supplied. GitHub CI does not establish
 the live Cloudflare deployment.
 
-## Verification evidence
+## Verified S043 PR-head evidence
 
-The first S043 PR-head CI outcome and its exact 16-root counts
-must be recorded **after** the Actions job completes. The preceding
-S042 main run and its exact figures above are verified and independent
-of that outcome.
+[PR-head Actions run 41596372892](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41596372892)
+completed **successfully** at implementation head
+`29973f16589b3b02aeed2629e3cfdd06f26c3384` on 3 November 2026.
+All 250 Node tests, frozen-source verifications, earlier S035–S042
+audits, fresh S043 strict source checks, KQK/KRK adversarial audits,
+source/build checks and **both** Maths and Engine Chromium QA passed.
+The final documentation-only head is a separate CI event and should
+be checked before merge.
+
+The strict 16-root / 100-node / 20-pair results were:
+
+| Directly measured, finite S043 audit | Separating-rank | Tight-above |
+| --- | ---: | ---: |
+| Fresh legal strong-turn roots | 8 | 8 |
+| First legal defender replies | 40 | 42 |
+| Second legal defender replies | 240 | 200 |
+| Independently authenticated first actions | 8 | 6 |
+| First named actions without full checker | 0 | 2 |
+| Authenticated second actions | 40 | 12 |
+| Unchecked second actions | 0 | 30 |
+| Authenticated third actions | 240 | 146 |
+| Unchecked third actions | 0 | 54 |
+| Failed theorem premises (all stages) | 0 | 0 |
+| Missing attacker source actions (all stages) | 0 | 0 |
+| Captures / nonmate endings observed | 0 | 0 |
+| Resource-capped full defender trees | 8 | 8 |
+| Fully mate-closed full defender trees | 0 | 0 |
+
+Thus **288 / 288** sampled separating-rank source decisions
+(8 first + 40 second + 240 third) passed independent local theorem
+authentication, but **none** of the eight whole defender trees closed.
+For tight-above, 164 local actions authenticated and 86 remained
+unchecked, including two genuine source-selected
+`KQK.FarFilePreparation.far_file_preparation.escape_preserving`
+initial constructors. An unchecked source family is not a false theorem.
+Both case families retained zero observed hard source gaps, captures,
+nonmate outcomes or detected structural cycles at these finite caps.
+
+This is **not** a 16-root global win certificate, still less a proof
+of all legal roots and adversarial histories. The strict tests
+verify local constructor correspondence only; all 16 capped trees
+remain open termination obligations. The KRK full-controller
+cross-phase rank and FIDE history are still missing. Cloudflare
+production deployment has **not** been independently verified.
