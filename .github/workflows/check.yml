@@ -137,6 +137,57 @@ jobs:
             /tmp/s044-original.json
             /tmp/s044-wide.json
           retention-days: 14
+      # S045: check the three actual S044 missing named constructors against
+      # frozen Lean premises and genuine recorded history. The original 24+24
+      # audit must have no residual instances from these three families.
+      # Increase to 32 fresh roots per family with all first/second replies
+      # and full chosen third move/token histories; caps remain inconclusive.
+      - name: S045 verify named source gaps and broaden genuine legal roots
+        run: |
+          node scripts/s042-fresh-families.mjs --per-family=32 --candidates=320 --nodes=160 --pairs=32 --strict --full > /tmp/s045-expanded.json
+          node --input-type=module <<'EOF'
+          import {readFileSync} from 'node:fs';
+          const base=JSON.parse(readFileSync('/tmp/s044-wide.json','utf8'));
+          const more=JSON.parse(readFileSync('/tmp/s045-expanded.json','utf8'));
+          const former=[
+            'KQK.TightEntry.protected_file_entry.forward_wall',
+            'KQK.SameRankEntry.backrank_entry.king_to_weak_file',
+            'KQK.SameRankEntry.protected_backrank_entry.queen_up'
+          ];
+          for(const [tag,r,n] of [['S044 original-wide',base,24],['S045 expanded',more,32]]){
+            for(const [family,f] of Object.entries(r.families)){
+              const unchanged=Object.entries(f.uncheckedBySource)
+                .filter(([source])=>former.some(k=>source.includes(k)));
+              console.log(JSON.stringify({tag,family,roots:f.roots,
+                firstReplies:f.firstReplies,secondReplies:f.secondReplies,
+                authenticated:[f.firstAuthenticated,f.followAuthenticated,
+                  f.thirdAuthenticated],
+                unchecked:[f.firstUnchecked,f.followUnchecked,f.thirdUnchecked],
+                residualFormer:unchanged,
+                uncheckedBySource:f.uncheckedBySource,
+                failed:[f.firstFailedPremise,f.followFailedPremise,
+                  f.thirdFailedPremise],missing:[f.missingFirst,
+                  f.missingFollow,f.missingThird],
+                captures:f.captures,otherTerminals:f.otherTerminals,
+                sourceFrameCounts:[f.selectedOriginalFrame,f.selectedOtherFrame],
+                trees:f.trees},null,2));
+              if(f.roots!==n||unchanged.length||
+                 f.firstFailedPremise||f.followFailedPremise||
+                 f.thirdFailedPremise||f.missingFirst||
+                 f.missingFollow||f.missingThird||
+                 f.captures||f.otherTerminals)
+                throw Error('S045 named-source exact legal replay regression: '+tag+' '+family);
+            }
+            if(r.globalKQKMateCertified!==false||
+               r.preparedTokensInvented!==false)
+              throw Error('S045 inflated universal certification / synthetic tokens');
+          }
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s045-expanded-source-audit
+          path: /tmp/s045-expanded.json
+          retention-days: 14
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
