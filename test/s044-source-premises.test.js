@@ -40,9 +40,9 @@ test('S044 first genuine escape-preserving FarFile selections validate every rep
 test('S044 frozen king_cross and noncorner queen_rise follow every real weak reply',()=>{
   for(const strong of ['w','b']){
     const weak=strong==='w'?'b':'w',board=makeBoard();
-    board[squareAt(3,1)]=strong+'K';
-    board[squareAt(3,2)]=strong+'Q';
-    board[squareAt(4,4)]=weak+'K';
+    board[squareAt(4,2)]=strong+'K';
+    board[squareAt(4,3)]=strong+'Q';
+    board[squareAt(5,5)]=weak+'K';
     const root=newGame(board,strong,'kqk',{experimentalKQK:true});
     const cross=kqkSourceChoice(root,strong);
     assert.equal(cross?.sourcePhase,S044_CROSS,
@@ -78,9 +78,9 @@ test('S044 does not authenticate a missing, unknown or misframed theorem',()=>{
   assert.equal(authenticateS044Action(null,'w',
     {sourcePhase:'KQK.Unrecognised'}).status,'not-independently-checked');
   const board=makeBoard();
-  board[squareAt(3,1)]='wK';
-  board[squareAt(3,2)]='wQ';
-  board[squareAt(4,4)]='bK';
+  board[squareAt(4,2)]='wK';
+  board[squareAt(4,3)]='wQ';
+  board[squareAt(5,5)]='bK';
   const root=newGame(board,'w','kqk',{experimentalKQK:true});
   const choice=kqkSourceChoice(root,'w');
   assert.equal(authenticateS044Action(root,'w',
