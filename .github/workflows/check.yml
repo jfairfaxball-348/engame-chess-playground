@@ -144,7 +144,7 @@ jobs:
       # and full chosen third move/token histories; caps remain inconclusive.
       - name: S045 verify named source gaps and broaden genuine legal roots
         run: |
-          npm run audit:s045-fresh-source > /tmp/s045-expanded.json
+          node scripts/s042-fresh-families.mjs --per-family=32 --candidates=320 --nodes=160 --pairs=32 --strict --full > /tmp/s045-expanded.json
           node --input-type=module <<'EOF'
           import {readFileSync} from 'node:fs';
           const base=JSON.parse(readFileSync('/tmp/s044-wide.json','utf8'));
