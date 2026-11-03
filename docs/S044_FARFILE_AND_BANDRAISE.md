@@ -94,8 +94,62 @@ npm run build
 
 The workflow also runs all prior S035-S043, KRK/KQK adversarial
 and rank audits, and both Chromium Maths/Engine browser suites.
-**S044 measured run results, remaining source names and CI references
-must be populated from the exact successful PR head**, not estimated.
+## Measured widened S044 CI evidence
+
+[S044 full-audit PR-head run 41625590512](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41625590512)
+**passed** at implementation SHA
+`99e1f01cb4819259b093f744b4c4a4b228b21666`,
+including the strict 8+8 baseline and strict **24+24** widened
+source-replay steps, upload of full per-root JSON artifact, all
+preexisting Node/source/rank/adversarial checks, npm check/build,
+and both Maths and Engine Chromium suites.
+The successful full predecessor implementation run was
+[41625294326](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41625294326)
+at `1cbd4f88c813780030b7410b5e5a146a9ebc5e10`.
+
+The actual counters below are ordered as
+**first/second/third attacker source applications** after 0/1/2
+legal defender replies. All cases used *genuine source moves and
+tokens*; full trace JSON is uploaded as `s044-full-source-audit`.
+
+| Fixed finite audit | Separating-rank | Tight-above |
+| --- | ---: | ---: |
+| Original roots (100 nodes, 20 pairs) | 8 | 8 |
+| Original first / second defender replies | 40 / 240 | 42 / 200 |
+| Original independently authenticated source applications | 8 / 40 / 240 | 8 / 12 / 200 |
+| Original unchecked source applications | 0 / 0 / 0 | 0 / 30 / 0 |
+| Widened roots (160 nodes, 32 pairs) | 24 | 24 |
+| Widened first / second defender replies | 120 / 736 | 122 / 552 |
+| Widened independently authenticated source applications | 24 / 120 / 736 | 20 / 12 / 552 |
+| Widened unchecked source applications | 0 / 0 / 0 | 4 / 110 / 0 |
+| Widened failed premises / missing actions / captures / nonmates | 0 | 0 |
+| Widened full trees resource-capped | 24 | 24 |
+| Widened full trees completely mate-closed | 0 | 0 |
+
+**Exact remaining named unchecked instances in the widened audit:**
+
+- **90 second actions:** `KQK.TightEntry.protected_file_entry.forward_wall`
+- **4 first actions:** `KQK.SameRankEntry.backrank_entry.king_to_weak_file`
+- **20 second actions:** `KQK.SameRankEntry.protected_backrank_entry.queen_up`
+
+These are **missing independent full-premise checkers**, not falsified
+Lean theorems or observed missing runtime moves. The remaining
+widened 1,464 / 1,578 attacker source applications were independently
+authenticated locally (880 separating-rank + 584 tight-above);
+114 / 1,578 were unchecked. Across both widened families:
+**242 first legal weak replies and 1,288 second legal weak replies**,
+zero failed implemented premises, zero hard source gaps/captures/
+nonmate outcomes/potential structural cycles, and **48/48 capped
+all-reply trees**. The result does **not** certify global checkmate
+or universal legal-root coverage.
+
+The S045 handoff must first audit the three real named constructors,
+their complete frozen Lean hypotheses and any authentic source-token
+frame crossings, and separately investigate the upstream missing
+KRK global controller composition theorem.
+Final docs/handoff-only PR-head and merged-main CI are separate
+runs and must be checked after those commits. Cloudflare Worker
+deployment was not independently verified.
 
 Release status: Stage A **open** for KRK and KQK; both remain
 explicitly experimental. Stage B comprehensive mathematical
