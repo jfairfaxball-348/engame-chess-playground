@@ -90,6 +90,53 @@ jobs:
       # S043: independently authenticate S040 constructors on fresh roots
       # and after both actual defender layers. Unchecked is not proof failure.
       - run: npm run audit:s042-fresh-families -- --per-family=8 --candidates=128 --nodes=100 --pairs=20 --strict
+      # S044: retain the original 8/root/family baseline, then WIDEN the
+      # true legal root and symmetry sample to 24 per family at explicit finite
+      # all-reply budgets. Preserve every original source frame/token and full
+      # first/second defender history as a replayable workflow artifact.
+      # Local theorem authentication != global termination certification.
+      - name: S044 full source replay and widened legal roots
+        run: |
+          node scripts/s042-fresh-families.mjs --per-family=8 --candidates=128 --nodes=100 --pairs=20 --strict --full > /tmp/s044-original.json
+          node scripts/s042-fresh-families.mjs --per-family=24 --candidates=256 --nodes=160 --pairs=32 --strict --full > /tmp/s044-wide.json
+          node --input-type=module <<'EOF'
+          import {readFileSync} from 'node:fs';
+          for(const name of ['original','wide']){
+            const r=JSON.parse(readFileSync('/tmp/s044-'+name+'.json','utf8'));
+            const rows=Object.fromEntries(Object.entries(r.families).map(([k,f])=>
+              [k,{roots:f.roots,firstReplies:f.firstReplies,
+                secondReplies:f.secondReplies,
+                authenticated:[f.firstAuthenticated,f.followAuthenticated,
+                  f.thirdAuthenticated],
+                unchecked:[f.firstUnchecked,f.followUnchecked,f.thirdUnchecked],
+                failed:[f.firstFailedPremise,f.followFailedPremise,
+                  f.thirdFailedPremise],
+                missing:[f.missingFirst,f.missingFollow,f.missingThird],
+                captures:f.captures,nonmate:f.otherTerminals,
+                trees:f.trees,uncheckedBySource:f.uncheckedBySource}]));
+            console.log(JSON.stringify({name,scope:r.scope,families:rows,
+              firstIssues:r.firstIssues,globalMateCertified:
+              r.globalKQKMateCertified},null,2));
+            const expected=name==='original'?8:24;
+            for(const f of Object.values(r.families)){
+              if(f.roots!==expected||f.firstFailedPremise||
+                 f.followFailedPremise||f.thirdFailedPremise||
+                 f.missingFirst||f.missingFollow||f.missingThird||
+                 f.captures||f.otherTerminals)
+                throw Error('S044 exact finite source falsification: '+name);
+            }
+            if(r.globalKQKMateCertified!==false||
+               r.preparedTokensInvented!==false)
+              throw Error('S044 source certification/invented token drift');
+          }
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s044-full-source-audit
+          path: |
+            /tmp/s044-original.json
+            /tmp/s044-wide.json
+          retention-days: 14
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
