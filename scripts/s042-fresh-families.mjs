@@ -19,6 +19,8 @@ import {authenticateS040LaterAction,S040_RULES}
   from './s040-source-premises.mjs';
 import {authenticateS044Action,S044_RULES}
   from './s044-source-premises.mjs';
+import {authenticateS045Action,S045_RULES}
+  from './s045-source-premises.mjs';
 
 const CASES=['separating-rank','tight-above'];
 const LOW='KQK.EntryGeometry.clear_low_wall_entry.queen_wall';
@@ -65,6 +67,8 @@ function check(state,strong,choice,token=null){
   }
   if(S044_RULES.includes(p))
     return authenticateS044Action(state,strong,choice,token);
+  if(S045_RULES.includes(p))
+    return authenticateS045Action(state,strong,choice,token);
   const result=p===TIGHT
     ?authenticateKQK35TightKing(state,strong,choice)
     :p===LOW
