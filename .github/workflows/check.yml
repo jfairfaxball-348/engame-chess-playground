@@ -87,7 +87,9 @@ jobs:
       - run: npm run audit:s041-cap-sweep -- --tuples=1600 --prepared=10 --nodes=160 --pairs=28 --krk-roots=4 --strict
       # S042: fresh separating-rank/tight-above legal roots (no invented token).
       # All first/second legal weak replies; exact source and finite tree caps.
-      - run: npm run audit:s042-fresh-families -- --per-family=4 --candidates=64 --nodes=100 --pairs=20 --strict
+      # S043: independently authenticate S040 constructors on fresh roots
+      # and after both actual defender layers. Unchecked is not proof failure.
+      - run: npm run audit:s042-fresh-families -- --per-family=8 --candidates=128 --nodes=100 --pairs=20 --strict
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
