@@ -1,56 +1,63 @@
-# S043 — close fresh KQK source-premise and KRK totality obligations
+# S044 — close actual S043 source gaps, investigate KRK totality
 
-**Execute, not only outline.** Confirm completed S042 PR-head and merged-main
-Node + both Chromium Actions and exact S042 family counters before work.
-Read AGENTS.md, docs/S042_FRESH_CASES_AND_KRK_OBLIGATION.md and frozen
-parent Lean files at pinned SHAs. Work in playground only; never mutate
-endgame-chess, manufacture source tokens or introduce engine/minimax/
-tablebase/arbitrary fallback in Maths.
+## Verified S043 baseline for S044
 
-## Measured starting point
-S041 independently replayed genuine FarFilePreparation roots:
-10 prepared roots, 42 first defender replies, 214 second replies;
-all source theorem premises in S040 passed; 8/42 trees closed at
-640 nodes/112 pairs and 34 were capped; zero observed hard failures.
-S042 added legal **fresh** original-frame separating-rank and already-
-far-file tight-above cohorts, with source-issued actions and every
-first/second weak reply, instead of recycling only preparation tokens.
-Get the completed actual CI counts; do not invent results.
+[Run 41596372892](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41596372892)
+passed PR-head code at `29973f16589b3b02aeed2629e3cfdd06f26c3384`.
+The 16 true fresh roots produced 82 first and 440 second legal
+defender replies. Separating-rank: 8+40+240 independently
+authenticated local first/second/third source actions; 0 unchecked.
+Tight-above: 6+12+146 authenticated; 2+30+54 unchecked.
+Neither family had a detected failed premise, missing source,
+capture, nonmate or structural cycle; all 16 full trees capped at
+100 nodes / 20 pairs. This is finite evidence, **not mate closure**.
+The source sometimes omits `choice.frame` on nested continuation:
+the exact real token frame, never a manufactured one, must be used
+for independent verification. The final docs-only CI is separate.
 
-## Obligations
+**Execute**, do not merely suggest. First verify S043 PR-head and merged-main
+Actions at their exact commit SHAs, including Node, source, build and
+both Chromium suites, and record the actual S043 counters. Also verify
+Cloudflare Worker deployment separately; green GitHub CI is not a deploy.
 
-1. Run S042 strict and --full with the same root budget and enumerate
-   exact first source-gap, independent failed theorem, unchecked named
-   theorem, captured attacker, nonmate and cap witnesses separately.
-   Reconstruct board, both colour choices, selected frame, full history
-   and genuine continuation token for each first new obligation.
-2. For genuinely encountered unchecked source families, read exact
-   frozen KQK EC-T0050 Lean statement and verify **all** premises,
-   move coordinates, legal weak replies and token invariant independent
-   of the runtime selector. An unchecked family is not false; an
-   authenticator passing a sample is not global.
-3. Extend the two fresh case cohorts across multiple real legal roots,
-   frame symmetries and the next required legal defender layer. Record
-   all matched source families and hard failures separately from finite
-   search caps. Prove only arithmetic/source coverage actually supported.
-4. KRK: inspect actual S039 PREP(rank2)→central and central/restoration
-   nested-token witnesses, match frozen `prep_bound`,
-   `restoration_bound`, and the next theorem for the *entire*
-   board + token; either locate a **global** source well-founded
-   cross-phase proof for this exact executable selector, or issue the
-   smallest concrete missing upstream statement. Never invent a rank.
-5. Keep K/K, K+B/K, K+N/K full board-specific Maths workings and
-   their proof links. Preserve simplified KRK/KQK beta honesty and
-   fail-closed behaviour. Stage B full KRK/KQK maths + provenance +
-   proper FIDE clocks/repetition/termination only when both Stage A
-   policies really are universal. Defer KPK/Engine.
-6. Run npm test, npm run verify:krk-sources, all S035–S043 audits,
-   KRK/KQK adversarial/rank audits, npm run check/build and both
-   Chromium QA suites. PR-head Actions must finish green before
-   merge; check main CI and live Cloudflare Worker separately.
-   Commit, merge, fast-forward and install S044 from actual results.
-
-Pinned immutable source: KQK EC-T0050
+Start from AGENTS.md, docs/S042_FRESH_CASES_AND_KRK_OBLIGATION.md,
+docs/S043_FRESH_SOURCE_AUTHENTICATION.md and live audit script output.
+Pinned read-only Lean anchors: KQK EC-T0050
 `c72365a8ba46f59114a2a77d9d38993f6a52df80`;
 KRK EC-T0048 `2311abe71bc1a4eed47026feccd5ba5a0760d5bb`;
 KRK executable `e7de0930fc61caeb11795cf3c10fde11e4774a40`.
+
+1. Run the fresh-source audit at 8 roots/family with `--strict`
+   and `--full`, then increase legal root and frame diversity at
+   explicit finite budgets. Preserve both colours and all original
+   source frames. Record exact root, full board, every legal first
+   and second defender reply, exact nested token and selected theorem.
+   Distinguish cross-frame unverified bridge, unknown named theorem,
+   failed premise, missing action, capture, nonmate, structural
+   cycle and resource cap as *different* categories.
+2. Inspect the actual first unchecked named S043 source families
+   (especially later BandRaise/other constructors), read their
+   exact frozen Lean statements, and implement independent **full**
+   source-premise and move-coordinate verification where genuinely
+   supported. Do not credit a theorem from an unselected frame or
+   extrapolate from a short sample. Add reproducible adversarial tests.
+3. In KRK, replay the real S039 PREP(rank2)->central handoff and
+   central/restoration cycles with original boards and full nested
+   tokens. Compare prep_bound and restoration_bound at the pinned
+   Lean executable SHA. Either identify a real frozen global
+   all-reply termination/cross-phase rank theorem for this exact
+   JS-compatible controller, or document the narrow upstream
+   missing theorem with full premises and counterexample witness.
+   Do not invent a decreasing measure or mistake an existential
+   MateWithin proof for executable selector certification.
+4. Preserve release behaviour: K/K, K+B/K and K+N/K full board-specific
+   maths equations, proof references and history; experimental KRK/KQK
+   plays and honest beta labelling; source-derived Maths selector only.
+   No engine/minimax/tablebase/first-legal fallback. Stage B KRK/KQK
+   maths and proper clocks/history begins once both Stage A strategies
+   truly terminate against all defenders. Defer KPK and Engine.
+5. Run npm test, npm run verify:krk-sources, all S035-S044 audits,
+   KRK/KQK adversarial and rank audits, npm run check/build and both
+   Chromium suites. PR-head CI must pass **before** merging; confirm
+   main CI and live Worker separately. Commit, merge, fast-forward,
+   record exact measured evidence and install S045 from real results.

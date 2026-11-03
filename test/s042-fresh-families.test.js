@@ -30,6 +30,16 @@ test('S042 checks every legal defender reply from both fresh case families',()=>
     assert.ok(f.firstReplies>=f.missingFollow);
     assert.equal(Object.values(f.trees).reduce((a,b)=>a+b,0),f.roots);
     assert.equal(f.firstFailedPremise,0);
+    assert.equal(f.followFailedPremise,0,
+      JSON.stringify(r.firstIssues.failedPremise));
+    assert.equal(f.thirdFailedPremise,0);
+    assert.equal(f.firstAuthenticated+f.firstUnchecked+f.firstFailedPremise,
+      f.roots-f.missingFirst);
+    assert.ok(f.thirdAuthenticated+f.thirdUnchecked>0,
+      'the third source actions must be independently classified');
+    if(family==='separating-rank')
+      assert.ok(f.firstAuthenticated>0,
+        'fresh separating-rank must now check S040 BandProgress premises');
   }
   for(const example of r.examples){
     assert.equal(example.inputToken,null);
@@ -39,6 +49,12 @@ test('S042 checks every legal defender reply from both fresh case families',()=>
     for(const reply of example.defenderReplies){
       assert.equal(reply.moveHistory.length,2);
       assert.deepEqual(reply.issuedToken,example.firstToken);
+      for(const second of reply.secondReplies??[]){
+        assert.equal(second.history.length,4);
+        assert.ok(second.premise?.status);
+        assert.ok(second.thirdMove);
+        assert.ok(second.thirdToken===null||typeof second.thirdToken==='object');
+      }
     }
   }
   assert.equal(r.preparedTokensInvented,false);
