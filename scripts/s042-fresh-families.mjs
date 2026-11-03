@@ -37,11 +37,18 @@ function check(state,strong,choice,token=null){
   if(!choice?.move)return {status:'missing'};
   const p=choice.sourcePhase;
   if(S040_RULES.includes(p)){
-    // S040's checker verifies exact frozen premises, constructor and all
-    // immediate weak replies. Never count an unverified cross-frame token
-    // as an authenticated continuation, even when local premises hold.
-    const crossFrame=token!==null&&token.frame!==choice.frame;
-    const checked=authenticateS040LaterAction(state,strong,choice,
+    // On source continuation, the constructor may deliberately omit frame:
+    // the exact frame is carried by the genuinely issued incoming token.
+    // Recover it for verification ONLY; never mutate the runtime selector.
+    const effectiveFrame=choice.frame??token?.frame??null;
+    if(effectiveFrame===null)return {status:'unchecked',source:p,
+      reason:'neither source choice nor incoming token carries a frame'};
+    const frameOrigin=choice.frame===null?'source-issued-token':'choice';
+    const framedChoice=choice.frame===effectiveFrame?choice:
+      {...choice,frame:effectiveFrame};
+    // Never credit an unverified cross-frame token as a theorem bridge.
+    const crossFrame=token!==null&&token.frame!==effectiveFrame;
+    const checked=authenticateS040LaterAction(state,strong,framedChoice,
       crossFrame?null:token);
     if(checked.status==='failed-premise')
       return {status:'failed-premise',theorem:p,reason:checked.reason};
@@ -50,6 +57,7 @@ function check(state,strong,choice,token=null){
       localPremises:checked.status};
     if(checked.status==='authenticated')
       return {status:'authenticated',theorem:p,
+        effectiveFrame,frameOrigin,
         legalWeakReplies:checked.legalWeakReplies};
     return {status:'unchecked',source:p,reason:checked.status};
   }
