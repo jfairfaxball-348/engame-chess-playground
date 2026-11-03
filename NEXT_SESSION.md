@@ -1,5 +1,20 @@
 # S044 — close actual S043 source gaps, investigate KRK totality
 
+## Verified S043 baseline for S044
+
+[Run 41596372892](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41596372892)
+passed PR-head code at `29973f16589b3b02aeed2629e3cfdd06f26c3384`.
+The 16 true fresh roots produced 82 first and 440 second legal
+defender replies. Separating-rank: 8+40+240 independently
+authenticated local first/second/third source actions; 0 unchecked.
+Tight-above: 6+12+146 authenticated; 2+30+54 unchecked.
+Neither family had a detected failed premise, missing source,
+capture, nonmate or structural cycle; all 16 full trees capped at
+100 nodes / 20 pairs. This is finite evidence, **not mate closure**.
+The source sometimes omits `choice.frame` on nested continuation:
+the exact real token frame, never a manufactured one, must be used
+for independent verification. The final docs-only CI is separate.
+
 **Execute**, do not merely suggest. First verify S043 PR-head and merged-main
 Actions at their exact commit SHAs, including Node, source, build and
 both Chromium suites, and record the actual S043 counters. Also verify
