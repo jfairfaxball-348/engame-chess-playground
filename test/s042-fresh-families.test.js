@@ -30,7 +30,8 @@ test('S042 checks every legal defender reply from both fresh case families',()=>
     assert.ok(f.firstReplies>=f.missingFollow);
     assert.equal(Object.values(f.trees).reduce((a,b)=>a+b,0),f.roots);
     assert.equal(f.firstFailedPremise,0);
-    assert.equal(f.followFailedPremise,0);
+    assert.equal(f.followFailedPremise,0,
+      JSON.stringify(r.firstIssues.failedPremise));
     assert.equal(f.thirdFailedPremise,0);
     assert.equal(f.firstAuthenticated+f.firstUnchecked+f.firstFailedPremise,
       f.roots-f.missingFirst);
