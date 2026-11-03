@@ -51,8 +51,8 @@ test('S042 checks every legal defender reply from both fresh case families',()=>
       for(const second of reply.secondReplies??[]){
         assert.equal(second.history.length,4);
         assert.ok(second.premise?.status);
-        assert.deepEqual(second.thirdToken,
-          second.thirdToken===null?null:second.thirdToken);
+        assert.ok(second.thirdMove);
+        assert.ok(second.thirdToken===null||typeof second.thirdToken==='object');
       }
     }
   }
