@@ -115,15 +115,29 @@ There were **22,176 actual immediate weak queen-capture moves to KK**
 per weak-to-move colour group, **44,352** in total. These are counts
 of legal capture moves, not necessarily distinct drawn root orbits.
 
-Across continuations after genuine moves, the independent checker
-reported **40 failed-premise instances per strong-to-move colour
-group** (**80 total**). These must be reproduced with exact
-board/frame/history/source token before declaring a bug in the source
-or checker. Many other continuation checks remain unchecked:
-per strong-to-move group 517,962 authenticated / 101,718 unchecked;
-per weak-to-move group 534,918 authenticated / 342,122 unchecked.
-No missing follow-source choices were reported. Local checker gaps
-and failures cannot be promoted into a mate certificate.
+The first complete run flagged **40 failed-premise instances per
+strong-to-move colour group**, 80 total. The exact first genuine
+source-token witness was strong king c6, queen g5, weak king a7,
+White to move, framed rotate180, source
+`KQK.TightEntry.protected_file_entry.forward_wall`, with the original
+strong root Kc7/Qg5/ka6, source Kc6 and legal defender Ka7. The checker
+had mistakenly disallowed framed queen file six when king file is five,
+although frozen `TightEntry.lean` lines 114-129 **explicitly use**
+`edge_wall_weak_open_bound` in precisely that branch. This was an
+**independent checker false negative, not a refutation of Lean**.
+
+S047 fixes only `scripts/s045-source-premises.mjs`, not the source
+controller, and adds `test/s047-tight-edge-forward.test.js` replaying
+the actual two-ply king/defender history and genuine continuation
+token for both colours, plus a negative forged-token test.
+[Post-fix exhaustive rerun 41824441006](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41824441006)
+passed all 16 shards and the merger, with **ZERO failed checker
+premises** across all four groups. Corrected continuation counts:
+per strong-to-move group **518,002 authenticated / 101,718
+unchecked / 0 failed**, and per weak-to-move group **534,918
+authenticated / 342,122 unchecked / 0 failed**.
+No missing follow-source choices were reported. Missing independent
+checkers and global termination remain open obligations, not certificates.
 
 The Action artifact `s047-complete-finite-root-census` holds exact
 aggregated counts and first issue witnesses; the expanded S047
