@@ -42,6 +42,10 @@ jobs:
             if(!g.exhaustedShard || g.sampledLegalRootsOnly ||
                g.candidateAssignments!==16384)
               throw Error('S047 shard incomplete: '+name);
+            if(g.illegalSourceMove || g.followingIllegalSourceMove ||
+               g.localPremises['failed-premise'] ||
+               g.followingPremises['failed-premise'])
+              throw Error('S047 real source/checker regression: '+name);
             console.log(JSON.stringify({name,legalRoots:g.legalRoots,
               firstMissing:g.missingFirstSource,
               firstFailedPremises:g.localPremises['failed-premise'],
