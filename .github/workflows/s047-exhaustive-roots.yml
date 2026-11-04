@@ -1,0 +1,107 @@
+name: S047 exhaustive KQK roots (diagnostic only)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/s047-exhaustive-roots.yml
+      - scripts/s046-root-census.mjs
+      - scripts/s047-merge-root-shards.mjs
+      - test/s047-root-shard-merge.test.js
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  root-shard:
+    name: KQK root shard ${{ matrix.shard }}/16
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Exhaust ALL 64^3 square triples per colour/turn within this shard
+        run: |
+          node scripts/s046-root-census.mjs --full --shard=${{ matrix.shard }}/16 --examples=32 > s047-root-${{ matrix.shard }}.json
+          node --input-type=module <<'EOF'
+          import {readFileSync} from 'node:fs';
+          const shard=${{ matrix.shard }};
+          const r=JSON.parse(readFileSync('s047-root-'+shard+'.json','utf8'));
+          if(r.scope.full!==true || r.scope.shardIndex!==shard ||
+             r.scope.shardCount!==16 || r.allRootBoardsEnumerated!==false ||
+             r.allDefenderTerminationCertified!==false ||
+             r.universalKQKMatingCertified!==false)
+            throw Error('S047 wrong scope / inflated proof');
+          for(const [name,g] of Object.entries(r.groups)){
+            if(!g.exhaustedShard || g.sampledLegalRootsOnly ||
+               g.candidateAssignments!==16384)
+              throw Error('S047 shard incomplete: '+name);
+            if(g.illegalSourceMove || g.followingIllegalSourceMove ||
+               g.localPremises['failed-premise'] ||
+               g.followingPremises['failed-premise'])
+              throw Error('S047 real source/checker regression: '+name);
+            console.log(JSON.stringify({name,legalRoots:g.legalRoots,
+              firstMissing:g.missingFirstSource,
+              firstFailedPremises:g.localPremises['failed-premise'],
+              followingMissing:g.followingSourceMissing,
+              legalImmediateQueenCaptures:g.directWeakQueenCaptures,
+              firstReplyCapture:g.afterFirstStrongCaptures}));
+          }
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s047-root-shard-${{ matrix.shard }}
+          path: s047-root-${{ matrix.shard }}.json
+          retention-days: 14
+
+  merge-census:
+    name: Verify all 16 shards and summarize finite root census
+    needs: root-shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: s047-root-shard-*
+          path: all-shards
+          merge-multiple: true
+      - name: Refuse missing/duplicate/incomplete shards, report actual totals
+        run: |
+          node scripts/s047-merge-root-shards.mjs all-shards/s047-root-*.json > s047-full-root-census.json
+          node --input-type=module <<'EOF'
+          import {readFileSync} from 'node:fs';
+          const r=JSON.parse(readFileSync('s047-full-root-census.json','utf8'));
+          if(!r.allRootBoardsEnumerated ||
+             !r.allImmediateWeakRepliesEnumerated ||
+             r.allDefenderTerminationCertified ||
+             r.universalKQKMatingCertified)
+            throw Error('S047 false finite root / mate certification');
+          for(const [name,g] of Object.entries(r.groups))
+            console.log(JSON.stringify({name,rawTriples:g.candidateAssignments,
+              legalRoots:g.legalRoots,terminal:g.terminal,
+              ongoing:g.ongoing,firstSource:g.sourceSelected,
+              firstMissing:g.missingFirstSource,
+              premises:g.localPremises,weakQueenCaptures:
+                g.directWeakQueenCaptures,followingMissing:
+                g.followingSourceMissing,followingPremises:
+                g.followingPremises,selectedFrames:g.selectedFrames}));
+          console.log('First exact source/premise witnesses: '+JSON.stringify(r.firstIssues));
+          for(const [name,g] of Object.entries(r.groups))
+            console.log('Root source family '+name+': '+JSON.stringify(g.selectedRules));
+          console.log('Finite root universe complete. All-plies source mate termination remains OPEN.');
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s047-complete-finite-root-census
+          path: s047-full-root-census.json
+          retention-days: 30
