@@ -1,110 +1,108 @@
-# S047 — exhaust KQK root classes and resolve the exact source-controller obligation
+# S048 — triage completed exhaustive KQK root census and source termination gaps
 
-## Source of truth / inherited release restrictions
+## Baseline and source locks
 
-Read AGENTS.md, docs/S046_ALL_ROOTS_AND_TERMINATION.md,
-docs/S045_SOURCE_CONSTRUCTOR_CLOSURE.md, and the exact latest
-merged-main CI run before making changes. Verify latest Cloudflare
-Worker HTTP/assets independently: GitHub green ≠ Cloudflare deployed.
+Read AGENTS.md and docs/S047_EXHAUSTIVE_ROOT_SHARDS.md, then inspect
+the **actual** S047 pull request, its head CI, all 16 shard results,
+the verified S047 merge artifact if produced, and merged-main CI.
+Do not claim a full census on the strength of a workflow definition;
+each of the 16 jobs and the shard-merger must complete successfully.
+Verify live Cloudflare Worker HTTP/assets INDEPENDENTLY; CI green does
+not mean Worker production has deployed.
 
-Frozen and READ-ONLY source anchors:
+Pinned READ-ONLY upstream proof sources:
 - KQK EC-T0050: c72365a8ba46f59114a2a77d9d38993f6a52df80
 - KRK EC-T0048: 2311abe71bc1a4eed47026feccd5ba5a0760d5bb
 - KRK executable: e7de0930fc61caeb11795cf3c10fde11e4774a40
 
-Owner priority remains Stage A: genuinely source-derived working
-KRK and KQK controllers for ALL legitimately winning legal roots,
-against ALL lawful weak replies, with correct handling for
-already-drawn or capture-to-KK roots. NEVER add arbitrary legal,
-Stockfish, tablebase, minimax or heuristic strong moves to Maths.
-Do not enable certified material booleans from a bounded audit.
-Keep K/K, K+B/K, K+N/K full positional maths working intact.
-Stage B complete KRK/KQK explanations, derivation provenance and
-history/clock FIDE parity begins immediately once both Stage A
-controllers actually close. KPK/Engine development is not priority.
+Owner Stage A remains highest priority: a genuinely source-derived,
+complete winning KRK and KQK controller, for each legitimately
+winning legal root against ALL lawful weak replies, and correct
+drawing/capture-to-KK roots. Never insert arbitrary legal, heuristic,
+tablebase, Stockfish, minimax or engine moves into Maths. Never
+promote material certification booleans based on a finite audit.
+Preserve K/K, K+B/K, K+N/K's fully working positional maths
+explanations and the isolated Engine arena.
 
-## Baseline exact facts from S046
+## S047 scope (verify results before reporting them)
 
-S045 merged main at efa7f12342c05c80b50229fb7a358ab9a8752edd
-and its merged-main Actions run 41679417394 completed successfully.
-S045 local finite sample: 1,970/1,970 authenticated actions over
-64 strong-turn fresh roots, 64/64 full trees resource-capped,
-NONE global mate-closed. S046 adds:
-- scripts/s046-root-census.mjs, a fresh-root census across both
-  colours, BOTH strong-to-move and weak-to-move, eight D4 frames;
-  original and source-selected frame/constructor kept distinct.
-- strict separate counts of genuine immediate weak queen captures
-  to certified KK draws, selector gaps, source premise checker
-  verdicts and actual after-source continuation tokens.
-- sampled 64 legal roots per colour/turn as CI diagnostic (256).
-  An optional --full --shard=N/M scanning mode exhausts each shard;
-  run EVERY shard to support an actual all-legal-root claim.
-- test/s046-root-census.test.js: explicit LEGAL weak-to-move
-  capture fixture White Ka1, Qd4, black Ke5, black to move,
-  Kxd4 -> KK draw, all 8 symmetries and 2 colours = 16.
-The literal demand that every possible legal KQK root is won is
-FALSE, because some weak-turn roots directly capture an
-unprotected queen. Recognize them as drawn, not a strategy
-contradiction or a fictitious KQK forced win.
+S047 introduces scripts/s047-merge-root-shards.mjs, its dedicated
+unit tests, and a separate workflow:
+.github/workflows/s047-exhaustive-roots.yml.
 
-S046 PR #56: https://github.com/jfairfaxball-348/engame-chess-playground/pull/56
-Inspect its exact resulting head, merged commit, checks and measured
-artifact before quoting any new statistics. Do not reuse counts
-from old S045 to claim S046 globally succeeded.
+It requests exactly 16 full, disjoint S046 census shards, each
+16,384 raw labelled (strong king, queen, weak king) square triples
+PER colour/turn combination, with all eight D4 root frames and
+all real immediate legal weak replies. Total target when **every**
+shard succeeds: 262,144 raw triples PER group and 1,048,576 raw
+triples across four colour/turn groups. The merger rejects missing,
+duplicate, incomplete, mis-scoped or internally inconsistent shards.
+Per-shard distinct D4 orbit numbers cannot be added to get a
+global unique D4 count, and full root enumeration cannot prove
+all-plies token-bearing source-controller mate termination.
 
-## Required execution next session
+S046 already contains a true legal direct queen capture to KK draw
+(White Ka1, Qd4, black Ke5, Black to move, ...Kxd4), including both
+strong colours and all eight symmetries. A claim that EVERY legal
+KQK root is winning is false. Identify genuinely won and drawn
+root classes separately, without conflating root legality or move
+source authenticity with an ultimate win certificate.
 
-1. Verify S046 merged-main commit and all Node, source lock,
-   S035–S046 finite audits, KRK/KQK adversarial/rank audits,
-   npm check/build, both Maths and Engine Chromium suites.
-   Verify live Worker HTTP and JS assets separately.
-2. Execute S046 legal-root census across ALL four (strong colour,
-   side-to-move) combinations, with all eight D4 orbits, by
-   enumerating ALL 64^3 square triples per combination. Use
-   independent deterministic shards if runtime is too high;
-   save complete machine-readable output and shard accounting.
-   Run in CI with manageable resource budgets or offline;
-   never label an uncompleted shard full coverage. Distinguish
-   legal drawn terminals, direct rook/queen captures, first
-   source selector missing, forged/unchecked premises,
-   original/theorem-selected frames and genuine weak replies.
-3. If a missing selector is discovered, first reproduce its
-   ACTUAL root/frame/history and exact source constructor.
-   Only translate a named applicable frozen theorem branch
-   with independently audited premises. No fake policy moves.
-   Add adversarial colour/frame/token tests for any repair.
-4. Attempt a real GLOBAL KQK all-reply source-bound/
-   lexicographically decreasing rank over (board, turn,
-   FULL source continuation token) accounting for all
-   geometry families, changes of frame, band and edge entries,
-   corner, shadow, preparations, and defensive replies.
-   An empirical finite root census, all first replies or
-   finite depth cap does NOT prove a global termination rank.
-   If pinned Lean proves MateWithin existence only, identify
-   the minimal NEW constructive selector/composition theorem
-   needed UPSTREAM; do not invent Lean mathematics here.
-5. Re-run genuine S039 KRK
-   PREP(rankBefore=2)->central (16-24) and
-   central->restoration (11-19), across every immediate weak
-   reply with original nested krk14-strong-continuation token,
-   original frame and actual legal history. Focus on source
-   re-entry and the missing globally well-founded rank.
-   Pinned prep_bound local MateWithin,
-   restoration_bound conditional CentralBound and
-   krk_force_transport existence alone are insufficient.
-6. Keep honest terminal/partial/resource-cap/unverified
-   counters. Maintain experimental KRK/KQK release gates
-   and preserve all older maths panels. Commit/PR/merge
-   only after passing PR-head CI; inspect merged-main CI.
-   Install S048 based on measured new blockers.
+## Required S048 execution
 
-## Certification threshold
+1. Check S047 PR-head AND merged-main Node, frozen source-lock,
+   S035-S047 audits, browser Maths and Engine Chromium, npm
+   check/build. Retrieve the S047 merged full-census artifact.
+   If any shard failed or timed out, rerun/partition that exact
+   shard and explicitly mark overall coverage INCOMPLETE until
+   the verified final aggregation has every residue index.
+2. Publish **measured** complete finite root counts only from the
+   artifact: legal roots per colour/turn, root mate/stalemate/
+   ongoing, initial genuine source-selected/missing/illegal,
+   selected original vs theorem frames, independently verified/
+   unchecked/failed named premises, all immediate weak replies,
+   actual immediate queen-to-KK captures, post-strong first
+   defender captures, and source continuation outcomes. Different
+   root classes and resource caps must never be silently combined.
+3. For the first confirmed **actual** missing source root or
+   false premise, reproduce the exact full board, original
+   frame, selected frame, strong colour, turn, source constructor,
+   legal defender reply, and genuine continuation token. Seek a
+   named frozen source theorem that truly applies; translate only
+   its independently audited constructor/premises. Add targeted
+   D4/colour/turn/token adversarial regression. If no source
+   hole, prioritize global termination rather than more shallow
+   samples.
+4. Try to formulate a genuinely well-founded KQK **all-reply**
+   measure for (board, turn, FULL source continuation token)
+   including preparation, band, far-file, rank, protected
+   backrank, corner/shadow, and transitions between original
+   and theorem-selected frames. Distinguish a complete
+   theorem from merely having finite source-selected moves.
+   If pinned Lean proves only MateWithin existence, identify
+   exact smallest missing upstream constructive composition/
+   extraction theorem. Do NOT manufacture an unproved rank.
+5. Revisit actual S039 KRK PREP(rankBefore=2)->central (16-24)
+   and central->restoration (11-19) with real nested
+   krk14-strong-continuation tokens, exact board/frame/history
+   and ALL legal immediate defender replies. Source PREP local
+   MateWithin, restoration conditional CentralBound and
+   force_transport existence do NOT certify a cross-phase
+   lexicographically decreasing policy.
+6. Keep material Stage A gates experimental/open unless **all**
+   legally winning roots are source-faithfully covered through
+   mate against all legal defender replies and have an
+   authoritative global termination certificate. After both
+   Stage A controllers truly close, immediately prioritize
+   full KRK/KQK maths derivations, provenance and FIDE
+   history/clock parity (Stage B). KPK and Engine research are
+   deferred. Commit/PR/merge after green PR-head checks,
+   verify merged-main CI, install S049 from measured results.
 
-To close Stage A, a documented *complete source-faithful
-controller* must account for **all legal starting positions with
-their correct win/draw outcome**, and on every root genuinely
-winning for the stronger side must be guaranteed to checkmate
-against every lawful weak reply. A sampled source premise success,
-a source-rank fragment, a finite exhaustive ROOT scan, a tree cap,
-an existence-level ForceMate theorem, or a claimed Worker
-deployment are not equivalent to this certificate.
+## Close-out requirement
+
+Separate: (A) complete finite starting-board census,
+(B) checked immediate source actions and legal weak replies,
+(C) complete source-derived all-depth controller,
+(D) proof of global termination and rule/clock parity,
+(E) verified Worker deployment. None implies the others.
