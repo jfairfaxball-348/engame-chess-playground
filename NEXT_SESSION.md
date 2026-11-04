@@ -48,6 +48,35 @@ KQK root is winning is false. Identify genuinely won and drawn
 root classes separately, without conflating root legality or move
 source authenticity with an ultimate win certificate.
 
+## Measured S047 baseline for S048
+
+All 16 exhaustive shards and the finite root merger passed on PR
+[run 41823395559](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41823395559):
+**1,048,576** square assignments; **736,904** legal KQK starting
+boards; **289,016** strong-to-move and **447,888** weak-to-move;
+**728** terminal mates and **1,744** stalemates at roots;
+**44,352** immediate legal weak queen-capture moves to KK.
+Every one of the **289,016** ongoing strong-turn roots had a
+source-selected initial move; zero initially missing/illegal, but
+**116,688** first source actions still lack complete independent
+premise authentication (others 172,328 authenticated).
+
+The initial complete scan exposed **80 false-negative checker
+failures** in KQK TightEntry file-six edge wall. The frozen Lean
+`TightEntry.lean` proof explicitly uses
+`edge_wall_weak_open_bound` for king file five/weak file seven.
+S047 fixed the independent checker, preserved runtime, and added
+a genuine source-token/two-ply regression for both colours.
+[Post-fix full scan 41824441006](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41824441006)
+passed **all sixteen shards and merger with zero failed premises**.
+Measured immediate continuation checks per strong-turn group:
+518,002 authenticated / 101,718 unchecked; per weak-turn group:
+534,918 authenticated / 342,122 unchecked. No missing follow-source
+moves found. These are all IMMEDIATE move layers only, not a
+global mate tree. Read full records in docs/S047_EXHAUSTIVE_ROOT_SHARDS.md.
+If new PR-head checks supersede these runs, verify the latest
+HEAD results and corresponding artifact before closing.
+
 ## Required S048 execution
 
 1. Check S047 PR-head AND merged-main Node, frozen source-lock,
