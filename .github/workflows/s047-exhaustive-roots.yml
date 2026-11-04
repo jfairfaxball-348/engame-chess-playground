@@ -91,6 +91,9 @@ jobs:
                 g.directWeakQueenCaptures,followingMissing:
                 g.followingSourceMissing,followingPremises:
                 g.followingPremises,selectedFrames:g.selectedFrames}));
+          console.log('First exact source/premise witnesses: '+JSON.stringify(r.firstIssues));
+          for(const [name,g] of Object.entries(r.groups))
+            console.log('Root source family '+name+': '+JSON.stringify(g.selectedRules));
           console.log('Finite root universe complete. All-plies source mate termination remains OPEN.');
           EOF
       - uses: actions/upload-artifact@v4
