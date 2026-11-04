@@ -37,7 +37,7 @@ const classify=t=>t.closedAllReplies?'mateClosed':
   t.unsupported?'sourceGap':t.captured?'capture':
   t.nonmateTerminal?'nonmate':
   t.structuralRepeats?'potentialCycle':'resourceCap';
-function check(state,strong,choice,token=null){
+export function authenticateS042SelectedAction(state,strong,choice,token=null){
   if(!choice?.move)return {status:'missing'};
   const p=choice.sourcePhase;
   if(S040_RULES.includes(p)){
@@ -179,7 +179,7 @@ export function auditS042FreshFamilies({
     seen.add(key);
     f.roots++;
     const choice=kqkSourceChoice(root,strong,null);
-    const selected=check(root,strong,choice);
+    const selected=authenticateS042SelectedAction(root,strong,choice);
     const witness={root:key,originalCase,originalFrame:frame,
       strong,seed,inputToken:null,
       firstSource:choice?.sourcePhase??null,
@@ -220,7 +220,7 @@ export function auditS042FreshFamilies({
             }else{
               const next=kqkSourceChoice(state,strong,
                 choice.continuationPhase??null);
-              const a=check(state,strong,next,choice.continuationPhase??null);
+              const a=authenticateS042SelectedAction(state,strong,next,choice.continuationPhase??null);
               row.nextSource=next?.sourcePhase??null;
               row.nextFrame=next?.frame??null;
               row.nextMove=id(next?.move);
@@ -256,7 +256,7 @@ export function auditS042FreshFamilies({
                           secondReply:id(weak2),moveHistory:state2.log,
                           thirdToken:next.continuationPhase??null});
                       }else{
-                        const a3=check(state2,strong,third,
+                        const a3=authenticateS042SelectedAction(state2,strong,third,
                           next.continuationPhase??null);
                         if(a3.status==='authenticated')f.thirdAuthenticated++;
                         else if(a3.status==='unchecked'){
