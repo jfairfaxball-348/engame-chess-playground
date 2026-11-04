@@ -136,9 +136,14 @@ export function authenticateS045Action(state,strong,choice,token=null){
     // The frozen proof calls a swap/reflectX framed wall theorem:
     // after Q-right, king.file < queen.file < weak.file, the queen
     // stands above the weak king, and transformed OpenBand holds.
+    // Frozen TightEntry.lean protected_file_entry lines 114-129:
+    // sk.file <= 4 uses wall_weak_ninety_two. The complementary sk.file=5
+    // (hence weak.file=7) uses edge_wall_weak_open_bound and moves the
+    // protected queen to framed FILE SIX, not file five.
+    const ordinaryWall=kx<=4&&to[0]<=5;
+    const edgeWall=kx===5&&wx===7&&to[0]===6;
     if(!(kx<to[0]&&to[0]<wx&&wy<qy&&
-       (to[0]<=4||(to[0]===5&&qy>=2))&&
-       dist(g.k,to)<=1))
+       (ordinaryWall||edgeWall)&&dist(g.k,to)<=1))
       return failed('forward wall/safe-queen framed source postcondition fails');
   }else if(phase===S045_BACK){
     // The final case after not-file-wall, not-offrank, not-adjacent.
