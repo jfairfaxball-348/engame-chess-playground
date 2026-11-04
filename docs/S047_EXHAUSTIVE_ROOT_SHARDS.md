@@ -89,3 +89,45 @@ separate Engine tab, FIDE history semantics, or upstream Lean sources.
 
 **Stage A remains OPEN**; Stage B full KRK/KQK explanation and rule/clock
 parity follows actual Stage A closure. See NEXT_SESSION.md for S048.
+
+## Measured initial PR-head exhaustive result (4 November 2026)
+
+[Full 16-shard + merger GitHub Actions run 41823395559](https://github.com/jfairfaxball-348/engame-chess-playground/actions/runs/41823395559)
+**passed** all 16 independent shards and the merger. It enumerated the
+entire finite starting-board universe. It did **not** prove eventual
+mate under all future weak replies.
+
+| Group | Raw triples | Legal roots | Initially ongoing | Terminal mate | Terminal stalemate |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| White strong / White to move | 262,144 | 144,508 | 144,508 | 0 | 0 |
+| White strong / Black to move | 262,144 | 223,944 | 222,708 | 364 | 872 |
+| Black strong / Black to move | 262,144 | 144,508 | 144,508 | 0 | 0 |
+| Black strong / White to move | 262,144 | 223,944 | 222,708 | 364 | 872 |
+| **Total** | **1,048,576** | **736,904** | **734,432** | **728** | **1,744** |
+
+Each strong-to-move group had **144,508/144,508** source-issued first
+actions available, no missing/illegal first source moves, **86,164**
+independently authenticated first actions, and **58,344** named first
+actions with a missing complete independent premise check. Both
+strong colours behaved symmetrically.
+
+There were **22,176 actual immediate weak queen-capture moves to KK**
+per weak-to-move colour group, **44,352** in total. These are counts
+of legal capture moves, not necessarily distinct drawn root orbits.
+
+Across continuations after genuine moves, the independent checker
+reported **40 failed-premise instances per strong-to-move colour
+group** (**80 total**). These must be reproduced with exact
+board/frame/history/source token before declaring a bug in the source
+or checker. Many other continuation checks remain unchecked:
+per strong-to-move group 517,962 authenticated / 101,718 unchecked;
+per weak-to-move group 534,918 authenticated / 342,122 unchecked.
+No missing follow-source choices were reported. Local checker gaps
+and failures cannot be promoted into a mate certificate.
+
+The Action artifact `s047-complete-finite-root-census` holds exact
+aggregated counts and first issue witnesses; the expanded S047
+workflow also prints first witnesses and source-family distributions.
+The original full pass is evidence of complete *root enumeration*
+only. The ordinary `Playground checks` CI and the independent
+Cloudflare Worker build/deployment must be evaluated separately.
