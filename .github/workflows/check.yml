@@ -195,7 +195,7 @@ jobs:
       # This is NOT a global KQK winning selector / infinite-depth proof.
       - name: S046 colour/turn root census with actual weak captures
         run: |
-          npm run audit:s046-roots > /tmp/s046-root-census.json
+          node scripts/s046-root-census.mjs --per-group=64 --strict > /tmp/s046-root-census.json
           node --input-type=module <<'EOF'
           import {readFileSync} from 'node:fs';
           const r=JSON.parse(readFileSync('/tmp/s046-root-census.json','utf8'));
