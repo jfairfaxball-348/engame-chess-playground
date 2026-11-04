@@ -188,6 +188,43 @@ jobs:
           name: s045-expanded-source-audit
           path: /tmp/s045-expanded.json
           retention-days: 14
+      # S046: independent root-census strata cover BOTH sides to move,
+      # BOTH material colours, all D4 frame classifications and every
+      # legal immediate defender reply. A legal weak root may directly
+      # capture an unprotected queen, yielding the already proved KK draw.
+      # This is NOT a global KQK winning selector / infinite-depth proof.
+      - name: S046 colour/turn root census with actual weak captures
+        run: |
+          npm run audit:s046-roots > /tmp/s046-root-census.json
+          node --input-type=module <<'EOF'
+          import {readFileSync} from 'node:fs';
+          const r=JSON.parse(readFileSync('/tmp/s046-root-census.json','utf8'));
+          const groups=Object.entries(r.groups);
+          if(groups.length!==4)throw Error('missing KQK colour/turn case');
+          for(const [key,g] of groups){
+            if(g.legalRoots!==64||g.illegalSourceMove||
+               g.followingIllegalSourceMove)
+              throw Error('S046 legal/root selector drift: '+key);
+            console.log(JSON.stringify({key,legalRoots:g.legalRoots,
+              terminal:g.terminal,firstSources:g.sourceSelected,
+              firstMissing:g.missingFirstSource,
+              directWeakQueenCaptures:g.directWeakQueenCaptures,
+              firstReplyCaptures:g.afterFirstStrongCaptures,
+              followingSourceMissing:g.followingSourceMissing,
+              premiseChecks:g.localPremises,
+              followingChecks:g.followingPremises,
+              chosenFrames:g.selectedFrames},null,2));
+          }
+          if(r.allRootBoardsEnumerated!==false||
+             r.allDefenderTerminationCertified!==false||
+             r.universalKQKMatingCertified!==false)
+            throw Error('S046 incomplete root scan incorrectly certified');
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s046-colour-turn-root-census
+          path: /tmp/s046-root-census.json
+          retention-days: 14
       # Diagnostic only: bounded KQK legal roots, all immediate replies and complete fixed lines.
       - run: npm run audit:kqk-roots
       # S021: stratified all-defender continuation falsification. Bounded
