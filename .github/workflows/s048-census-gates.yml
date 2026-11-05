@@ -1,0 +1,67 @@
+name: S048 verify KQK census artifact and theorem boundaries
+on:
+  pull_request:
+    paths:
+      - .github/workflows/s048-census-gates.yml
+      - scripts/s048-census-gate-report.mjs
+      - test/s048-census-gate-report.test.js
+      - docs/S048_FINITE_COUNTS_AND_TERMINATION.md
+      - NEXT_SESSION.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  measured-census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify S048 report rejects truncated and inflated evidence
+        run: node --test test/s048-census-gate-report.test.js
+      - name: Retrieve S047 PR-head complete 16-shard merged artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: s047-complete-finite-root-census
+          run-id: 41825109758
+          github-token: ${{ github.token }}
+      - name: Build source-locked S048 evidence/obligation ledger
+        run: |
+          node scripts/s048-census-gate-report.mjs s047-full-root-census.json > s048-finite-gate-report.json
+          node --input-type=module <<'EOF'
+          import {readFileSync} from 'node:fs';
+          import assert from 'node:assert/strict';
+          const x=JSON.parse(readFileSync('s048-finite-gate-report.json','utf8'));
+          const t=x.totals;
+          assert.equal(t.candidateAssignments,1048576);
+          assert.equal(t.legalRoots,736904);
+          assert.equal(t.ongoing,734432);
+          assert.equal(t.terminal.mate,728);
+          assert.equal(t.terminal.stalemate,1744);
+          assert.equal(t.firstSourceSelected,289016);
+          assert.deepEqual(t.firstPremises,{
+            authenticated:172328,unchecked:116688,
+            'failed-premise':0,missing:0
+          });
+          assert.equal(t.directWeakQueenCaptureMoves,44352);
+          assert.deepEqual(t.continuationPremises,{
+            authenticated:2105840,unchecked:887680,
+            'failed-premise':0,missing:0
+          });
+          for(const x of Object.values(x.gaps))assert.equal(x,0);
+          assert.equal(x.certification.globalMateTermination,false);
+          assert.equal(x.certification.fideRuleClockParity,false);
+          assert.equal(x.certification.verifiedWorkerDeployment,false);
+          console.log(JSON.stringify({groups:x.groups,totals:t,
+            certification:x.certification},null,2));
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s048-verified-finite-census-and-open-termination
+          path: s048-finite-gate-report.json
+          retention-days: 30
