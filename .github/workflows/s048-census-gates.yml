@@ -53,7 +53,7 @@ jobs:
             authenticated:2105840,unchecked:887680,
             'failed-premise':0,missing:0
           });
-          for(const x of Object.values(x.gaps))assert.equal(x,0);
+          for(const value of Object.values(x.gaps))assert.equal(value,0);
           assert.equal(x.certification.globalMateTermination,false);
           assert.equal(x.certification.fideRuleClockParity,false);
           assert.equal(x.certification.verifiedWorkerDeployment,false);
